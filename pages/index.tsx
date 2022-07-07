@@ -7,7 +7,6 @@ import Loading from "../comps/Loading";
 import Login from "../comps/Login";
 import { auth } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import ChatDrawer from "../comps/ChatDrawer";
 
 const Home: NextPage = () => {
   const [user, loading] = useAuthState(auth);
@@ -16,7 +15,7 @@ const Home: NextPage = () => {
     return <Loading />;
   }
 
-  if (user) {
+  if (!user) {
     return <Login />;
   }
 
