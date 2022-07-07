@@ -1,16 +1,7 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+/* App.css */
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+/* to load animation for a specific spinner */
+@import "~spinners-react/lib/SpinnerCircular.css";
 
-* {
-  box-sizing: border-box;
-}
+/* to load animations for all spinners at once */
+@import "~spinners-react/lib/index.css";

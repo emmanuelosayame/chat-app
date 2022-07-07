@@ -33,6 +33,7 @@ const ChatModal = () => {
         ref={btnRef}
         onClick={onOpen}
         size="sm"
+        variant='link'
       >
         Start Chat
       </Button>
