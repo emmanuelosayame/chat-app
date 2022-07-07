@@ -3,7 +3,7 @@ import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
 
 const SmChats = () => {
     return (
-      <Box pos="relative" w="100%" borderRight="2px">
+      <Box pos="relative" w="100%" h='full' >
         <Flex bgColor="gray.300" py="1">
           <DeleteIcon mx="3" my="1" />
           <p>Archived</p>
@@ -23,7 +23,7 @@ const SmChats = () => {
             my="2"
           />
         </Flex>
-        <Flex h="400" justify="center" align="center">
+        <Flex h="full" justify="center" align="center">
           <Text>start a new chat</Text>
         </Flex>
       </Box>
