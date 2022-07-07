@@ -17,7 +17,8 @@
     "framer-motion": "^6",
     "next": "12.2.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-firebase-hooks": "^5.0.3"
   },
   "devDependencies": {
     "@swc/helpers": "^0.4.3",

@@ -1,11 +1,25 @@
-// import { DeleteIcon, PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
+
 import Header from "../comps/Header";
 import SmChats from "../comps/SmChats";
-// import Image from 'next/image'
+import Loading from "../comps/Loading";
+import Login from "../comps/Login";
+import { auth } from "../firebase/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import ChatDrawer from "../comps/ChatDrawer";
 
 const Home: NextPage = () => {
+  const [user, loading] = useAuthState(auth);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (user) {
+    return <Login />;
+  }
+
   return (
     <Flex h="100vh" w="100%" bgColor="gray.200" pos="fixed">
       <Box w={["full", "full", "40%", "30%"]} position="relative">
@@ -13,14 +27,11 @@ const Home: NextPage = () => {
           sx={{
             "&::-webkit-scrollbar": {
               width: "4px",
+              backgroundColor: "blue.500",
             },
             "&::-webkit-scrollbar-thumb": {
               borderRadius: "18px",
-              backgroundColor: "teal",
-              border: '3px solid red'
-            },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "blue",
+              backgroundColor: "teal.400",
             },
           }}
           w="full"
@@ -29,6 +40,7 @@ const Home: NextPage = () => {
           borderRight={["none", "none", "2px"]}
         >
           <Header />
+
           <SmChats />
         </Box>
       </Box>

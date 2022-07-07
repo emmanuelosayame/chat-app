@@ -1,5 +1,5 @@
 import { DeleteIcon, PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
 
 const SmChats = () => {
     return (
@@ -24,7 +24,9 @@ const SmChats = () => {
           />
         </Flex>
         <Flex h="full" justify="center" align="center">
-          <Text>start a new chat</Text>
+          <Button variant='link' >
+            Start a new chat
+          </Button>
         </Flex>
       </Box>
     );
