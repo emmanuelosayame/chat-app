@@ -2,12 +2,15 @@ import {
   Avatar,
   Box,
   Flex,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
   Text,
 } from "@chakra-ui/react";
-import { PhoneIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
+import ChatModal from "./ChatModal";
+import { PencilAltIcon } from "@heroicons/react/solid";
 
 const Header = () => {
   return (
@@ -15,7 +18,7 @@ const Header = () => {
       {/* <Avatar position="absolute" top="2" left="2" size="sm" zIndex={1000} /> */}
 
       <Flex
-      justify='space-between'
+        justify="space-between"
         h="8"
         position="absolute"
         w="full"
@@ -23,18 +26,16 @@ const Header = () => {
         top={0}
         bgColor="gray.200"
         zIndex={1000}
-        px='2'
+        px="2"
       >
-        <Text fontWeight={600}>
-          Edit
-        </Text>
+        <Text fontWeight={600}>Edit</Text>
 
         <Text fontWeight={800} textAlign="center">
           ChatApp
         </Text>
 
         <Flex>
-          <PhoneIcon />
+          <ChatModal icon={<PencilAltIcon width={22} />} />
         </Flex>
       </Flex>
 

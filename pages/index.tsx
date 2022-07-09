@@ -1,15 +1,47 @@
 import type { NextPage } from "next";
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Flex, Text, useDisclosure } from "@chakra-ui/react";
 
 import Header from "../comps/Header";
 import SmChats from "../comps/SmChats";
 import Loading from "../comps/Loading";
 import Login from "../comps/Login";
-import { auth } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useEffect } from "react";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+// import {people} from '@googleapis/people'
 
 const Home: NextPage = () => {
+  // const modalState = useDisclosure()
+  // const { user, loading } = useGlobals();
+
+  // const getContact = ()=>{
+  //     const contact = people({
+  //       version: "v1",
+  //       auth: "AIzaSyBU_Ee-_PCNHsUlyV80GNoXCz0g1pT1Lrg",
+  //     });
+  // }
   const [user, loading] = useAuthState(auth);
+
+  useEffect(() => {
+    if (user) {
+      UpdateUserData();
+    }
+  }, [user]);
+
+  // remember to wrap async code in useeffect
+  const UpdateUserData = async () => {
+    await setDoc(
+      doc(db, "Users", `${user?.uid}`),
+      {
+        // username: user?.displayName,
+        emailName: [user?.email, user?.displayName],
+        photoURL: user?.photoURL,
+        lastseen: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
 
   if (loading) {
     return <Loading />;

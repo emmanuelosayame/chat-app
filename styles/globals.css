@@ -1,7 +1,3 @@
-/* App.css */
-
-/* to load animation for a specific spinner */
 @import "~spinners-react/lib/SpinnerCircular.css";
 
-/* to load animations for all spinners at once */
 @import "~spinners-react/lib/index.css";
