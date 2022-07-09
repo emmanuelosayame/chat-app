@@ -17,6 +17,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Text,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
@@ -28,47 +29,41 @@ import {
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-// import { PencilAltIcon } from "@heroicons/react/solid";
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "../firebase/firebase";
+import { useGlobal } from "../context/GlobalContext";
+import { } from "react-firebase-hooks/firestore";
 
-const ChatModal = ({ text, icon }: any) => {
+const NewChatComp = ({ text, icon }: any) => {
+  const { userData } = useGlobal();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
-  const user = auth.currentUser;
   const router = useRouter();
-  const [userData, setUserData] = useState<any>({});
 
-  useEffect(() => {
-    (async () => {
-      const data = await getDoc(doc(db, "Users", `${user?.uid}`));
-      setUserData(data.data());
-    })();
-  }, []);
+  const [newChatInput, setnewChatInput] = useState<string>("");
 
-  const startChat = async (e) => {
-    e.preventDefault()
-    const newChatInput = inputRef.current?.value;
-    // if (newChatInput === userData?.username) return;
- 
-    const queryUser = query(
+  const startChat = async () => {
+    
+    if (
+      newChatInput === userData?.emailName[0] ||
+      newChatInput === userData?.emailName[1]
+    )
+      return;
+
+    const recExist = await getDocs(query(
       collection(db, "Users"),
-      where("emailName", "array-contains-any", [
-        `${newChatInput}`,
-        `${newChatInput}`,
-      ])
-    );
-    const userExists = await getDocs(queryUser);
+      where("emailName", "array-contains", `${newChatInput}`)
+    ));
 
-    // if (userNameExist) {
-      const recUID = userExists.docs.map(
-        (doc) => doc.id
-      );
+    if (!recExist.empty) {
+      const recUID = recExist.docs.map((doc) => doc.id);
       console.log(recUID);
 
       // router.push(`/${recUID}`);
-    // }
+    }
     console.log("user null");
+    // errRec(`invite ${newChatInput}`);
+
     return;
   };
 
@@ -103,9 +98,7 @@ const ChatModal = ({ text, icon }: any) => {
 
           <InputGroup px="3">
             <InputLeftElement children={<SearchIcon mb="1" ml="8" />} />
-            <form onSubmit={startChat} >
               <Input
-                onSubmit={startChat}
                 ref={inputRef}
                 size="sm"
                 variant="filled"
@@ -114,8 +107,8 @@ const ChatModal = ({ text, icon }: any) => {
                 placeholder="Search"
                 bgColor="whitesmoke"
                 _placeholder={{ color: "gray.300" }}
+                onChange={(e) => setnewChatInput(e.target.value)}
               />
-            </form>
           </InputGroup>
 
           <ModalBody>
@@ -125,7 +118,7 @@ const ChatModal = ({ text, icon }: any) => {
                 New Group
               </Flex>
               <Divider ml="10" w="90%" />
-              <Flex p="1">
+              <Flex p="1" onClick={startChat} cursor='pointer' >
                 <Avatar size="sm" mr="5" />
                 Private Chat
               </Flex>
@@ -141,4 +134,4 @@ const ChatModal = ({ text, icon }: any) => {
   );
 };
 
-export default ChatModal;
+export default NewChatComp;

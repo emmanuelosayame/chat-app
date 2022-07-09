@@ -9,8 +9,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
-import ChatModal from "./ChatModal";
 import { PencilAltIcon } from "@heroicons/react/solid";
+import NewChatComp from "./NewChat";
 
 const Header = () => {
   return (
@@ -35,7 +35,7 @@ const Header = () => {
         </Text>
 
         <Flex>
-          <ChatModal icon={<PencilAltIcon width={22} />} />
+          <NewChatComp icon={<PencilAltIcon width={22} />} />
         </Flex>
       </Flex>
 
@@ -49,6 +49,9 @@ const Header = () => {
           placeholder="Search"
           bgColor="whitesmoke"
           _placeholder={{ color: "gray.300" }}
+          focusBorderColor="gray.200"
+          _hover={{ bgColor: "white" }}
+          _focus={{ bgColor: "white" }}
         />
       </InputGroup>
     </Flex>

@@ -1,48 +1,64 @@
 import type { AppProps } from "next/app";
-import { ChakraProvider, useDisclosure } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import "../styles/globals.css";
-import { auth } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { createContext, useContext } from "react";
-import { User } from "firebase/auth";
-
-// export type appContextType = {
-//   user: User | null | undefined;
-//   loading: boolean;
-//   logout: () => void;
-//   // modalState: any;
-// };
-
-// const appContextDefaultValues = {
-//   user: null,
-//   loading: false,
-//   logout: () => {},
-//   // modalState:{},
-// };
-// const AppContext = createContext<appContextType>(appContextDefaultValues);
+import { useEffect, useState } from "react";
+import {
+  doc,
+  DocumentData,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import Loading from "../comps/Loading";
+import Login from "../comps/Login";
+import { GlobalContext } from "../context/GlobalContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
-//   const [user, loading] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
+  const [userData, setUserData] = useState<DocumentData | undefined>([]);
 
-//   const logout = async () => {
-//     auth.signOut();
-//   };
+  useEffect(() => {
+    if (user) {
+      UpdateUserData();
+    }
+  }, []);
 
-//   const modalState = useDisclosure();
+  // remember to wrap async code in useeffect
+  const UpdateUserData = async () => {
+    await setDoc(
+      doc(db, "Users", `${user?.uid}`),
+      {
+        // username: user?.displayName,
+        emailName: [user?.email, user?.displayName],
+        photoURL: user?.photoURL,
+        lastseen: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
 
-//   const values = {
-//     user,
-//     loading,
-//     logout,
-//     // modalState,
-//   };
+  useEffect(() => {
+    (async () => {
+      const data = await getDoc(doc(db, "Users", `${user?.uid}`));
+      setUserData(data.data());
+    })();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+  const values = {
+    userData: userData,
+  };
 
   return (
-    // <AppContext.Provider value={values}>
+    <GlobalContext.Provider value={values}>
       <ChakraProvider>
-        <Component {...pageProps} />
+        {user ? <Component {...pageProps} /> : <Login />}
       </ChakraProvider>
-    // </AppContext.Provider>
+    </GlobalContext.Provider>
   );
 }
 
