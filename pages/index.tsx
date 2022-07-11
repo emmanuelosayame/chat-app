@@ -1,9 +1,10 @@
 import type { NextPage } from "next";
-import { Box, Flex, IconButton, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, IconButton, Text} from "@chakra-ui/react";
 import Header from "../comps/Header";
 import NewChatComp from "../comps/NewChat";
 import { PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
 import { ArchiveIcon } from "@heroicons/react/solid";
+import SmChats from "../comps/SmChats";
 
 const Home: NextPage = () => {
   return (
@@ -26,34 +27,7 @@ const Home: NextPage = () => {
           borderRight={["none", "none", "2px"]}
         >
           <Header />
-          <Box pos="relative" w="100%" h="full">
-            <Flex bgColor="gray.300" py="1">
-              <ArchiveIcon width={23} />
-              <Text ml="3">Archived</Text>
-            </Flex>
-            <Flex flexDirection="column" pos="absolute" right={2} bottom={5}>
-              <IconButton
-                aria-label="a"
-                size="sm"
-                rounded="full"
-                icon={<PhoneIcon />}
-              />
-              <IconButton
-                aria-label="b"
-                size="sm"
-                rounded="full"
-                icon={<SettingsIcon />}
-                my="2"
-              />
-            </Flex>
-            <Flex>hii</Flex>
-            <Flex h="full" justify="center" align="center">
-              <NewChatComp text="Start Chat" />
-              {/* <Button aria-label="modal-button" mt={1} size="sm" variant="link" >
-          Start Chat
-        </Button> */}
-            </Flex>
-          </Box>
+          <SmChats/>
         </Box>
       </Box>
       {/* next */}

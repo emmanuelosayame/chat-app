@@ -18,51 +18,69 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Toast,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
+  addDoc,
   collection,
   doc,
+  DocumentData,
   getDoc,
   getDocs,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { auth, db } from "../firebase/firebase";
 import { useGlobal } from "../context/GlobalContext";
-import { } from "react-firebase-hooks/firestore";
+// import {} from "react-firebase-hooks/firestore";
 
 const NewChatComp = ({ text, icon }: any) => {
-  const { userData } = useGlobal();
+  const user = auth.currentUser;
+  const { userData, userDataError, chats } = useGlobal();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-
   const [newChatInput, setnewChatInput] = useState<string>("");
 
+  const chatExist = (recId: string[]) => {
+    return !!chats?.docs.find(
+      (doc: DocumentData | undefined) =>
+        doc?.data().USID.filter((arr: string[] | undefined) => arr == recId)
+          ?.length > 0
+    );
+  };
+
   const startChat = async () => {
-    
-    if (
-      newChatInput === userData?.emailName[0] ||
-      newChatInput === userData?.emailName[1]
-    )
+    if (!!userDataError || newChatInput === userData?.userName) return;
+
+    const recExist = await getDocs(
+      query(
+        collection(db, "Users"),
+        where("Uid", "array-contains", `${newChatInput}`)
+      )
+    );
+    const recId = recExist.docs.map((doc) => doc.id);
+    const {} = recExist.docs.map((doc) => doc.data());
+    const oneData = recExist.docs.map((doc) => doc.data());
+
+    console.log(oneData)
+
+    if (!recExist.empty && !chatExist(recId)) {
+      await addDoc(collection(db, "chatGroup"), {
+        USID: [`${user?.uid}`, `${recId}`],
+        USData: {
+          // zero: zeroData,
+          one: oneData,
+        },
+      });
       return;
 
-    const recExist = await getDocs(query(
-      collection(db, "Users"),
-      where("emailName", "array-contains", `${newChatInput}`)
-    ));
-
-    if (!recExist.empty) {
-      const recUID = recExist.docs.map((doc) => doc.id);
-      console.log(recUID);
-
-      // router.push(`/${recUID}`);
+      // router.push(`/${user}`)
     }
-    console.log("user null");
-    // errRec(`invite ${newChatInput}`);
 
     return;
   };
@@ -98,17 +116,17 @@ const NewChatComp = ({ text, icon }: any) => {
 
           <InputGroup px="3">
             <InputLeftElement children={<SearchIcon mb="1" ml="8" />} />
-              <Input
-                ref={inputRef}
-                size="sm"
-                variant="filled"
-                type="text"
-                borderRadius="12"
-                placeholder="Search"
-                bgColor="whitesmoke"
-                _placeholder={{ color: "gray.300" }}
-                onChange={(e) => setnewChatInput(e.target.value)}
-              />
+            <Input
+              ref={inputRef}
+              size="sm"
+              variant="filled"
+              type="text"
+              borderRadius="12"
+              placeholder="Search"
+              bgColor="whitesmoke"
+              _placeholder={{ color: "gray.300" }}
+              onChange={(e) => setnewChatInput(e.target.value)}
+            />
           </InputGroup>
 
           <ModalBody>
@@ -118,7 +136,7 @@ const NewChatComp = ({ text, icon }: any) => {
                 New Group
               </Flex>
               <Divider ml="10" w="90%" />
-              <Flex p="1" onClick={startChat} cursor='pointer' >
+              <Flex p="1" onClick={startChat} cursor="pointer">
                 <Avatar size="sm" mr="5" />
                 Private Chat
               </Flex>
