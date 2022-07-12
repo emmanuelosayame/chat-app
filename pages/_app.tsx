@@ -8,7 +8,6 @@ import {
   collection,
   doc,
   DocumentData,
-  FirestoreError,
   getDoc,
   query,
   serverTimestamp,
@@ -18,12 +17,8 @@ import {
 import Loading from "../comps/Loading";
 import Login from "../comps/Login";
 import { GlobalContext } from "../context/GlobalContext";
-import {
-  useCollection,
-  useCollectionOnce,
-  useDocument,
-  useDocumentOnce,
-} from "react-firebase-hooks/firestore";
+import { useCollection, useDocument } from "react-firebase-hooks/firestore";
+import { promises } from "stream";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
@@ -35,29 +30,57 @@ function MyApp({ Component, pageProps }: AppProps) {
     where("USID", "array-contains", `${user?.uid}`)
   );
   const [chats] = useCollection(chatQuery);
-  // console.log(chats)
+
+  const [recData, setRecData] = useState<any>();
+
+  const getRecData = async () => {
+    if (!chats) return;
+    const chatsUsersData = chats?.docs.map(
+      async (rec: DocumentData | undefined) =>
+        await getDoc(
+          doc(
+            db,
+            "Users",
+            `${rec
+              ?.data()
+              .USID.filter(
+                (arr: string | null | undefined) => arr !== user?.uid
+              )}`
+          )
+        )
+    );
+    const recsData = await Promise.all<any>(chatsUsersData);
+    setRecData(recsData);
+  };
+
+  console.log(recData);
+
+  // auth.signOut()
+  useEffect(() => {
+    if (user) {
+      getRecData();
+    }
+  }, [chats]);
 
   useEffect(() => {
     if (user) {
       UpdateUserData();
     }
   }, [user]);
-//  auth.signOut()
   // remember to wrap async code in useeffect
   const UpdateUserData = async () => {
-     setDoc(
-       doc(db, "Users", `${user?.uid}`),
-       {
-         Uid: [`${user?.displayName}`, `${user?.email}`],
-         userName: `${user?.email}`,
-         name: `${user?.displayName}`,
-         photoURL: user?.photoURL,
-         lastseen: serverTimestamp(),
-       },
-       { merge: true }
-     );
+    setDoc(
+      doc(db, "Users", `${user?.uid}`),
+      {
+        Uid: [`${user?.displayName}`, `${user?.email}`],
+        userName: `${user?.email}`,
+        name: `${user?.displayName}`,
+        photoURL: user?.photoURL,
+        lastseen: serverTimestamp(),
+      },
+      { merge: true }
+    );
   };
-
 
   if (loading) {
     return <Loading />;
@@ -66,6 +89,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     userData: userData,
     userDataError: dataError,
     chats: chats,
+    recData: recData,
   };
 
   return (

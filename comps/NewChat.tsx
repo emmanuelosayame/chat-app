@@ -63,19 +63,12 @@ const NewChatComp = ({ text, icon }: any) => {
         where("Uid", "array-contains", `${newChatInput}`)
       )
     );
+    
     const recId = recExist.docs.map((doc) => doc.id);
-    const {} = recExist.docs.map((doc) => doc.data());
-    const oneData = recExist.docs.map((doc) => doc.data());
-
-    console.log(oneData)
 
     if (!recExist.empty && !chatExist(recId)) {
       await addDoc(collection(db, "chatGroup"), {
         USID: [`${user?.uid}`, `${recId}`],
-        USData: {
-          // zero: zeroData,
-          one: oneData,
-        },
       });
       return;
 

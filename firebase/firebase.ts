@@ -1,6 +1,10 @@
 import { getApps, initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { connectFirestoreEmulator, enableIndexedDbPersistence, getFirestore } from "firebase/firestore";
+import {
+  connectFirestoreEmulator,
+  enableIndexedDbPersistence,
+  getFirestore,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBU_Ee-_PCNHsUlyV80GNoXCz0g1pT1Lrg",
@@ -12,9 +16,12 @@ const firebaseConfig = {
   measurementId: "G-505MS6V11B",
 };
 const apps = getApps();
+const app = null
 
 if (!apps.length) {
   const app = initializeApp(firebaseConfig);
+} else {
+  const app = apps[0];
 }
 
 // const db = getFirestore(app);

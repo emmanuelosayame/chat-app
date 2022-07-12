@@ -1,0 +1,11 @@
+ {!!chats?.empty ? (
+        <Flex h="full" justify="center" align="center">
+          <NewChatComp text="Start Chat" />
+        </Flex>
+      ) : (
+        <Box>
+          {chats?.docs.map((chat: DocumentData | undefined) => (
+            <Chat key={chat?.id} uid={chat?.id} data={chat?.data()} />
+          ))}
+        </Box>
+      )}

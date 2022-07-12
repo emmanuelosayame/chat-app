@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { Box, Flex, IconButton, Text} from "@chakra-ui/react";
+import { Box, Flex, IconButton, Text, useMediaQuery} from "@chakra-ui/react";
 import Header from "../comps/Header";
 import NewChatComp from "../comps/NewChat";
 import { PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
@@ -7,6 +7,7 @@ import { ArchiveIcon } from "@heroicons/react/solid";
 import SmChats from "../comps/SmChats";
 
 const Home: NextPage = () => {
+  // console.log("hii")
   return (
     <Flex h="100vh" w="100%" bgColor="gray.200" pos="fixed">
       <Box w={["full", "full", "40%", "30%"]} position="relative">
