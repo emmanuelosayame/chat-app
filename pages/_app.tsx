@@ -49,7 +49,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           )
         )
     );
-    const recsData = await Promise.all<any>(chatsUsersData);
+    const data = await Promise.all<any>(chatsUsersData);
+    const recsData = data.map((rec: DocumentData | undefined) => {
+      return { id: rec?.id, data: rec?.data() };
+    });
     setRecData(recsData);
   };
 
@@ -60,7 +63,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (user) {
       getRecData();
     }
-  }, [chats]);
+  }, [chats]); 
 
   useEffect(() => {
     if (user) {

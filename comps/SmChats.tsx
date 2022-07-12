@@ -10,9 +10,6 @@ import NewChatComp from "./NewChat";
 
 const SmChats = () => {
   const { recData } = useGlobal();
-  const recInfo = recData?.map((rec: DocumentData | undefined) => {
-    return { id: rec?.id, data: rec?.data() };
-  });
 
   return (
     <Box pos="relative" w="100%" h="full">
@@ -35,11 +32,17 @@ const SmChats = () => {
           my="2"
         />
       </Flex>
-      <Box>
-        {recInfo?.map((user: DocumentData | undefined) => (
-          <Chat key={user?.id} uid={user?.id} data={user?.data} />
-        ))}
-      </Box>
+      {!!recData?.empty ? (
+        <Flex h="full" justify="center" align="center">
+          <NewChatComp text="Start Chat" />
+        </Flex>
+      ) : (
+        <Box>
+          {recData?.map((user: DocumentData | undefined) => (
+            <Chat key={user?.id} uid={user?.id} data={user?.data} />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
