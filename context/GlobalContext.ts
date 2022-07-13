@@ -5,14 +5,14 @@ export type globalContextType = {
   userData: DocumentData | undefined;
   userDataError: FirestoreError | undefined;
   chats: DocumentData | undefined;
-  recData: DocumentData | undefined;
+  chatsData: DocumentData | undefined;
 };
 
 export const globalContextDefaultValues: globalContextType = {
   userData: undefined,
   userDataError: undefined,
   chats: undefined,
-  recData: [],
+  chatsData: [],
 };
 const GlobalContext = createContext<globalContextType>(
   globalContextDefaultValues

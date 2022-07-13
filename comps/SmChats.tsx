@@ -9,7 +9,7 @@ import Chat from "./Chat";
 import NewChatComp from "./NewChat";
 
 const SmChats = () => {
-  const { recData } = useGlobal();
+  const { chatsData } = useGlobal();
 
   return (
     <Box pos="relative" w="100%" h="full">
@@ -32,14 +32,14 @@ const SmChats = () => {
           my="2"
         />
       </Flex>
-      {!!recData?.empty ? (
+      {!!chatsData?.empty ? (
         <Flex h="full" justify="center" align="center">
           <NewChatComp text="Start Chat" />
         </Flex>
       ) : (
         <Box>
-          {recData?.map((user: DocumentData | undefined) => (
-            <Chat key={user?.id} uid={user?.id} data={user?.data} />
+          {chatsData?.map((chat: DocumentData | undefined) => (
+            <Chat key={chat?.id} uid={chat?.id} data={chat?.data} />
           ))}
         </Box>
       )}

@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
-import { ChakraProvider } from "@chakra-ui/react";
 import "../styles/globals.css";
+import { ChakraProvider, Flex } from "@chakra-ui/react";
 import { auth, db } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect, useState } from "react";
@@ -14,11 +14,11 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import Loading from "../comps/Loading";
 import Login from "../comps/Login";
 import { GlobalContext } from "../context/GlobalContext";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { promises } from "stream";
+import { SpinnerDotted } from "spinners-react";
+import App from "../comps/App"
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
@@ -31,39 +31,40 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
   const [chats] = useCollection(chatQuery);
 
-  const [recData, setRecData] = useState<any>();
+  const [chatsData, setChatsData] = useState<DocumentData>();
 
-  const getRecData = async () => {
+  const getChatsData = async () => {
     if (!chats) return;
     const chatsUsersData = chats?.docs.map(
-      async (rec: DocumentData | undefined) =>
-        await getDoc(
-          doc(
-            db,
-            "Users",
-            `${rec
-              ?.data()
-              .USID.filter(
-                (arr: string | null | undefined) => arr !== user?.uid
-              )}`
-          )
-        )
+      async (rec: DocumentData | undefined) => {
+        return {
+          data: (
+            await getDoc(
+              doc(
+                db,
+                "Users",
+                `${rec
+                  ?.data()
+                  .USID.filter(
+                    (arr: string | null | undefined) => arr !== user?.uid
+                  )}`
+              )
+            )
+          ).data(),
+          id: rec?.id,
+        };
+      }
     );
     const data = await Promise.all<any>(chatsUsersData);
-    const recsData = data.map((rec: DocumentData | undefined) => {
-      return { id: rec?.id, data: rec?.data() };
-    });
-    setRecData(recsData);
+    setChatsData(data);
   };
-
-  console.log(recData);
 
   // auth.signOut()
   useEffect(() => {
     if (user) {
-      getRecData();
+      getChatsData();
     }
-  }, [chats]); 
+  }, [chats]);
 
   useEffect(() => {
     if (user) {
@@ -92,20 +93,30 @@ function MyApp({ Component, pageProps }: AppProps) {
     userData: userData,
     userDataError: dataError,
     chats: chats,
-    recData: recData,
+    chatsData: chatsData,
   };
 
   return (
     <GlobalContext.Provider value={values}>
       <ChakraProvider>
-        {user ? <Component {...pageProps} /> : <Login />}
+        {user ? (
+          <App>
+            <Component {...pageProps} />{" "}
+          </App>
+        ) : (
+          <Login />
+        )}
       </ChakraProvider>
     </GlobalContext.Provider>
   );
 }
 
-// export const useGlobals = () => {
-//   return useContext(AppContext);
-// };
-
 export default MyApp;
+
+export const Loading = () => {
+  return (
+    <Flex h="100vh" w="full" align="center" justify="center">
+      <SpinnerDotted color="orange" />
+    </Flex>
+  );
+};

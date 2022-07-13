@@ -24,24 +24,22 @@ if (!apps.length) {
   const app = apps[0];
 }
 
-// const db = getFirestore(app);
-// const auth = getAuth(app);
+const db = getFirestore();
 const auth = getAuth();
 connectAuthEmulator(auth, "http://localhost:9099");
 
-const db = getFirestore();
 connectFirestoreEmulator(db, "localhost", 8080);
 
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code == "failed-precondition") {
-    // Multiple tabs open, persistence can only be enabled
-    // in one tab at a a time.
-    // ...
-  } else if (err.code == "unimplemented") {
-    // The current browser does not support all of the
-    // features required to enable persistence
-    // ...
-  }
-});
+// enableIndexedDbPersistence(db).catch((err) => {
+//   if (err.code == "failed-precondition") {
+//     // Multiple tabs open, persistence can only be enabled
+//     // in one tab at a a time.
+//     // ...
+//   } else if (err.code == "unimplemented") {
+//     // The current browser does not support all of the
+//     // features required to enable persistence
+//     // ...
+//   }
+// });
 
 export { auth, db };
