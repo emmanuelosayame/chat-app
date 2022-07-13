@@ -9,8 +9,8 @@ import Chat from "./Chat";
 import NewChatComp from "./NewChat";
 
 const SmChats = () => {
-  const { chatsData } = useGlobal();
-
+  const { chats } = useGlobal();
+  // auth.signOut()
   return (
     <Box pos="relative" w="100%" h="full">
       <Flex bgColor="gray.300" py="1">
@@ -32,14 +32,14 @@ const SmChats = () => {
           my="2"
         />
       </Flex>
-      {!!chatsData?.empty ? (
+      {!!chats?.empty ? (
         <Flex h="full" justify="center" align="center">
           <NewChatComp text="Start Chat" />
         </Flex>
       ) : (
         <Box>
-          {chatsData?.map((chat: DocumentData | undefined) => (
-            <Chat key={chat?.id} uid={chat?.id} data={chat?.data} />
+          {chats?.docs.map((chat: DocumentData | undefined) => (
+            <Chat key={chat?.id} uid={chat?.id} data={chat?.data()} />
           ))}
         </Box>
       )}

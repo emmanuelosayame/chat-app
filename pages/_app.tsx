@@ -31,40 +31,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
   const [chats] = useCollection(chatQuery);
 
-  const [chatsData, setChatsData] = useState<DocumentData>();
-
-  const getChatsData = async () => {
-    if (!chats) return;
-    const chatsUsersData = chats?.docs.map(
-      async (rec: DocumentData | undefined) => {
-        return {
-          data: (
-            await getDoc(
-              doc(
-                db,
-                "Users",
-                `${rec
-                  ?.data()
-                  .USID.filter(
-                    (arr: string | null | undefined) => arr !== user?.uid
-                  )}`
-              )
-            )
-          ).data(),
-          id: rec?.id,
-        };
-      }
-    );
-    const data = await Promise.all<any>(chatsUsersData);
-    setChatsData(data);
-  };
 
   // auth.signOut()
-  useEffect(() => {
-    if (user) {
-      getChatsData();
-    }
-  }, [chats]);
 
   useEffect(() => {
     if (user) {
@@ -93,7 +61,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     userData: userData,
     userDataError: dataError,
     chats: chats,
-    chatsData: chatsData,
   };
 
   return (
