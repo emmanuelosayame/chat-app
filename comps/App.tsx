@@ -20,19 +20,41 @@ import {
 } from "firebase/firestore";
 import Chat from "./Chat";
 import { useCollection, useDocument } from "swr-firestore-v9";
+import { useRouter } from "next/router";
 
 const View = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const user = auth.currentUser;
-  const userData = useDocument(`${!!user?.uid ? `Users/${user?.uid}` : null}`).data;
+  const userData = useDocument(
+    `${!!user?.uid ? `Users/${user?.uid}` : null}`
+  ).data;
   const chats = useCollection("chatGroup", {
     where: ["USID", "array-contains", `${user?.uid}`],
     listen: true,
     orderBy: ["timeStamp", "desc"],
   });
 
+  const datt = router.query;
+  if (!!datt.chat) {
+    console.log("chatpage");
+  }
+
+  const responsiveLayout = (chatPage: string, noChatPage: string) => {
+    if (!!router.query?.chat) return chatPage;
+    else return noChatPage;
+  };
+
   return (
     <Flex h="100vh" w="100%" bgColor="gray.200" pos="fixed">
-      <Box w={["full", "full", "45%", "35%", "30%"]} position="relative">
+      <Box
+        display={[
+          responsiveLayout("none", "block"),
+          responsiveLayout("none", "block"),
+          "block",
+        ]}
+        w={["full", "full", "45%", "35%", "30%"]}
+        position="relative"
+      >
         <Box
           sx={{
             "&::-webkit-scrollbar": {
@@ -79,7 +101,15 @@ const View = ({ children }: { children: ReactNode }) => {
         </Box>
       </Box>
       {/* next */}
-      <Box bgColor='gray.100' w="100%" display={["none", "none", "block"]}>
+      <Box
+        bgColor="gray.100"
+        w="100%"
+        display={[
+          responsiveLayout("block", "none"),
+          responsiveLayout("block", "none"),
+          "block",
+        ]}
+      >
         {children}
       </Box>
     </Flex>
