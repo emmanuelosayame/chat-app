@@ -11,17 +11,20 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.0.2",
     "@chakra-ui/react": "^2.2.1",
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
-    "@googleapis/people": "^2.0.1",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@heroicons/react": "^1.0.6",
+    "@react-query-firebase/auth": "1.0.0-dev.1",
+    "@react-query-firebase/firestore": "1.0.0-dev.6",
     "firebase": "^9.8.4",
-    "framer-motion": "^6",
+    "framer-motion": "^6.3.16",
     "next": "12.2.0",
+    "pnpm": "^7.5.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.0.3",
-    "spinners-react": "^1.0.7"
+    "spinners-react": "^1.0.7",
+    "swr-firestore-v9": "^1.0.5"
   },
   "devDependencies": {
     "@swc/helpers": "^0.4.3",

@@ -34,9 +34,7 @@ const Login: NextPage = () => {
       });
   };
 
-  // console.log(token)
-  // auth.signOut()
-
+// auth.signOut()
   return (
     <>
       <Flex alignItems="center" h="100vh" justify="center">

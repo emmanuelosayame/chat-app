@@ -1,13 +1,16 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { auth } from "../firebase/firebase";
 
 const Home: NextPage = () => {
-  // auth.signOut();
-
   return (
     <>
-      <Box>hii</Box>
+      <Flex></Flex>
+      <Flex w="full" align='center' h="full">
+        <Text fontSize={25} fontWeight={600} mx="auto">
+          such empty !!
+        </Text>
+      </Flex>
     </>
   );
 };

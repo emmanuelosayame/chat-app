@@ -11,8 +11,10 @@ import {
 import { SearchIcon } from "@chakra-ui/icons";
 import { PencilAltIcon } from "@heroicons/react/solid";
 import NewChatComp from "./NewChat";
+import { ReactNode } from "react";
 
-const Header = () => {
+const Header = ({children}:{children:ReactNode}) => {
+  
   return (
     <Flex w="full" h="auto" p={2}>
       {/* <Avatar position="absolute" top="2" left="2" size="sm" zIndex={1000} /> */}
@@ -24,7 +26,9 @@ const Header = () => {
         w="full"
         left={0}
         top={0}
-        bgColor="gray.200"
+        bgColor="whiteAlpha.500"
+        backdropFilter="auto"
+        backdropBlur="md"
         zIndex={1000}
         px="2"
       >
@@ -34,9 +38,7 @@ const Header = () => {
           ChatApp
         </Text>
 
-        <Flex>
-          <NewChatComp icon={<PencilAltIcon width={22} />} />
-        </Flex>
+        <Flex>{children}</Flex>
       </Flex>
 
       <InputGroup mt={10}>

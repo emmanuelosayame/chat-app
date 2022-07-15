@@ -24,51 +24,50 @@ import {
 import {
   addDoc,
   collection,
-  doc,
   DocumentData,
-  getDoc,
   getDocs,
   query,
-  setDoc,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { auth, db } from "../firebase/firebase";
-import { useGlobal } from "../context/GlobalContext";
-// import {} from "react-firebase-hooks/firestore";
 
-const NewChatComp = ({ text, icon }: any) => {
+const NewChatComp = ({ userData, chats, text, icon }: any) => {
+  const router = useRouter();
   const user = auth.currentUser;
-  const { userData, userDataError, chats } = useGlobal();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [newChatInput, setnewChatInput] = useState<string>("");
 
-  const chatExist = (recId: string[]) => {
-    return !!chats?.docs.find(
+  const chatExist = (recId: string[]) =>
+    !!chats?.data.find(
       (doc: DocumentData | undefined) =>
-        doc?.data().USID.filter((arr: string[] | undefined) => arr == recId)
+        doc?.USID.filter((userId: string[] | undefined) => userId == recId)
           ?.length > 0
     );
-  };
 
   const startChat = async () => {
-    if (!!userDataError || newChatInput === userData?.userName) return;
-
+    if (
+      !!chats.error ||
+      newChatInput.length === 0 ||
+      newChatInput === userData?.userName
+    )
+      return;
     const recExist = await getDocs(
       query(
         collection(db, "Users"),
         where("Uid", "array-contains", `${newChatInput}`)
       )
     );
-    
+
     const recId = recExist.docs.map((doc) => doc.id);
 
     if (!recExist.empty && !chatExist(recId)) {
       await addDoc(collection(db, "chatGroup"), {
         USID: [`${user?.uid}`, `${recId}`],
+        timeStamp: serverTimestamp(),
       });
       return;
 
@@ -101,14 +100,14 @@ const NewChatComp = ({ text, icon }: any) => {
         motionPreset="slideInBottom"
       >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent borderRadius={15} px="2">
           <ModalHeader textAlign="center" fontSize="13">
             Start Chat
           </ModalHeader>
-          <ModalCloseButton size="sm" />
+          <ModalCloseButton size="sm" color="blue.400" />
 
-          <InputGroup px="3">
-            <InputLeftElement children={<SearchIcon mb="1" ml="8" />} />
+          <InputGroup px="5">
+            <InputLeftElement children={<SearchIcon mb="1" ml="10" />} />
             <Input
               ref={inputRef}
               size="sm"

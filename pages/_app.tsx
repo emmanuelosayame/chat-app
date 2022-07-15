@@ -1,39 +1,21 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import { auth, db } from "../firebase/firebase";
+import { auth, db, feugo } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect, useState } from "react";
 import {
-  collection,
   doc,
-  DocumentData,
-  getDoc,
-  query,
   serverTimestamp,
   setDoc,
-  where,
 } from "firebase/firestore";
 import Login from "../comps/Login";
-import { GlobalContext } from "../context/GlobalContext";
-import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { SpinnerDotted } from "spinners-react";
-import App from "../comps/App"
+import App from "../comps/App";
+import { FuegoProvider } from "swr-firestore-v9";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
-  const dataQuery = doc(db, "Users", `${user?.uid}`);
-  const [data, dataLoading, dataError] = useDocument(dataQuery);
-  const userData = data?.data();
-  const chatQuery = query(
-    collection(db, "chatGroup"),
-    where("USID", "array-contains", `${user?.uid}`)
-  );
-  const [chats] = useCollection(chatQuery);
-
-
-  // auth.signOut()
-
   useEffect(() => {
     if (user) {
       UpdateUserData();
@@ -53,28 +35,22 @@ function MyApp({ Component, pageProps }: AppProps) {
       { merge: true }
     );
   };
-
   if (loading) {
     return <Loading />;
   }
-  const values = {
-    userData: userData,
-    userDataError: dataError,
-    chats: chats,
-  };
 
   return (
-    <GlobalContext.Provider value={values}>
+    <FuegoProvider fuego={feugo}>
       <ChakraProvider>
-        {user ? (
-          <App>
-            <Component {...pageProps} />{" "}
-          </App>
-        ) : (
+        {!user ? (
           <Login />
+        ) : (
+          <App>
+            <Component {...pageProps} />
+          </App>
         )}
       </ChakraProvider>
-    </GlobalContext.Provider>
+    </FuegoProvider>
   );
 }
 
