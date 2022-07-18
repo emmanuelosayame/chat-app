@@ -3,7 +3,7 @@ import { Box, Flex, IconButton, Text, useMediaQuery } from "@chakra-ui/react";
 import Header from "../comps/Header";
 import NewChatComp from "../comps/NewChat";
 import { PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
-import { ArchiveIcon, PencilAltIcon } from "@heroicons/react/solid";
+import { ArchiveIcon, PencilAltIcon } from "@heroicons/react/outline";
 import SmChats from "../comps/SmChats";
 import { ReactNode, useEffect } from "react";
 import { useAuthUser } from "@react-query-firebase/auth";
@@ -13,31 +13,32 @@ import {
   collection,
   doc,
   DocumentData,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
 import Chat from "./Chat";
-import { useCollection, useDocument } from "swr-firestore-v9";
 import { useRouter } from "next/router";
+import Settings from "./Settings";
+import {
+  useCollectionData,
+  useDocumentData,
+  useCollection,
+} from "react-firebase-hooks/firestore";
 
 const View = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const user = auth.currentUser;
-  const userData = useDocument(
-    `${!!user?.uid ? `Users/${user?.uid}` : null}`
-  ).data;
-  const chats = useCollection("chatGroup", {
-    where: ["USID", "array-contains", `${user?.uid}`],
-    listen: true,
-    orderBy: ["timeStamp", "desc"],
-  });
-
-  const datt = router.query;
-  if (!!datt.chat) {
-    console.log("chatpage");
-  }
+  const chatsQuery = query(
+    collection(db, "chatGroup"),
+    where("USID", "array-contains", `${user?.uid}`),
+    orderBy("timeStamp", "desc")
+  );
+  const userRef = doc(db, "Users", `${user?.uid}`);
+  const [chats] = useCollection(chatsQuery);
+  const [userData] = useDocumentData(userRef);
 
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
     if (!!router.query?.chat) return chatPage;
@@ -77,15 +78,16 @@ const View = ({ children }: { children: ReactNode }) => {
               chats={chats}
               icon={<PencilAltIcon width={22} />}
             />
+            <Settings userData={userData} />
           </Header>
           <SmChats>
-            {!(chats?.data?.length === 0) ? (
+            {!chats?.empty ? (
               <Box>
-                {chats?.data?.map((chat: DocumentData | undefined) => {
-                  const recId = chat?.USID.filter(
+                {chats?.docs.map((chat: DocumentData | undefined) => {
+                  const recId = chat?.data().USID.filter(
                     (id: DocumentData | undefined) => id !== user?.uid
                   );
-                  return <Chat key={chat?.id} uid={chat?.id} recId={recId} />;
+                  return <Chat key={chat?.id} chatId={chat?.id} recId={recId} />;
                 })}
               </Box>
             ) : (
@@ -102,8 +104,9 @@ const View = ({ children }: { children: ReactNode }) => {
       </Box>
       {/* next */}
       <Box
+        h="full"
         bgColor="gray.100"
-        w="100%"
+        w="full"
         display={[
           responsiveLayout("block", "none"),
           responsiveLayout("block", "none"),

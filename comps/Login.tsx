@@ -5,7 +5,6 @@ import { auth } from "../firebase/firebase";
 import { useState } from "react";
 
 const Login: NextPage = () => {
-
   // const [token,setToken] = useState<string | undefined>("")
   const toast = useToast();
   // const [signedUser, setSignedUser] = useState<any | null>(null);
@@ -34,10 +33,19 @@ const Login: NextPage = () => {
       });
   };
 
-// auth.signOut()
+  // auth.signOut()
   return (
     <>
-      <Flex alignItems="center" h="100vh" justify="center">
+      <Flex
+        alignItems="center"
+        h="100vh"
+        position="fixed"
+        right="0"
+        left="0"
+        top="0"
+        bottom="0"
+        justify="center"
+      >
         <Button onClick={signIn}>Login</Button>
       </Flex>
       <Button

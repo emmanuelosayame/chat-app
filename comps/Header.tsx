@@ -31,6 +31,7 @@ const Header = ({children}:{children:ReactNode}) => {
         backdropBlur="md"
         zIndex={1000}
         px="2"
+        align='center'
       >
         <Text fontWeight={600}>Edit</Text>
 
@@ -38,7 +39,7 @@ const Header = ({children}:{children:ReactNode}) => {
           ChatApp
         </Text>
 
-        <Flex>{children}</Flex>
+        <Flex align='center' >{children}</Flex>
       </Flex>
 
       <InputGroup mt={10}>

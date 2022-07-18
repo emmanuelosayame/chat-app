@@ -1,18 +1,14 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import { auth, db, feugo } from "../firebase/firebase";
+import { auth, db} from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect, useState } from "react";
-import {
-  doc,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
+import { useEffect } from "react";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Login from "../comps/Login";
 import { SpinnerDotted } from "spinners-react";
 import App from "../comps/App";
-import { FuegoProvider } from "swr-firestore-v9";
+// import { FuegoProvider } from "swr-firestore-v9";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
@@ -40,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <FuegoProvider fuego={feugo}>
+    // <FuegoProvider fuego={fuego}>
       <ChakraProvider>
         {!user ? (
           <Login />
@@ -50,7 +46,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </App>
         )}
       </ChakraProvider>
-    </FuegoProvider>
+    // </FuegoProvider>
   );
 }
 

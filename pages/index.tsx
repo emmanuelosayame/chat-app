@@ -14,7 +14,7 @@ const Home: NextPage = () => {
     >
       <Flex h="8" justify="space-between">
         <Text>...</Text>
-        <IconButton aria-label="settings" size="xs" icon={<CogIcon />} />
+        <IconButton aria-label="settings" size="xs" icon={<CogIcon width={20} />} />
       </Flex>
       <Flex w="full" align="center" h="full">
         <Text fontSize={25} opacity={0.7} fontWeight={600} mx="auto">

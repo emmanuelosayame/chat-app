@@ -42,7 +42,7 @@ const NewChatComp = ({ userData, chats, text, icon }: any) => {
   const [newChatInput, setnewChatInput] = useState<string>("");
 
   const chatExist = (recId: string[]) =>
-    !!chats?.data.find(
+    !!chats?.data?.find(
       (doc: DocumentData | undefined) =>
         doc?.USID.filter((userId: string[] | undefined) => userId == recId)
           ?.length > 0
