@@ -14,14 +14,17 @@ const Chat = ({ chatId, recId }: DocumentData) => {
   const recQuery = doc(db, "Users", `${recId}`);
   const [recData] = useDocumentData(recQuery);
   const dp = recData?.photoURL;
-  const status = recData?.lastseen.toDate().toString();
   // console.log(status)
 
   return (
     <Link
       href={{
         pathname: chatId,
-        query: { rec: recId},
+        query: {
+          // rec: recId,
+          name: recData?.name,
+          userName: recData?.userName,
+        },
       }}
       scroll={false}
     >

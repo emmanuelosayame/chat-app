@@ -26,6 +26,7 @@ import {
   useCollectionData,
   useDocumentData,
   useCollection,
+  useDocumentDataOnce,
 } from "react-firebase-hooks/firestore";
 
 const View = ({ children }: { children: ReactNode }) => {
@@ -39,6 +40,36 @@ const View = ({ children }: { children: ReactNode }) => {
   const userRef = doc(db, "Users", `${user?.uid}`);
   const [chats] = useCollection(chatsQuery);
   const [userData] = useDocumentData(userRef);
+
+  useEffect(() => {
+    if (user) {
+      UpdateUserData();
+    }
+  }, [user]);
+  useEffect(() => {
+    if (!!userData)
+      setDoc(
+        doc(db, "statuses", `${userData?.userName}`),
+        {
+          lastSeen: serverTimestamp(),
+        },
+        { merge: true }
+      );
+  }, [userData]);
+  // remember to wrap async code in useeffect
+
+  const UpdateUserData = async () => {
+    setDoc(
+      doc(db, "Users", `${user?.uid}`),
+      {
+        Uid: [`${user?.displayName}`, `${user?.email}`],
+        userName: `${user?.email}`,
+        name: `${user?.displayName}`,
+        photoURL: user?.photoURL,
+      },
+      { merge: true }
+    );
+  };
 
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
     if (!!router.query?.chat) return chatPage;
@@ -84,10 +115,14 @@ const View = ({ children }: { children: ReactNode }) => {
             {!chats?.empty ? (
               <Box>
                 {chats?.docs.map((chat: DocumentData | undefined) => {
-                  const recId = chat?.data().USID.filter(
-                    (id: DocumentData | undefined) => id !== user?.uid
+                  const recId = chat
+                    ?.data()
+                    .USID.filter(
+                      (id: DocumentData | undefined) => id !== user?.uid
+                    );
+                  return (
+                    <Chat key={chat?.id} chatId={chat?.id} recId={recId} />
                   );
-                  return <Chat key={chat?.id} chatId={chat?.id} recId={recId} />;
                 })}
               </Box>
             ) : (

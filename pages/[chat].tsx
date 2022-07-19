@@ -1,4 +1,4 @@
-import { ArrowUpIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -28,9 +28,12 @@ import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-import TimeAgo from "timeago-react";
+// import TimeAgo from "react-timeago";
 import { StickerIcon } from "../comps/Icons";
 import { auth, db } from "../firebase/firebase";
+import en from "javascript-time-ago/locale/en.json";
+import TimeAgo from "javascript-time-ago";
+import ReactTimeAgo from "react-time-ago";
 
 const Chats: NextPage = () => {
   const router = useRouter();
@@ -40,14 +43,14 @@ const Chats: NextPage = () => {
   const keepBottomRef = useRef<any>();
   const messagesQuery = collection(db, "chatGroup", `${messageId}`, "messages");
   const [messages] = useCollectionData(messagesQuery);
-  // const recQuery = query(
-  //   collection(db, "Users"),
-  //   where("name", "==", `${router.query.rec}`)
-  // );
-  const recRef = doc(db,"Users",`${router.query.rec}`)
+  const statusRef = doc(db, "statuses", `${router.query.userName}`);
+  const [recStatus] = useDocumentData(statusRef);
+  const date = recStatus?.lastSeen?.toDate();
+  // console.log(recStatus);
 
-  const [recData] = useDocumentData(recRef);
-  // console.log(recData);
+  useEffect(() => {
+    TimeAgo.addDefaultLocale(en);
+  }, []);
 
   const keepBottom = () => {
     keepBottomRef.current?.scrollIntoView({
@@ -83,30 +86,63 @@ const Chats: NextPage = () => {
         justify="space-between"
         position={["fixed", "fixed", "unset"]}
       >
-        <Flex w="full" py="2" maxH="12">
-          <IconButton
-            display={["block", "block", "none"]}
-            aria-label="back-btn"
-            size="sm"
-            icon={<ChevronLeftIcon width={30} />}
-            mr="-3"
-            onClick={routeToChats}
-            _hover={{ bgColor: "transparent" }}
-            _active={{ bgColor: "green" }}
-            bgColor="transparent"
-            color="orange.500"
-          />
-          {recData?.photoURL ?<Box>image</Box>: <Avatar size="sm" mx="2" />}
-          <Box>
-            <Text fontWeight={600} fontSize={18} lineHeight="1">
-              {recData && recData.name}
+        <Flex
+          w="full"
+          py="2"
+          maxH="12"
+          justify={["space-between", "space-between", "space-between", "unset"]}
+        >
+          <Flex>
+            <IconButton
+              display={["block", "block", "none"]}
+              aria-label="back-btn"
+              size="sm"
+              icon={<ChevronLeftIcon width={30} />}
+              mr="-3"
+              onClick={routeToChats}
+              _hover={{ bgColor: "transparent" }}
+              _active={{ bgColor: "green" }}
+              bgColor="transparent"
+              color="orange.500"
+            />
+            {!!router.query.photoURL ? (
+              <Box>image</Box>
+            ) : (
+              <Avatar size="sm" mx="2" />
+            )}
+          </Flex>
+          <Box display="flex" flexDir="column">
+            <Text mx="auto" fontWeight={600} fontSize={16} lineHeight="1">
+              {router.query.name && router.query.name}
             </Text>
-            <TimeAgo datetime={!!recData && recData.lastseen.toDate()} />
-            {/* <Text fontSize={15} lineHeight="1.5">
-              online
-            </Text> */}
+            <Text fontWeight={600} fontSize={10} lineHeight="1">
+              {router.query.name && router.query.userName}
+            </Text>
           </Box>
+          <Box fontSize={10} fontWeight={600} mx="2">
+            {/* <TimeAgo
+              formatter={(value, unit) => {
+                if (unit === "second") return "online";
+                if (unit === "minute") return value + "m";
+                if (unit === "hour") return value + "h";
+                if (unit === "day") return value + "d";
+                if (unit === "week") return value + "w";
+                if (unit === "month") return value + "month";
+              }}
+
+              date={!!router.query.userName && recStatus?.lastSeen?.toDate()}
+            /> */}
+            {!!recStatus && (
+              <ReactTimeAgo timeStyle="twitter-first-minute" date={date} />
+            )}
+          </Box>
+          {/* <IconButton
+            aria-label="delete-chat&search"
+            size="sm"
+            icon={<ChevronDownIcon boxSize={4} />}
+          /> */}
         </Flex>
+        {/* <Divider/> */}
         <Flex
           scrollBehavior="smooth"
           flexDirection="column"
