@@ -33,7 +33,7 @@ const Header = ({children}:{children:ReactNode}) => {
         px="2"
         align='center'
       >
-        <Text fontWeight={600} color="orange.300" >Edit</Text>
+        <Text fontWeight={600} fontSize={17} color="blue.400" >Edit</Text>
 
         <Text fontWeight={800} textAlign="center">
           ChatApp

@@ -10,11 +10,11 @@ import TimeAgo from "timeago-react";
 
 const Chat = ({ chatId, recId }: DocumentData) => {
   const user = auth.currentUser;
-  // const router = useRouter();
+  const router = useRouter();
   const recQuery = doc(db, "Users", `${recId}`);
   const [recData] = useDocumentData(recQuery);
   const dp = recData?.photoURL;
-  // console.log(status)
+  // console.log(router.query.chat)
 
   return (
     <Link
@@ -30,6 +30,7 @@ const Chat = ({ chatId, recId }: DocumentData) => {
     >
       <Flex
         // onClick={openChat}
+        bgColor={router.query.chat === chatId ? "white" : ""}
         flexDirection="column"
         _hover={{ bgColor: "whiteAlpha.600" }}
         cursor="pointer"

@@ -32,7 +32,7 @@ const Settings = ({
   return (
     <>
       <IconButton
-        color="orange.400"
+        color="blue.400"
         aria-label="settings"
         bgColor="transparent"
         icon={<ChevronDownIcon boxSize={4} />}

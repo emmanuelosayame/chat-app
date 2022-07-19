@@ -121,19 +121,21 @@ const Chats: NextPage = () => {
               _hover={{ bgColor: "transparent" }}
               _active={{ bgColor: "transparent" }}
               bgColor="transparent"
-              color="orange.500"
+              color="blue.500"
             />
             <Box
               fontSize={11}
               borderRadius={10}
-              bgColor="orange.200"
+              bgColor="whitesmoke"
               opacity={0.7}
               alignSelf="center"
               py="1"
               px="2"
               fontWeight={600}
               mx="2"
-              color="blackAlpha.800"
+              color="blue.400"
+              // border="1px"
+              // borderColor="white"
             >
               {/* <TimeAgo
               formatter={(value, unit) => {
@@ -180,6 +182,16 @@ const Chats: NextPage = () => {
         </Flex>
         {/* <Divider/> */}
         <Flex
+          sx={{
+            "&::-webkit-scrollbar": {
+              width: "4px",
+              backgroundColor: "blue.50",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              borderRadius: "18px",
+              backgroundColor: "blue.100",
+            },
+          }}
           scrollBehavior="smooth"
           flexDirection="column"
           overflowX="auto"
@@ -259,7 +271,7 @@ export const Message = ({
   return (
     <Flex
       alignSelf={messageStyle("end", "start")}
-      bgColor={messageStyle("orange.200", "white")}
+      bgColor={messageStyle("blue.200", "whitesmoke")}
       h="auto"
       borderRadius={13}
       px="2.5"
@@ -273,7 +285,7 @@ export const Message = ({
       <Box
         fontSize={14}
         fontWeight={600}
-        color={messageStyle("orange.50", "gray")}
+        color={messageStyle("orange.50", "blackAlpha.700")}
         maxW="300px"
       >
         {content}
