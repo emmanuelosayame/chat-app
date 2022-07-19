@@ -31,7 +31,7 @@ const Chat = ({ chatId, recId }: DocumentData) => {
       <Flex
         // onClick={openChat}
         flexDirection="column"
-        _hover={{ bgColor: "gray.300" }}
+        _hover={{ bgColor: "whiteAlpha.600" }}
         cursor="pointer"
       >
         <Flex py="1" px="2">
@@ -53,7 +53,11 @@ const Chat = ({ chatId, recId }: DocumentData) => {
             <Box fontSize={15}>{recData?.userName}</Box>
           </Box>
         </Flex>
-        <Divider borderColor="gray.300" w={["78%", "90%"]} alignSelf="end" />
+        <Divider
+          borderColor="blackAlpha.200"
+          w={["78%", "90%"]}
+          alignSelf="end"
+        />
       </Flex>
     </Link>
   );

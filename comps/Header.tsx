@@ -21,7 +21,7 @@ const Header = ({children}:{children:ReactNode}) => {
 
       <Flex
         justify="space-between"
-        h="8"
+        h="9"
         position="absolute"
         w="full"
         left={0}
@@ -33,7 +33,7 @@ const Header = ({children}:{children:ReactNode}) => {
         px="2"
         align='center'
       >
-        <Text fontWeight={600}>Edit</Text>
+        <Text fontWeight={600} color="orange.300" >Edit</Text>
 
         <Text fontWeight={800} textAlign="center">
           ChatApp
@@ -43,7 +43,7 @@ const Header = ({children}:{children:ReactNode}) => {
       </Flex>
 
       <InputGroup mt={10}>
-        <InputLeftElement children={<SearchIcon w="3" mb="1" />} />
+        <InputLeftElement children={<SearchIcon w="3" mb="1.5" />} />
         <Input
           size="sm"
           variant="filled"

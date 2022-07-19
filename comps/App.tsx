@@ -77,7 +77,7 @@ const View = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Flex h="100vh" w="100%" bgColor="gray.200" pos="fixed">
+    <Flex h="100vh" w="100%" bgColor="blackAlpha.100" pos="fixed">
       <Box
         display={[
           responsiveLayout("none", "block"),
@@ -91,23 +91,27 @@ const View = ({ children }: { children: ReactNode }) => {
           sx={{
             "&::-webkit-scrollbar": {
               width: "4px",
-              backgroundColor: "blue.500",
+              backgroundColor: "orange.100",
             },
             "&::-webkit-scrollbar-thumb": {
               borderRadius: "18px",
-              backgroundColor: "teal.400",
+              backgroundColor: "orange.200",
             },
           }}
           w="full"
           h="full"
           overflowY="scroll"
-          borderRight={["none", "none", "2px"]}
+          // borderRight={["none", "none", "Scrollbar"]}
+          // // borderRightColor="orange.300"
+          // borderRightWidth="2px"
+          // borderRightColor="red"
         >
           <Header>
             <NewChatComp
               userData={userData}
               chats={chats}
               icon={<PencilAltIcon width={22} />}
+              color="orange.300"
             />
             <Settings userData={userData} />
           </Header>
@@ -140,13 +144,14 @@ const View = ({ children }: { children: ReactNode }) => {
       {/* next */}
       <Box
         h="full"
-        bgColor="gray.100"
+        bgColor="whitesmoke"
         w="full"
         display={[
           responsiveLayout("block", "none"),
           responsiveLayout("block", "none"),
           "block",
         ]}
+        pos="relative"
       >
         {children}
       </Box>

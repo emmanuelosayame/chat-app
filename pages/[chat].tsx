@@ -1,4 +1,11 @@
-import { ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import {
+  ArrowUpIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  RepeatClockIcon,
+  RepeatIcon,
+  TimeIcon,
+} from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -7,18 +14,18 @@ import {
   Flex,
   IconButton,
   Input,
-  InputGroup,
   Text,
 } from "@chakra-ui/react";
 import { ArrowCircleUpIcon, ChevronLeftIcon } from "@heroicons/react/solid";
 import {
+  addDoc,
   collection,
   doc,
   DocumentData,
-  FieldValue,
+  orderBy,
   query,
   serverTimestamp,
-  where,
+  Timestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -34,18 +41,20 @@ import { auth, db } from "../firebase/firebase";
 import en from "javascript-time-ago/locale/en.json";
 import TimeAgo from "javascript-time-ago";
 import ReactTimeAgo from "react-time-ago";
+import { ClockIcon } from "@heroicons/react/outline";
 
 const Chats: NextPage = () => {
   const router = useRouter();
   const user = auth.currentUser;
-  const messageId = router.query.chat;
-  const [newMessage, setNewMessage] = useState("");
+  const messagesId = router.query.chat;
   const keepBottomRef = useRef<any>();
-  const messagesQuery = collection(db, "chatGroup", `${messageId}`, "messages");
+  const messagesRef = collection(db, "chatGroup", `${messagesId}`, "messages");
+  const messagesQuery = query(messagesRef, orderBy("timeSent", "asc"));
   const [messages] = useCollectionData(messagesQuery);
   const statusRef = doc(db, "statuses", `${router.query.userName}`);
   const [recStatus] = useDocumentData(statusRef);
   const date = recStatus?.lastSeen?.toDate();
+  const [newMessage, setNewMessage] = useState("");
   // console.log(recStatus);
 
   useEffect(() => {
@@ -67,6 +76,11 @@ const Chats: NextPage = () => {
 
   const sendMessage = () => {
     if (!(newMessage.length === 0)) {
+      addDoc(messagesRef, {
+        content: newMessage,
+        sender: user?.uid,
+        timeSent: serverTimestamp(),
+      });
       keepBottom();
     }
     return;
@@ -87,12 +101,16 @@ const Chats: NextPage = () => {
         position={["fixed", "fixed", "unset"]}
       >
         <Flex
+          pos="absolute"
           w="full"
-          py="2"
-          maxH="12"
-          justify={["space-between", "space-between", "space-between", "unset"]}
+          py="1"
+          maxH="10"
+          bgColor="whiteAlpha.500"
+          backdropFilter="auto"
+          backdropBlur="lg"
+          justify="space-between"
         >
-          <Flex>
+          <Flex mr="-14">
             <IconButton
               display={["block", "block", "none"]}
               aria-label="back-btn"
@@ -101,26 +119,23 @@ const Chats: NextPage = () => {
               mr="-3"
               onClick={routeToChats}
               _hover={{ bgColor: "transparent" }}
-              _active={{ bgColor: "green" }}
+              _active={{ bgColor: "transparent" }}
               bgColor="transparent"
               color="orange.500"
             />
-            {!!router.query.photoURL ? (
-              <Box>image</Box>
-            ) : (
-              <Avatar size="sm" mx="2" />
-            )}
-          </Flex>
-          <Box display="flex" flexDir="column">
-            <Text mx="auto" fontWeight={600} fontSize={16} lineHeight="1">
-              {router.query.name && router.query.name}
-            </Text>
-            <Text fontWeight={600} fontSize={10} lineHeight="1">
-              {router.query.name && router.query.userName}
-            </Text>
-          </Box>
-          <Box fontSize={10} fontWeight={600} mx="2">
-            {/* <TimeAgo
+            <Box
+              fontSize={11}
+              borderRadius={10}
+              bgColor="orange.200"
+              opacity={0.7}
+              alignSelf="center"
+              py="1"
+              px="2"
+              fontWeight={600}
+              mx="2"
+              color="blackAlpha.800"
+            >
+              {/* <TimeAgo
               formatter={(value, unit) => {
                 if (unit === "second") return "online";
                 if (unit === "minute") return value + "m";
@@ -132,23 +147,45 @@ const Chats: NextPage = () => {
 
               date={!!router.query.userName && recStatus?.lastSeen?.toDate()}
             /> */}
-            {!!recStatus && (
-              <ReactTimeAgo timeStyle="twitter-first-minute" date={date} />
+              {!!recStatus && <ReactTimeAgo date={date} />}
+            </Box>
+          </Flex>
+
+          <Box display="flex" flexDir="column">
+            <Text
+              mx="auto"
+              fontWeight={600}
+              fontSize={16}
+              lineHeight="1.2"
+              color="blackAlpha.800"
+            >
+              {router.query.name && router.query.name}
+            </Text>
+            <Text
+              fontWeight={600}
+              fontSize={10}
+              lineHeight="1"
+              color="blackAlpha.800"
+            >
+              {router.query.name && router.query.userName}
+            </Text>
+          </Box>
+          <Box>
+            {!!router.query.photoURL ? (
+              <Box>image</Box>
+            ) : (
+              <Avatar size="sm" mx="2" />
             )}
           </Box>
-          {/* <IconButton
-            aria-label="delete-chat&search"
-            size="sm"
-            icon={<ChevronDownIcon boxSize={4} />}
-          /> */}
         </Flex>
         {/* <Divider/> */}
         <Flex
           scrollBehavior="smooth"
           flexDirection="column"
           overflowX="auto"
-          px="1"
+          px={["3", "4", "6"]}
           h="full"
+          pt="14"
         >
           {!!messages &&
             messages?.map((message: DocumentData) => (
@@ -156,18 +193,19 @@ const Chats: NextPage = () => {
                 key={message.id}
                 content={message.content}
                 sender={message.sender}
-                timeStamp={message.timeStamp}
+                timeSent={message.timeSent}
               />
             ))}
           <div ref={keepBottomRef} />
         </Flex>
 
-        <Box>
+        <Box px="2">
           <Divider mb="2" />
           <Flex>
             <IconButton
               aria-label="sticker"
               color="orange.400"
+              bgColor="transparent"
               size="md"
               icon={<StickerIcon />}
             />
@@ -184,6 +222,7 @@ const Chats: NextPage = () => {
             <IconButton
               aria-label="send"
               color="orange.400"
+              bgColor="transparent"
               size="sm"
               icon={<ArrowCircleUpIcon width={25} />}
               onClick={sendMessage}
@@ -199,32 +238,64 @@ export default Chats;
 export const Message = ({
   content,
   sender,
-  timeStamp,
+  timeSent,
 }: {
   content: string;
   sender: string | undefined;
-  timeStamp: FieldValue;
+  timeSent: Timestamp;
 }) => {
+  const user = auth.currentUser;
+  const time =
+    !!timeSent &&
+    timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
+  // console.log(time);
   const messageStyle = (userVal: string, recVal: string) => {
-    const user = auth.currentUser;
     if (sender === user?.uid) {
       return userVal;
     }
     return recVal;
   };
+
   return (
-    <Box
+    <Flex
       alignSelf={messageStyle("end", "start")}
-      bgColor={messageStyle("orange.300", "white")}
+      bgColor={messageStyle("orange.200", "white")}
       h="auto"
-      borderRadius={15}
+      borderRadius={13}
       px="2.5"
-      py="1"
+      py="0.25rem"
       m="1"
       w="fit-content"
+      flexWrap="wrap"
+      maxW="330px"
+      justify="end"
     >
-      <Box fontSize={14}>{content}</Box>
-      {/* <Box>{timeStamp}</Box> */}
-    </Box>
+      <Box
+        fontSize={14}
+        fontWeight={600}
+        color={messageStyle("orange.50", "gray")}
+        maxW="300px"
+      >
+        {content}
+      </Box>
+      <Box
+        mt="3"
+        mb="-0.5"
+        ml="1.5"
+        mr="1"
+        alignSelf="end"
+        fontSize={8}
+        fontWeight={500}
+        color={messageStyle("gray.50", "gray")}
+      >
+        {timeSent ? (
+          time
+        ) : (
+          <Box mb="1" mt="-1">
+            <ClockIcon width={10} />
+          </Box>
+        )}
+      </Box>
+    </Flex>
   );
 };

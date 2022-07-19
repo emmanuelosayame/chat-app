@@ -34,7 +34,7 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { auth, db } from "../firebase/firebase";
 
-const NewChatComp = ({ userData, chats, text, icon }: any) => {
+const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -88,6 +88,7 @@ const NewChatComp = ({ userData, chats, text, icon }: any) => {
         iconSpacing={0}
         // ref={btnRef}
         onClick={onOpen}
+        color={color}
       >
         {text}
       </Button>
