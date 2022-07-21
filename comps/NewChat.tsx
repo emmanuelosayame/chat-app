@@ -101,7 +101,7 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
         motionPreset="slideInBottom"
       >
         <ModalOverlay />
-        <ModalContent borderRadius={15} px="2">
+        <ModalContent borderRadius={15} px="2" bgColor="whitesmoke" >
           <ModalHeader textAlign="center" fontSize="13">
             Start Chat
           </ModalHeader>
@@ -116,8 +116,8 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
               type="text"
               borderRadius="12"
               placeholder="Search"
-              bgColor="whitesmoke"
-              _placeholder={{ color: "gray.300" }}
+              bgColor="white"
+              _placeholder={{ color: "gray" }}
               onChange={(e) => setnewChatInput(e.target.value)}
             />
           </InputGroup>

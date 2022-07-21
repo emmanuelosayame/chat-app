@@ -1,24 +1,56 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import { auth, db } from "../firebase/firebase";
+import { auth, rdb } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect } from "react";
-import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import Login from "../comps/Login";
 import { SpinnerDotted } from "spinners-react";
 import App from "../comps/App";
-// import { FuegoProvider } from "swr-firestore-v9";
+import {
+  onDisconnect,
+  onValue,
+  push,
+  ref,
+  serverTimestamp,
+  set,
+} from "firebase/database";
+import { useEffect } from "react";
+import { browserName } from "react-device-detect";
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en.json";
+
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
+  const onlineRef = ref(rdb, `status/${user?.uid}/online`);
+  const lastSeenRef = ref(rdb, `status/${user?.uid}/lastSeen`);
+  const statusRef = ref(rdb, ".info/connected");
+
+   useEffect(() => {
+     TimeAgo.addDefaultLocale(en);
+  }, []);
+  
+  useEffect(() => {
+    if (user) {
+      onValue(statusRef, (snap) => {
+        if (snap.val() === true) {
+          const con = push(onlineRef);
+
+          onDisconnect(con).remove();
+
+          set(con, browserName);
+
+          onDisconnect(lastSeenRef).set(serverTimestamp());
+        }
+      });
+    }
+  }, [user]);
 
   if (loading) {
     return <Loading />;
   }
 
   return (
-    // <FuegoProvider fuego={fuego}>
     <ChakraProvider>
       {!user ? (
         <Login />
@@ -28,7 +60,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         </App>
       )}
     </ChakraProvider>
-    // </FuegoProvider>
   );
 }
 

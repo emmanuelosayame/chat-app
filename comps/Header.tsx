@@ -50,8 +50,8 @@ const Header = ({children}:{children:ReactNode}) => {
           type="text"
           borderRadius="12"
           placeholder="Search"
-          bgColor="whitesmoke"
-          _placeholder={{ color: "gray.300" }}
+          bgColor="whiteAlpha.700"
+          _placeholder={{ color: "gray" }}
           focusBorderColor="gray.200"
           _hover={{ bgColor: "white" }}
           _focus={{ bgColor: "white" }}

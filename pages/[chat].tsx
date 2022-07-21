@@ -15,8 +15,13 @@ import {
   IconButton,
   Input,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
-import { ArrowCircleUpIcon, ChevronLeftIcon } from "@heroicons/react/solid";
+import {
+  ArrowCircleUpIcon,
+  ArrowNarrowUpIcon,
+  ChevronLeftIcon,
+} from "@heroicons/react/solid";
 import {
   addDoc,
   collection,
@@ -35,13 +40,13 @@ import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-// import TimeAgo from "react-timeago";
-import { StickerIcon } from "../comps/Icons";
-import { auth, db } from "../firebase/firebase";
-import en from "javascript-time-ago/locale/en.json";
-import TimeAgo from "javascript-time-ago";
+import { SendIcon, StickerIcon } from "../comps/Icons";
+import { auth, db, rdb } from "../firebase/firebase";
 import ReactTimeAgo from "react-time-ago";
 import { ClockIcon } from "@heroicons/react/outline";
+import { Database, ref, DataSnapshot } from "firebase/database";
+import { useListVals, useObjectVal } from "react-firebase-hooks/database";
+// import TimeAgo from "timeago-react";
 
 const Chats: NextPage = () => {
   const router = useRouter();
@@ -51,15 +56,11 @@ const Chats: NextPage = () => {
   const messagesRef = collection(db, "chatGroup", `${messagesId}`, "messages");
   const messagesQuery = query(messagesRef, orderBy("timeSent", "asc"));
   const [messages] = useCollectionData(messagesQuery);
-  const statusRef = doc(db, "statuses", `${router.query.userName}`);
-  const [recStatus] = useDocumentData(statusRef);
-  const date = recStatus?.lastSeen?.toDate();
   const [newMessage, setNewMessage] = useState("");
-  // console.log(recStatus);
-
-  useEffect(() => {
-    TimeAgo.addDefaultLocale(en);
-  }, []);
+  const [recStatus] = useObjectVal<{ lastSeen: number; online: DataSnapshot }>(
+    ref(rdb, `status/${router.query.recId}`)
+  );
+  const lastSeen = !!recStatus ? new Date(recStatus.lastSeen) : new Date();
 
   const keepBottom = () => {
     keepBottomRef.current?.scrollIntoView({
@@ -124,32 +125,23 @@ const Chats: NextPage = () => {
               color="blue.500"
             />
             <Box
-              fontSize={11}
-              borderRadius={10}
-              bgColor="whitesmoke"
+              fontSize={14}
+              borderRadius={12}
+              bgColor="blue.300"
               opacity={0.7}
               alignSelf="center"
               py="1"
               px="2"
               fontWeight={600}
               mx="2"
-              color="blue.400"
-              // border="1px"
-              // borderColor="white"
+              color="white"
             >
-              {/* <TimeAgo
-              formatter={(value, unit) => {
-                if (unit === "second") return "online";
-                if (unit === "minute") return value + "m";
-                if (unit === "hour") return value + "h";
-                if (unit === "day") return value + "d";
-                if (unit === "week") return value + "w";
-                if (unit === "month") return value + "month";
-              }}
-
-              date={!!router.query.userName && recStatus?.lastSeen?.toDate()}
-            /> */}
-              {!!recStatus && <ReactTimeAgo date={date} />}
+              {!!recStatus?.online ? (
+                <Box>online</Box>
+              ) : (
+                <ReactTimeAgo date={lastSeen} timeStyle="twitter-minute-now" />
+                // <TimeAgo datetime={lastSeen} />
+              )}
             </Box>
           </Flex>
 
@@ -211,33 +203,43 @@ const Chats: NextPage = () => {
           <div ref={keepBottomRef} />
         </Flex>
 
-        <Box px="2">
+        <Box px="5">
           <Divider mb="2" />
           <Flex>
             <IconButton
               aria-label="sticker"
-              color="orange.400"
+              color="blue.400"
               bgColor="transparent"
               size="md"
               icon={<StickerIcon />}
             />
-            <Input
+            <Textarea
               borderRadius={15}
               borderWidth="1px"
               variant="filled"
               bgColor="white"
               borderColor="gray.200"
-              size="sm"
+              size="md"
+              h="auto"
+              rows={3}
+              p="1.5"
+              // maxH='14'
               // placeholder=" yo..."
               onChange={(e) => setNewMessage(e.target.value)}
             />
             <IconButton
+              isRound
               aria-label="send"
-              color="orange.400"
-              bgColor="transparent"
-              size="sm"
-              icon={<ArrowCircleUpIcon width={25} />}
+              // color="blue.500"
+              bgColor="blue.400"
+              // colorScheme="twitter"
+              size="md"
+              p="1"
+              icon={<SendIcon boxSize={7} stroke="white" strokeWidth="15" />}
               onClick={sendMessage}
+              ml="3"
+              // alignSelf="center"
+              mr="5"
             />
           </Flex>
         </Box>
@@ -279,11 +281,11 @@ export const Message = ({
       m="1"
       w="fit-content"
       flexWrap="wrap"
-      maxW="330px"
+      maxW="320px"
       justify="end"
     >
       <Box
-        fontSize={14}
+        fontSize={13}
         fontWeight={600}
         color={messageStyle("orange.50", "blackAlpha.700")}
         maxW="300px"
@@ -291,8 +293,7 @@ export const Message = ({
         {content}
       </Box>
       <Box
-        mt="3"
-        mb="-0.5"
+        mt="2"
         ml="1.5"
         mr="1"
         alignSelf="end"

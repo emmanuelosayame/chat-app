@@ -10,6 +10,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  Flex,
   Icon,
   IconButton,
   Input,
@@ -18,6 +19,8 @@ import {
 } from "@chakra-ui/react";
 import { DuplicateIcon } from "@heroicons/react/solid";
 import { DocumentData } from "firebase/firestore";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { auth } from "../firebase/firebase";
 
 const Settings = ({
@@ -25,7 +28,17 @@ const Settings = ({
 }: {
   userData: DocumentData | null | undefined;
 }) => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    if (userData) {
+      if (!userData?.userName) {
+        onOpen();
+      }
+    }
+  }, [userData]);
+  router.push("/");
   const logout = () => {
     auth.signOut();
   };
@@ -59,7 +72,33 @@ const Settings = ({
             />
           </DrawerHeader>
 
-          <DrawerBody>
+          <DrawerBody pt="100">
+            <Flex
+              mx="auto"
+              borderRadius={8}
+              flexDir="column"
+              justify="start"
+              w="90%"
+              my="3"
+              bgColor="whitesmoke"
+            >
+              <Button m="2">Account</Button>
+              <Button m="2">Data</Button>
+            </Flex>
+            <Flex
+              mx="auto"
+              borderRadius={8}
+              flexDir="column"
+              justify="start"
+              w="90%"
+              my="3"
+              bgColor="whitesmoke"
+            >
+              <Button m="2">Account</Button>
+              <Button m="2">Data</Button>
+              <Button m="2">Account</Button>
+              <Button m="2">Data</Button>
+            </Flex>
             <Button size="sm" onClick={logout}>
               logout
             </Button>

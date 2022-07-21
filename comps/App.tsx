@@ -45,17 +45,7 @@ const View = ({ children }: { children: ReactNode }) => {
     if (user) {
       UpdateUserData();
     }
-  }, [user]);
-  useEffect(() => {
-    if (!!userData)
-      setDoc(
-        doc(db, "statuses", `${userData?.userName}`),
-        {
-          lastSeen: serverTimestamp(),
-        },
-        { merge: true }
-      );
-  }, [userData]);
+  }, [user]);  
   // remember to wrap async code in useeffect
 
   const UpdateUserData = async () => {
@@ -77,7 +67,16 @@ const View = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Flex h="100vh" w="100%" bgColor="whitesmoke" pos="fixed" maxW="7xl" mx='auto' right='0' left='0' >
+    <Flex
+      h="100vh"
+      w="100%"
+      bgColor="whitesmoke"
+      pos="fixed"
+      maxW="-moz-initial"
+      mx="auto"
+      right="0"
+      left="0"
+    >
       <Box
         display={[
           responsiveLayout("none", "block"),
@@ -144,7 +143,7 @@ const View = ({ children }: { children: ReactNode }) => {
       {/* next */}
       <Box
         h="full"
-        bgColor="white"
+        bgColor="whiteAlpha.700"
         w="full"
         display={[
           responsiveLayout("block", "none"),
