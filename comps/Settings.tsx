@@ -38,8 +38,8 @@ const Settings = ({
       }
     }
   }, [userData]);
-  router.push("/");
   const logout = () => {
+    router.push("/");
     auth.signOut();
   };
   return (

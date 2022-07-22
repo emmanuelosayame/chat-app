@@ -52,7 +52,7 @@ const Chats: NextPage = () => {
   const router = useRouter();
   const user = auth.currentUser;
   const messagesId = router.query.chat;
-  const keepBottomRef = useRef<any>();
+  // const keepBottomRef = useRef<any>();
   const messagesRef = collection(db, "chatGroup", `${messagesId}`, "messages");
   const messagesQuery = query(messagesRef, orderBy("timeSent", "asc"));
   const [messages] = useCollectionData(messagesQuery);
@@ -62,18 +62,18 @@ const Chats: NextPage = () => {
   );
   const lastSeen = !!recStatus ? new Date(recStatus.lastSeen) : new Date();
 
-  const keepBottom = () => {
-    keepBottomRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
+  // const keepBottom = () => {
+  //   keepBottomRef.current?.scrollIntoView({
+  //     behavior: "smooth",
+  //     block: "start",
+  //   });
+  // };
 
-  useEffect(() => {
-    if (!!messages) {
-      keepBottom();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!!messages) {
+  //     keepBottom();
+  //   }
+  // }, []);
 
   const sendMessage = () => {
     if (!(newMessage.length === 0)) {
@@ -82,7 +82,7 @@ const Chats: NextPage = () => {
         sender: user?.uid,
         timeSent: serverTimestamp(),
       });
-      keepBottom();
+      // keepBottom();
     }
     return;
   };
@@ -137,7 +137,7 @@ const Chats: NextPage = () => {
               color="white"
             >
               {!!recStatus?.online ? (
-                <Box>online</Box>
+                <Box>Active now</Box>
               ) : (
                 <ReactTimeAgo date={lastSeen} timeStyle="twitter-minute-now" />
                 // <TimeAgo datetime={lastSeen} />
@@ -200,7 +200,7 @@ const Chats: NextPage = () => {
                 timeSent={message.timeSent}
               />
             ))}
-          <div ref={keepBottomRef} />
+          {/* <div ref={keepBottomRef} /> */}
         </Flex>
 
         <Box px="5">
@@ -297,7 +297,7 @@ export const Message = ({
         ml="1.5"
         mr="1"
         alignSelf="end"
-        fontSize={8}
+        fontSize={9}
         fontWeight={500}
         color={messageStyle("gray.50", "gray")}
       >

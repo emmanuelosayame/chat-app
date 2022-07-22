@@ -26,55 +26,62 @@ import {
   collection,
   DocumentData,
   getDocs,
-  query,
+  // query,
   serverTimestamp,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { auth, db } from "../firebase/firebase";
+import { auth, db, rdb } from "../firebase/firebase";
+import algoliasearch from "algoliasearch/lite";
+import {
+  Hits,
+  HitsProps,
+  InstantSearch,
+  SearchBox,
+  useSearchBox,
+  UseSearchBoxProps,
+} from "react-instantsearch-hooks-web";
+import {
+  useList,
+  useListKeys,
+  useListVals,
+  useObject,
+  useObjectVal,
+} from "react-firebase-hooks/database";
+import {
+  child,
+  endAt,
+  limitToLast,
+  onValue,
+  orderByChild,
+  orderByKey,
+  orderByValue,
+  Query,
+  query,
+  ref,
+  startAt,
+} from "firebase/database";
 
 const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [newChatInput, setnewChatInput] = useState<string>("");
+  const usersRef = ref(rdb, `Users`);
+  const [searchRef, setSearchRef] = useState<Query | null>(null);
+  const [usersDat] = useListVals<{
+    uid: string | undefined;
+    name: string | undefined;
+    userName: string | undefined;
+  }>(searchRef,{});
+  // console.log(usersDat?.find(dat=>dat)?.name);
 
-  const chatExist = (recId: string[]) =>
-    !!chats?.data?.find(
-      (doc: DocumentData | undefined) =>
-        doc?.USID.filter((userId: string[] | undefined) => userId == recId)
-          ?.length > 0
+  const searchUser = (e: any) => {
+    const input = e.target.value;
+    setSearchRef(
+      query(usersRef, orderByKey(), startAt(input), endAt(`${input}\uf8ff`))
     );
-
-  const startChat = async () => {
-    if (
-      !!chats.error ||
-      newChatInput.length === 0 ||
-      newChatInput === userData?.userName
-    )
-      return;
-    const recExist = await getDocs(
-      query(
-        collection(db, "Users"),
-        where("Uid", "array-contains", `${newChatInput}`)
-      )
-    );
-
-    const recId = recExist.docs.map((doc) => doc.id);
-
-    if (!recExist.empty && !chatExist(recId)) {
-      await addDoc(collection(db, "chatGroup"), {
-        USID: [`${user?.uid}`, `${recId}`],
-        timeStamp: serverTimestamp(),
-      });
-      return;
-
-      // router.push(`/${user}`)
-    }
-
-    return;
   };
 
   return (
@@ -86,7 +93,6 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
         mr={-3}
         leftIcon={icon}
         iconSpacing={0}
-        // ref={btnRef}
         onClick={onOpen}
         color={color}
       >
@@ -94,42 +100,41 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
       </Button>
       <Modal
         onClose={onClose}
-        // finalFocusRef={btnRef}
         initialFocusRef={inputRef}
         isOpen={isOpen}
         scrollBehavior="inside"
         motionPreset="slideInBottom"
       >
         <ModalOverlay />
-        <ModalContent borderRadius={15} px="2" bgColor="whitesmoke" >
+        <ModalContent borderRadius={15} px="4" bgColor="whitesmoke">
           <ModalHeader textAlign="center" fontSize="13">
             Start Chat
           </ModalHeader>
           <ModalCloseButton size="sm" color="blue.400" />
 
-          <InputGroup px="5">
-            <InputLeftElement children={<SearchIcon mb="1" ml="10" />} />
-            <Input
-              ref={inputRef}
-              size="sm"
-              variant="filled"
-              type="text"
-              borderRadius="12"
-              placeholder="Search"
-              bgColor="white"
-              _placeholder={{ color: "gray" }}
-              onChange={(e) => setnewChatInput(e.target.value)}
-            />
-          </InputGroup>
-
           <ModalBody>
+            <InputGroup>
+              <InputLeftElement children={<SearchIcon mb="1" ml="10" />} />
+              <Input
+                ref={inputRef}
+                size="sm"
+                variant="filled"
+                type="text"
+                borderRadius="12"
+                placeholder="Search"
+                bgColor="white"
+                _placeholder={{ color: "gray" }}
+                onChange={searchUser}
+                // onKeyDown={searchUser}
+              />
+            </InputGroup>
             <Box>
               <Flex p="1">
                 <Avatar size="sm" mr="5" />
                 New Group
               </Flex>
               <Divider ml="10" w="90%" />
-              <Flex p="1" onClick={startChat} cursor="pointer">
+              <Flex p="1" cursor="pointer">
                 <Avatar size="sm" mr="5" />
                 Private Chat
               </Flex>

@@ -1,7 +1,7 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import { auth, rdb } from "../firebase/firebase";
+import { auth, db, rdb } from "../firebase/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "../comps/Login";
 import { SpinnerDotted } from "spinners-react";
@@ -19,17 +19,16 @@ import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 
-
 function MyApp({ Component, pageProps }: AppProps) {
   const [user, loading] = useAuthState(auth);
   const onlineRef = ref(rdb, `status/${user?.uid}/online`);
   const lastSeenRef = ref(rdb, `status/${user?.uid}/lastSeen`);
   const statusRef = ref(rdb, ".info/connected");
 
-   useEffect(() => {
-     TimeAgo.addDefaultLocale(en);
+  useEffect(() => {
+    TimeAgo.addDefaultLocale(en);
   }, []);
-  
+
   useEffect(() => {
     if (user) {
       onValue(statusRef, (snap) => {

@@ -2,9 +2,15 @@ import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase/firebase";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const Login: NextPage = () => {
+  const router = useRouter();
+  useEffect(() => {
+    router.push("/");
+  }, []);
+
   // const [token,setToken] = useState<string | undefined>("")
   const toast = useToast();
   // const [signedUser, setSignedUser] = useState<any | null>(null);

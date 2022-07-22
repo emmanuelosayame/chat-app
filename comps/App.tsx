@@ -7,7 +7,7 @@ import { ArchiveIcon, PencilAltIcon } from "@heroicons/react/outline";
 import SmChats from "../comps/SmChats";
 import { ReactNode, useEffect } from "react";
 import { useAuthUser } from "@react-query-firebase/auth";
-import { auth, db } from "../firebase/firebase";
+import { auth, db, rdb } from "../firebase/firebase";
 import { SpinnerDotted } from "spinners-react";
 import {
   collection,
@@ -28,6 +28,7 @@ import {
   useCollection,
   useDocumentDataOnce,
 } from "react-firebase-hooks/firestore";
+import { ref, set } from "firebase/database";
 
 const View = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
@@ -40,12 +41,13 @@ const View = ({ children }: { children: ReactNode }) => {
   const userRef = doc(db, "Users", `${user?.uid}`);
   const [chats] = useCollection(chatsQuery);
   const [userData] = useDocumentData(userRef);
+  const usersRef = ref(rdb, `Users/${user?.displayName}`);
 
   useEffect(() => {
     if (user) {
       UpdateUserData();
     }
-  }, [user]);  
+  }, [user]);
   // remember to wrap async code in useeffect
 
   const UpdateUserData = async () => {
@@ -59,6 +61,8 @@ const View = ({ children }: { children: ReactNode }) => {
       },
       { merge: true }
     );
+
+    set(usersRef, { uid: user?.uid ,name:user?.displayName,userName:user?.email});
   };
 
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
@@ -151,9 +155,8 @@ const View = ({ children }: { children: ReactNode }) => {
           "block",
         ]}
         pos="relative"
-      >
-        {children}
-      </Box>
+      ></Box>
+      {children}
     </Flex>
   );
 };
