@@ -12,7 +12,7 @@ const Login: NextPage = () => {
   }, []);
 
   // const [token,setToken] = useState<string | undefined>("")
-  const toast = useToast();
+  // const toast = useToast();
   // const [signedUser, setSignedUser] = useState<any | null>(null);
   const provider = new GoogleAuthProvider();
 
@@ -54,29 +54,6 @@ const Login: NextPage = () => {
       >
         <Button onClick={signIn}>Login</Button>
       </Flex>
-      <Button
-        size="sm"
-        onClick={() =>
-          toast({
-            position: "bottom-right",
-            duration: 1200,
-            render: () => (
-              <Box
-                color="white"
-                p={3}
-                bg="orange.300"
-                w="200px"
-                h="70px"
-                borderRadius={20}
-              >
-                <Text>{}</Text>
-              </Box>
-            ),
-          })
-        }
-      >
-        Show Toast
-      </Button>
     </>
   );
 };

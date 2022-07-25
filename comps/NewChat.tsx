@@ -24,14 +24,17 @@ import {
 import {
   addDoc,
   collection,
+  doc,
   DocumentData,
+  getDoc,
+  getDocFromCache,
   getDocs,
   // query,
   serverTimestamp,
   where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
 import algoliasearch from "algoliasearch/lite";
 import {
@@ -62,26 +65,72 @@ import {
   ref,
   startAt,
 } from "firebase/database";
+import Fuse from "fuse.js";
 
-const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
+const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const usersRef = ref(rdb, `Users`);
-  const [searchRef, setSearchRef] = useState<Query | null>(null);
-  const [usersDat] = useListVals<{
-    uid: string | undefined;
-    name: string | undefined;
-    userName: string | undefined;
-  }>(searchRef,{});
-  // console.log(usersDat?.find(dat=>dat)?.name);
+  const [usersList, setUsersList] = useState<
+    [{ key: string; name: string; uid: string; userName: string }] | null
+  >(null);
+  const [chatUsers, setChatUsers] = useState<any>([]);
+  const recIds = mappedChats?.map(
+    (ids: { recId: string } | undefined) => ids?.recId
+  );
+  const [chatUsersList, setChatUsersList] = useState<any>([]);
+
+  const fetchChatUsers = async () => {
+    let list: any = [];
+    mappedChats?.forEach(async (id: any) => {
+      const data = await getDoc(doc(db, "Users", `${id.recId}`));
+      list.push({ recId: data.id, chatId:id.chatId, ...data.data() });
+    });
+    
+    setChatUsers(await list);
+  };
+
+  useEffect(() => {
+    fetchChatUsers();
+  }, []);
 
   const searchUser = (e: any) => {
-    const input = e.target.value;
-    setSearchRef(
-      query(usersRef, orderByKey(), startAt(input), endAt(`${input}\uf8ff`))
+    const input = e.target.value.toLowerCase();
+
+    const fuse = new Fuse(chatUsers, {
+      keys: ["name", "userName"],
+    });
+    setChatUsersList(fuse.search(`${input}`));
+
+    const searchQuery = query(
+      usersRef,
+      orderByKey(),
+      startAt(input),
+      endAt(`${input}\uf8ff`)
     );
+    onValue(searchQuery, (snapshot) => {
+      let list: any = [];
+      snapshot.forEach((data) => {
+        const key = data.key;
+        const val = data.val();
+        list.push({ key, ...val });
+      });
+      setUsersList(list);
+    });
+  };
+
+  const noChatUsersList = usersList?.filter(
+    (list) => !recIds.includes(list.uid) && list.uid !== user?.uid
+  );
+  // console.log(chatUsersList);
+
+  const handleNewChat = (uid: any) => {
+    addDoc(collection(db, "chatGroup"), {
+      USID: [user?.uid, uid],
+      timeStamp: serverTimestamp(),
+    });
   };
 
   return (
@@ -104,17 +153,18 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
         isOpen={isOpen}
         scrollBehavior="inside"
         motionPreset="slideInBottom"
+        size="sm"
       >
         <ModalOverlay />
-        <ModalContent borderRadius={15} px="4" bgColor="whitesmoke">
+        <ModalContent borderRadius={15} px="4" bgColor="white">
           <ModalHeader textAlign="center" fontSize="13">
             Start Chat
           </ModalHeader>
           <ModalCloseButton size="sm" color="blue.400" />
 
-          <ModalBody>
+          <ModalBody p={3}>
             <InputGroup>
-              <InputLeftElement children={<SearchIcon mb="1" ml="10" />} />
+              <InputLeftElement children={<SearchIcon mb="1" />} />
               <Input
                 ref={inputRef}
                 size="sm"
@@ -122,26 +172,83 @@ const NewChatComp = ({ userData, chats, text, icon, color }: any) => {
                 type="text"
                 borderRadius="12"
                 placeholder="Search"
-                bgColor="white"
+                bgColor="whitesmoke"
                 _placeholder={{ color: "gray" }}
                 onChange={searchUser}
                 // onKeyDown={searchUser}
               />
             </InputGroup>
             <Box>
-              <Flex p="1">
+              <Flex p="2">
                 <Avatar size="sm" mr="5" />
                 New Group
               </Flex>
               <Divider ml="10" w="90%" />
-              <Flex p="1" cursor="pointer">
-                <Avatar size="sm" mr="5" />
-                Private Chat
-              </Flex>
-              <Flex fontSize={13} fontWeight={600} mt="3">
+
+              <Text fontSize={13} fontWeight={600} my="3">
                 All
-              </Flex>
-              <Divider />
+              </Text>
+              <Box
+                bgColor="whitesmoke"
+                borderRadius="15px"
+                overflowY="auto"
+                maxH="300px"
+                transitionDelay="1s ease-in-out"
+                key="local"
+              >
+                {chatUsersList &&
+                  chatUsersList.map((user: any) => (
+                    <Flex
+                      onClick={() =>
+                        router.push({
+                          pathname: user.item.chatId,
+                          query: {
+                            recId: user.item.recId,
+                            name: user.item.name,
+                            userName: user.item.userName,
+                          },
+                        })
+                      }
+                      key={user.item.recId}
+                      _hover={{ bgColor: "whitesmoke" }}
+                      cursor="pointer"
+                      justify="center"
+                    >
+                      <Box>
+                        <Text fontSize={20} fontWeight="600">
+                          {user.item.name}
+                        </Text>
+                        <Text fontSize={13}>{user.item.userName}</Text>
+                      </Box>
+                    </Flex>
+                  ))}
+              </Box>
+              <Box
+                bgColor="whitesmoke"
+                borderRadius="15px"
+                overflowY="auto"
+                maxH="300px"
+                transitionDelay="1s ease-in-out"
+                key="server"
+              >
+                {usersList &&
+                  noChatUsersList?.map((user) => (
+                    <Flex
+                      onClick={() => handleNewChat(user.uid)}
+                      key={user.key}
+                      _hover={{ bgColor: "whitesmoke" }}
+                      cursor="pointer"
+                      justify="center"
+                    >
+                      <Box>
+                        <Text fontSize={20} fontWeight="600">
+                          {user.name}
+                        </Text>
+                        <Text fontSize={13}>{user.userName}</Text>
+                      </Box>
+                    </Flex>
+                  ))}
+              </Box>
             </Box>
           </ModalBody>
         </ModalContent>

@@ -40,8 +40,14 @@ const View = ({ children }: { children: ReactNode }) => {
   );
   const userRef = doc(db, "Users", `${user?.uid}`);
   const [chats] = useCollection(chatsQuery);
+  const mappedChats = chats?.docs.map((chat: DocumentData | undefined) => {
+    const [recId] = chat
+      ?.data()
+      .USID.filter((id: DocumentData | undefined) => id !== user?.uid);
+    return { chatId: chat?.id, recId };
+  });
   const [userData] = useDocumentData(userRef);
-  const usersRef = ref(rdb, `Users/${user?.displayName}`);
+  const usersRef = ref(rdb, `Users/${user?.displayName?.toLowerCase()}`);
 
   useEffect(() => {
     if (user) {
@@ -62,7 +68,11 @@ const View = ({ children }: { children: ReactNode }) => {
       { merge: true }
     );
 
-    set(usersRef, { uid: user?.uid ,name:user?.displayName,userName:user?.email});
+    set(usersRef, {
+      uid: user?.uid,
+      name: user?.displayName,
+      userName: user?.email,
+    });
   };
 
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
@@ -73,7 +83,7 @@ const View = ({ children }: { children: ReactNode }) => {
   return (
     <Flex
       h="100vh"
-      w="100%"
+      w="full"
       bgColor="whitesmoke"
       pos="fixed"
       maxW="-moz-initial"
@@ -112,7 +122,7 @@ const View = ({ children }: { children: ReactNode }) => {
           <Header>
             <NewChatComp
               userData={userData}
-              chats={chats}
+              mappedChats={mappedChats}
               icon={<PencilAltIcon width={22} />}
               color="blue.400"
             />
@@ -121,14 +131,13 @@ const View = ({ children }: { children: ReactNode }) => {
           <SmChats>
             {!chats?.empty ? (
               <Box>
-                {chats?.docs.map((chat: DocumentData | undefined) => {
-                  const recId = chat
-                    ?.data()
-                    .USID.filter(
-                      (id: DocumentData | undefined) => id !== user?.uid
-                    );
+                {mappedChats?.map((chat: DocumentData | undefined) => {
                   return (
-                    <Chat key={chat?.id} chatId={chat?.id} recId={recId} />
+                    <Chat
+                      key={chat?.chatId}
+                      chatId={chat?.chatId}
+                      recId={chat?.recId}
+                    />
                   );
                 })}
               </Box>
@@ -136,7 +145,7 @@ const View = ({ children }: { children: ReactNode }) => {
               <Flex h="full" justify="center" align="center">
                 <NewChatComp
                   userData={userData}
-                  chats={chats}
+                  mappedChats={mappedChats}
                   text="Start Chat"
                 />
               </Flex>
@@ -155,8 +164,9 @@ const View = ({ children }: { children: ReactNode }) => {
           "block",
         ]}
         pos="relative"
-      ></Box>
-      {children}
+      >
+        {children}
+      </Box>
     </Flex>
   );
 };
