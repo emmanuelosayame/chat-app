@@ -18,14 +18,16 @@ import { useEffect } from "react";
 import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
+// import { useRouter } from "next/router";
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps, router }: AppProps) {
   const [user, loading] = useAuthState(auth);
   const onlineRef = ref(rdb, `status/${user?.uid}/online`);
   const lastSeenRef = ref(rdb, `status/${user?.uid}/lastSeen`);
   const statusRef = ref(rdb, ".info/connected");
 
   useEffect(() => {
+    router.push("/");
     TimeAgo.addDefaultLocale(en);
   }, []);
 
@@ -54,9 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {!user ? (
         <Login />
       ) : (
-        <App>
-          <Component {...pageProps} />
-        </App>
+        <App router={router} Component={Component} pageProps={pageProps} />
       )}
     </ChakraProvider>
   );
@@ -67,7 +67,7 @@ export default MyApp;
 export const Loading = () => {
   return (
     <Flex h="100vh" w="full" align="center" justify="center">
-      <SpinnerDotted color="orange" />
+      <SpinnerDotted color="#007affff" />
     </Flex>
   );
 };

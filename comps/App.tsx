@@ -1,18 +1,29 @@
 import type { NextPage } from "next";
-import { Box, Flex, IconButton, Text, useMediaQuery } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  useMediaQuery,
+} from "@chakra-ui/react";
+
 import Header from "../comps/Header";
 import NewChatComp from "../comps/NewChat";
-import { PhoneIcon, SettingsIcon } from "@chakra-ui/icons";
-import { ArchiveIcon, PencilAltIcon } from "@heroicons/react/outline";
-import SmChats from "../comps/SmChats";
-import { ReactNode, useEffect } from "react";
-import { useAuthUser } from "@react-query-firebase/auth";
+import { SearchIcon } from "@chakra-ui/icons";
+import { PencilAltIcon } from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
-import { SpinnerDotted } from "spinners-react";
 import {
   collection,
   doc,
   DocumentData,
+  getDoc,
+  getDocFromCache,
   orderBy,
   query,
   serverTimestamp,
@@ -29,8 +40,10 @@ import {
   useDocumentDataOnce,
 } from "react-firebase-hooks/firestore";
 import { ref, set } from "firebase/database";
+import Fuse from "fuse.js";
+import { AppProps } from "next/app";
 
-const View = ({ children }: { children: ReactNode }) => {
+const View = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const user = auth.currentUser;
   const chatsQuery = query(
@@ -48,6 +61,31 @@ const View = ({ children }: { children: ReactNode }) => {
   });
   const [userData] = useDocumentData(userRef);
   const usersRef = ref(rdb, `Users/${user?.displayName?.toLowerCase()}`);
+
+  const [chatsData, setChatsData] = useState<any>(null);
+  const [chatList, setChatList] = useState<any>(null);
+  const [search, setSearch] = useState<boolean>(false);
+
+  const fetchRecsData = async () => {
+    if (!chats) return;
+    const recPromise = chats?.docs.map(async (r) => {
+      const recIds = r.data().USID.filter((r: any) => user?.uid !== r);
+      const chatId = r.id;
+      const data = await getDoc(doc(db, "Users", `${recIds}`));
+      return { recId: data.id, ...data.data(), chatId };
+    });
+    if (!recPromise) return;
+    const res = [];
+    for (const resolved of recPromise) {
+      res.push(await resolved);
+    }
+    setChatsData(res);
+  };
+  // console.log(chatList);
+
+  useEffect(() => {
+    fetchRecsData();
+  }, [chats]);
 
   useEffect(() => {
     if (user) {
@@ -75,16 +113,26 @@ const View = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const searchChat = async (e: any) => {
+    const input = e.target.value.toLowerCase();
+    if (!chatsData) return;
+    const fuse = new Fuse(chatsData, {
+      keys: ["name", "userName"],
+    });
+    setChatList(fuse.search(`${input}`));
+  };
+
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
     if (!!router.query?.chat) return chatPage;
     else return noChatPage;
   };
+  // console.log(chatList)
 
   return (
     <Flex
       h="100vh"
       w="full"
-      bgColor="whitesmoke"
+      bgColor="#f2f2f7ff	"
       pos="fixed"
       maxW="-moz-initial"
       mx="auto"
@@ -97,18 +145,18 @@ const View = ({ children }: { children: ReactNode }) => {
           responsiveLayout("none", "block"),
           "block",
         ]}
-        w={["full", "full", "45%", "35%", "30%"]}
+        w={["full", "full", "45%", "45%", "32%"]}
         position="relative"
       >
         <Box
           sx={{
             "&::-webkit-scrollbar": {
               width: "4px",
-              backgroundColor: "blue.50",
+              backgroundColor: "transparent",
             },
             "&::-webkit-scrollbar-thumb": {
               borderRadius: "18px",
-              backgroundColor: "blue.100",
+              backgroundColor: "transparent",
             },
           }}
           w="full"
@@ -119,18 +167,99 @@ const View = ({ children }: { children: ReactNode }) => {
           // borderRightWidth="2px"
           // borderRightColor="red"
         >
-          <Header>
-            <NewChatComp
-              userData={userData}
-              mappedChats={mappedChats}
-              icon={<PencilAltIcon width={22} />}
-              color="blue.400"
-            />
-            <Settings userData={userData} />
-          </Header>
-          <SmChats>
+          {!search && (
+            <Header mappedChats={mappedChats}>
+              <NewChatComp
+                mappedChats={mappedChats}
+                chatsData={chatsData}
+                icon={<PencilAltIcon width={22} />}
+                color="#007affff"
+              />
+              <Settings userData={userData} />
+            </Header>
+          )}
+          <Flex
+            w="full"
+            mt={search ? 5 : 12}
+            h="auto"
+            px={2}
+            pb="3"
+            position="relative"
+          >
+            <InputGroup
+              onClick={() => {
+                setSearch(true);
+              }}
+            >
+              <InputLeftElement children={<SearchIcon w="4" mb="1.5" />} />
+              <Input
+                size="sm"
+                variant="filled"
+                type="text"
+                borderRadius="7"
+                placeholder="Search"
+                bgColor="#74748014"
+                _placeholder={{ color: "	#3c3c434c	" }}
+                focusBorderColor="transparent"
+                _hover={{ bgColor: "white" }}
+                _focus={{ bgColor: "white" }}
+                onChange={searchChat}
+              />
+            </InputGroup>
+            {search && (
+              <Button
+                size="xs"
+                onClick={() => {
+                  setSearch(false);
+                }}
+                color="#007affff"
+                variant="ghost"
+              >
+                Cancel
+              </Button>
+            )}
+          </Flex>
+          <Divider />
+          {chatList &&
+            search &&
+            chatList.map((user: any) => (
+              <Flex
+                onClick={() => {
+                  setSearch(false);
+                  router.push({
+                    pathname: user.item.chatId,
+                    query: {
+                      recId: user.item.recId,
+                      name: user.item.name,
+                      userName: user.item.userName,
+                    },
+                  });
+                }}
+                key={user.item.recId}
+                _hover={{ bgColor: "white" }}
+                cursor="pointer"
+                // justify="center"
+                py="1"
+                px="4"
+              >
+                <Box>
+                  <Text fontSize={20} color="#007affff" fontWeight="600">
+                    {user.item.name}
+                  </Text>
+                  <Text fontSize={13}>{user.item.userName}</Text>
+                </Box>
+              </Flex>
+            ))}
+
+          <Box
+            pos="relative"
+            pt="2"
+            w="100%"
+            h="full"
+            display={search ? "none" : "unset"}
+          >
             {!chats?.empty ? (
-              <Box>
+              <Box pt="2">
                 {mappedChats?.map((chat: DocumentData | undefined) => {
                   return (
                     <Chat
@@ -144,13 +273,13 @@ const View = ({ children }: { children: ReactNode }) => {
             ) : (
               <Flex h="full" justify="center" align="center">
                 <NewChatComp
-                  userData={userData}
                   mappedChats={mappedChats}
+                  chatsData={chatsData}
                   text="Start Chat"
                 />
               </Flex>
             )}
-          </SmChats>
+          </Box>
         </Box>
       </Box>
       {/* next */}
@@ -165,7 +294,18 @@ const View = ({ children }: { children: ReactNode }) => {
         ]}
         pos="relative"
       >
-        {children}
+        {search ? (
+          <Box
+            w="full"
+            h="full"
+            bgColor="#ffffffff	"
+            // bgGradient="linear(90deg, whitesmoke 0%, blue.100, whitesmoke)"
+            opacity={0.6}
+            filter="blur(20px)"
+          />
+        ) : (
+          <Component {...pageProps} />
+        )}
       </Box>
     </Flex>
   );

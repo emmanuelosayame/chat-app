@@ -67,7 +67,7 @@ import {
 } from "firebase/database";
 import Fuse from "fuse.js";
 
-const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
+const NewChatComp = ({ chatsData, mappedChats, text, icon, color }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -76,30 +76,14 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
   const [usersList, setUsersList] = useState<
     [{ key: string; name: string; uid: string; userName: string }] | null
   >(null);
-  const [chatUsers, setChatUsers] = useState<any>([]);
+  const [chatUsersList, setChatUsersList] = useState<any>([]);
   const recIds = mappedChats?.map(
     (ids: { recId: string } | undefined) => ids?.recId
   );
-  const [chatUsersList, setChatUsersList] = useState<any>([]);
-
-  const fetchChatUsers = async () => {
-    let list: any = [];
-    mappedChats?.forEach(async (id: any) => {
-      const data = await getDoc(doc(db, "Users", `${id.recId}`));
-      list.push({ recId: data.id, chatId:id.chatId, ...data.data() });
-    });
-    
-    setChatUsers(await list);
-  };
-
-  useEffect(() => {
-    fetchChatUsers();
-  }, []);
-
   const searchUser = (e: any) => {
     const input = e.target.value.toLowerCase();
-
-    const fuse = new Fuse(chatUsers, {
+    if (!chatsData) return;
+    const fuse = new Fuse(chatsData, {
       keys: ["name", "userName"],
     });
     setChatUsersList(fuse.search(`${input}`));
@@ -110,26 +94,39 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
       startAt(input),
       endAt(`${input}\uf8ff`)
     );
-    onValue(searchQuery, (snapshot) => {
-      let list: any = [];
-      snapshot.forEach((data) => {
-        const key = data.key;
-        const val = data.val();
-        list.push({ key, ...val });
-      });
-      setUsersList(list);
-    });
+    onValue(
+      searchQuery,
+      (snapshot) => {
+        let list: any = [];
+        snapshot.forEach((data) => {
+          const key = data.key;
+          const val = data.val();
+          list.push({ key, ...val });
+        });
+        setUsersList(list);
+      },
+      { onlyOnce: true }
+    );
   };
+  // console.log(chatsData)
 
   const noChatUsersList = usersList?.filter(
     (list) => !recIds.includes(list.uid) && list.uid !== user?.uid
   );
   // console.log(chatUsersList);
 
-  const handleNewChat = (uid: any) => {
-    addDoc(collection(db, "chatGroup"), {
+  const handleNewChat = async (uid: any, name: any, userName: any) => {
+    const newRef = await addDoc(collection(db, "chatGroup"), {
       USID: [user?.uid, uid],
       timeStamp: serverTimestamp(),
+    });
+    router.push({
+      pathname: newRef.id,
+      query: {
+        recId: uid,
+        name: name,
+        userName: userName,
+      },
     });
   };
 
@@ -175,7 +172,6 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
                 bgColor="whitesmoke"
                 _placeholder={{ color: "gray" }}
                 onChange={searchUser}
-                // onKeyDown={searchUser}
               />
             </InputGroup>
             <Box>
@@ -199,7 +195,8 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
                 {chatUsersList &&
                   chatUsersList.map((user: any) => (
                     <Flex
-                      onClick={() =>
+                      onClick={() => {
+                        onClose();
                         router.push({
                           pathname: user.item.chatId,
                           query: {
@@ -207,15 +204,15 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
                             name: user.item.name,
                             userName: user.item.userName,
                           },
-                        })
-                      }
+                        });
+                      }}
                       key={user.item.recId}
                       _hover={{ bgColor: "whitesmoke" }}
                       cursor="pointer"
                       justify="center"
                     >
                       <Box>
-                        <Text fontSize={20} fontWeight="600">
+                        <Text fontSize={20} color="red" fontWeight="600">
                           {user.item.name}
                         </Text>
                         <Text fontSize={13}>{user.item.userName}</Text>
@@ -234,7 +231,10 @@ const NewChatComp = ({ userData, mappedChats, text, icon, color }: any) => {
                 {usersList &&
                   noChatUsersList?.map((user) => (
                     <Flex
-                      onClick={() => handleNewChat(user.uid)}
+                      onClick={() => {
+                        handleNewChat(user.uid, user.name, user.userName);
+                        onClose();
+                      }}
                       key={user.key}
                       _hover={{ bgColor: "whitesmoke" }}
                       cursor="pointer"

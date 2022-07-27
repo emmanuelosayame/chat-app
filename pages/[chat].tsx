@@ -97,7 +97,7 @@ const Chats: NextPage = () => {
         flexDirection="column"
         w="full"
         h="full"
-        // bgColor="red"
+        bgColor="#ffffffff"
         justify="space-between"
         position={["fixed", "fixed", "unset"]}
       >
@@ -110,34 +110,38 @@ const Chats: NextPage = () => {
           backdropFilter="auto"
           backdropBlur="lg"
           justify="space-between"
+          align="center"
         >
           <Flex mr="-14">
             <IconButton
               display={["block", "block", "none"]}
               aria-label="back-btn"
-              size="sm"
-              icon={<ChevronLeftIcon width={30} />}
-              mr="-3"
+              size="md"
+              icon={<ChevronLeftIcon width={40} height={40} />}
+              mr="-4"
+              // mb="2"
               onClick={routeToChats}
               _hover={{ bgColor: "transparent" }}
               _active={{ bgColor: "transparent" }}
               bgColor="transparent"
               color="blue.500"
+              variant="ghost"
+              // alignSelf="center"
             />
             <Box
-              fontSize={14}
-              borderRadius={12}
-              bgColor="blue.300"
-              opacity={0.7}
+              fontSize={["12", "12", "15"]}
+              borderRadius={9}
+              bgColor="#5ac8faff"
+              // opacity={0.7}
               alignSelf="center"
-              py="1"
-              px="2"
-              fontWeight={600}
+              py="0.5"
+              px="1"
+              fontWeight={700}
               mx="2"
               color="white"
             >
               {!!recStatus?.online ? (
-                <Box>Active now</Box>
+                <Box>online</Box>
               ) : (
                 <ReactTimeAgo date={lastSeen} timeStyle="twitter-minute-now" />
                 // <TimeAgo datetime={lastSeen} />
@@ -148,18 +152,18 @@ const Chats: NextPage = () => {
           <Box display="flex" flexDir="column">
             <Text
               mx="auto"
-              fontWeight={600}
-              fontSize={16}
+              fontWeight={700}
+              fontSize={[18, 18, 20]}
               lineHeight="1.2"
-              color="blackAlpha.800"
+              color="#000000ff"
             >
               {router.query.name && router.query.name}
             </Text>
             <Text
               fontWeight={600}
-              fontSize={10}
+              fontSize={[11, 11, 13]}
               lineHeight="1"
-              color="blackAlpha.800"
+              color="#3c3c4399"
             >
               {router.query.name && router.query.userName}
             </Text>
@@ -273,7 +277,7 @@ export const Message = ({
   return (
     <Flex
       alignSelf={messageStyle("end", "start")}
-      bgColor={messageStyle("blue.200", "whitesmoke")}
+      bgColor={messageStyle("#5ac8faff", "#78788028")}
       h="auto"
       borderRadius={13}
       px="2.5"
@@ -285,9 +289,9 @@ export const Message = ({
       justify="end"
     >
       <Box
-        fontSize={13}
+        fontSize={[14, 15, 16]}
         fontWeight={600}
-        color={messageStyle("orange.50", "blackAlpha.700")}
+        color={messageStyle("orange.50", "3c3c4399")}
         maxW="300px"
       >
         {content}
