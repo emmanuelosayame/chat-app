@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   const statusRef = ref(rdb, ".info/connected");
 
   useEffect(() => {
-    router.push("/");
+    // router.push("/");
     TimeAgo.addDefaultLocale(en);
   }, []);
 

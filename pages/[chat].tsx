@@ -130,11 +130,11 @@ const Chats: NextPage = () => {
             />
             <Box
               fontSize={["12", "12", "15"]}
-              borderRadius={9}
+              borderRadius={10}
               bgColor="#5ac8faff"
               // opacity={0.7}
               alignSelf="center"
-              py="0.5"
+              // py="0.5"
               px="1"
               fontWeight={700}
               mx="2"
@@ -181,11 +181,11 @@ const Chats: NextPage = () => {
           sx={{
             "&::-webkit-scrollbar": {
               width: "4px",
-              backgroundColor: "blue.50",
+              backgroundColor: "transparent",
             },
             "&::-webkit-scrollbar-thumb": {
-              borderRadius: "18px",
-              backgroundColor: "blue.100",
+              borderRadius: "4px",
+              backgroundColor: "transparent",
             },
           }}
           scrollBehavior="smooth"
@@ -223,9 +223,10 @@ const Chats: NextPage = () => {
               variant="filled"
               bgColor="white"
               borderColor="gray.200"
-              size="md"
-              h="auto"
-              rows={3}
+              size="sm"
+              // h="auto"
+              rows={1}
+              resize="none"
               p="1.5"
               // maxH='14'
               // placeholder=" yo..."

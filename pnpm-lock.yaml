@@ -6,9 +6,12 @@ specifiers:
   '@emotion/react': ^11.9.3
   '@emotion/styled': ^11.9.3
   '@heroicons/react': ^1.0.6
+  '@ionic/core': ^6.2.0
+  '@ionic/react': ^6.2.0
   '@react-query-firebase/auth': 1.0.0-dev.1
   '@react-query-firebase/firestore': 1.0.0-dev.6
   '@swc/helpers': ^0.4.3
+  '@types/lodash': ^4.14.182
   '@types/node': 18.0.3
   '@types/react': 18.0.15
   '@types/react-dom': 18.0.6
@@ -20,6 +23,7 @@ specifiers:
   framer-motion: ^6.3.16
   fuse.js: ^6.6.2
   javascript-time-ago: ^2.5.6
+  lodash: ^4.17.21
   next: 12.2.0
   pnpm: ^7.5.1
   react: 18.2.0
@@ -41,13 +45,17 @@ dependencies:
   '@emotion/react': 11.9.3_dlcr7kzjh265l7kenqxjsvuiz4
   '@emotion/styled': 11.9.3_xorl7rqfpn4gtnla4dfecagcw4
   '@heroicons/react': 1.0.6_react@18.2.0
+  '@ionic/core': 6.2.0
+  '@ionic/react': 6.2.0_biqbaboplfbrettd7655fr4n2y
   '@react-query-firebase/auth': 1.0.0-dev.1_zdt3s3y4ourprs6ghdsralaf54
   '@react-query-firebase/firestore': 1.0.0-dev.6_zdt3s3y4ourprs6ghdsralaf54
+  '@types/lodash': 4.14.182
   algoliasearch: 4.14.1
   firebase: 9.8.4
   framer-motion: 6.3.16_biqbaboplfbrettd7655fr4n2y
   fuse.js: 6.6.2
   javascript-time-ago: 2.5.6
+  lodash: 4.17.21
   next: 12.2.0_beenoklgwfttvph5dgxj7na7aq
   pnpm: 7.5.1
   react: 18.2.0
@@ -1913,6 +1921,27 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
+  /@ionic/core/6.2.0:
+    resolution: {integrity: sha512-3qUNsVcSAdrjhIhPr5M2RRnh+1xuc9RFaxoeUgI9xQ0YjTmn2FWiH4urDCXuE/rZAwnvHF4X17P0L2EqCPSfWA==}
+    dependencies:
+      '@stencil/core': 2.17.1
+      ionicons: 6.0.2
+      tslib: 2.4.0
+    dev: false
+
+  /@ionic/react/6.2.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-6RJrMpivslHszazxDV7Shmqbmgi7ki0RsqTklAXKKk40+Gglfx/fm+9H7PRJMGJ17ueGRFKN4ZWLahnzl6Y6ag==}
+    peerDependencies:
+      react: '>=16.8.6'
+      react-dom: '>=16.8.6'
+    dependencies:
+      '@ionic/core': 6.2.0
+      ionicons: 6.0.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      tslib: 2.4.0
+    dev: false
+
   /@jridgewell/gen-mapping/0.1.1:
     resolution: {integrity: sha512-sQXCasFk+U8lWYEe66WxRDOE9PjVz4vSM51fTu3Hw+ClTpUSQb718772vH3pyS5pShp6lvQM7SxgIDXXXmOX7w==}
     engines: {node: '>=6.0.0'}
@@ -2173,6 +2202,18 @@ packages:
   /@rushstack/eslint-patch/1.1.4:
     resolution: {integrity: sha512-LwzQKA4vzIct1zNZzBmRKI9QuNpLgTQMEjsQLf3BXuGYb3QPTP4Yjf6mkdX+X1mYttZ808QpOwAzZjv28kq7DA==}
     dev: true
+
+  /@stencil/core/2.16.1:
+    resolution: {integrity: sha512-s/UJp9qxExL3DyQPT70kiuWeb3AdjbUZM+5lEIXn30I2DLcLYPOPXfsoWJODieQywq+3vPiLZeIdkoqjf6jcSw==}
+    engines: {node: '>=12.10.0', npm: '>=6.0.0'}
+    hasBin: true
+    dev: false
+
+  /@stencil/core/2.17.1:
+    resolution: {integrity: sha512-ErjQsNALgZQ9SYeBHhqwL1UO+Zbptwl3kwrRJC2tGlc3G/T6UvPuaKr+PGsqI+CZGia+0+R5EELQvFu74mYeIg==}
+    engines: {node: '>=12.10.0', npm: '>=6.0.0'}
+    hasBin: true
+    dev: false
 
   /@swc/helpers/0.4.2:
     resolution: {integrity: sha512-556Az0VX7WR6UdoTn4htt/l3zPQ7bsQWK+HqdG4swV7beUCxo/BqmvbOpUkTIm/9ih86LIf1qsUnywNL3obGHw==}
@@ -3449,6 +3490,12 @@ packages:
       loose-envify: 1.4.0
     dev: false
 
+  /ionicons/6.0.2:
+    resolution: {integrity: sha512-AyKfFaUKVoBz4eB8XkU7H1R5HFnVsgq5ijqSdbXC0lES9PDK/J6LUQz6XUJq0mVVQF5k9kczSPOLMW3mszG0mQ==}
+    dependencies:
+      '@stencil/core': 2.16.1
+    dev: false
+
   /is-arrayish/0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
     dev: false
@@ -3674,6 +3721,10 @@ packages:
 
   /lodash.mergewith/4.6.2:
     resolution: {integrity: sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==}
+    dev: false
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
   /long/4.0.0:

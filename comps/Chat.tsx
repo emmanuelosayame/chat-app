@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, Fade, Flex } from "@chakra-ui/react";
+import { Avatar, Box, Divider, Fade, Flex, Text } from "@chakra-ui/react";
 import { doc, DocumentData, getDoc } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,21 +26,26 @@ const Chat = ({ chatId, recId }: DocumentData) => {
           userName: recData?.userName,
         },
       }}
+      shallow={true}
       scroll={false}
     >
       <Box>
         <Flex
           flexDirection="column"
+          borderRadius={8}
+          overflow="hidden"
+          // border="1px solid #5ac7faa2"
+          mx="4"
           // justify=
           // onClick={openChat}
-          bgColor={router.query.chat === chatId ? "blue.200" : "unset"}
-          // color={router.query.chat === chatId ? "gray.200" : "unset"}
+          bgColor={router.query.chat === chatId ? "#5ac7faa2" : "unset"}
+          color={router.query.chat === chatId ? "whitesmoke" : "unset"}
           transform={router.query.chat === chatId ? "scale(1.1)" : "unset"}
-          pl={router.query.chat === chatId ? "4" : "unset"}
+          // pl={router.query.chat === chatId ? "4" : "unset"}
           _hover={{
-            bgColor: router.query.chat === chatId ? "blue.200" : "white",
+            bgColor: router.query.chat === chatId ? "#5ac8faff" : "white",
             transform: "scale(1.15)",
-            pl: [4, 10, 4, 4, 6],
+            // pl: [4, 10, 4, 4, 6],
           }}
           cursor="pointer"
         >
@@ -58,11 +63,13 @@ const Chat = ({ chatId, recId }: DocumentData) => {
                 />
               </Flex>
             )}
-            <Box mx="2" p="1" h={"12"} color="gray.900">
+            <Box mx="2" p="1" h={"12"}>
               <Box fontWeight={600} fontSize="20" lineHeight="1">
                 {recData?.name}
               </Box>
-              <Box fontSize={15}>{recData?.userName}</Box>
+              <Text color="#3c3c4399" fontSize={15}>
+                {recData?.userName}
+              </Text>
             </Box>
           </Flex>
           <Divider

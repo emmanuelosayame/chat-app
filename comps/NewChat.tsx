@@ -57,7 +57,6 @@ import {
   endAt,
   limitToLast,
   onValue,
-  orderByChild,
   orderByKey,
   orderByValue,
   Query,
@@ -67,7 +66,15 @@ import {
 } from "firebase/database";
 import Fuse from "fuse.js";
 
-const NewChatComp = ({ chatsData, mappedChats, text, icon, color }: any) => {
+const NewChatComp = ({
+  newSearch,
+  setNewSearch,
+  chatsData,
+  mappedChats,
+  text,
+  icon,
+  color,
+}: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -80,6 +87,11 @@ const NewChatComp = ({ chatsData, mappedChats, text, icon, color }: any) => {
   const recIds = mappedChats?.map(
     (ids: { recId: string } | undefined) => ids?.recId
   );
+
+  useEffect(() => {
+    !isOpen && setNewSearch(false);
+  }, [isOpen]);
+
   const searchUser = (e: any) => {
     const input = e.target.value.toLowerCase();
     if (!chatsData) return;
@@ -153,29 +165,46 @@ const NewChatComp = ({ chatsData, mappedChats, text, icon, color }: any) => {
         size="sm"
       >
         <ModalOverlay />
-        <ModalContent borderRadius={15} px="4" bgColor="white">
-          <ModalHeader textAlign="center" fontSize="13">
+        <ModalContent
+          borderRadius={13}
+          boxShadow="2xl"
+          border="2px solid #74748039"
+          px="4"
+          bgColor="#f2f2f7ff"
+        >
+          <ModalHeader
+            textAlign="center"
+            fontSize="15"
+            color="#3c3c4399"
+            fontWeight={600}
+            p="2"
+          >
             Start Chat
           </ModalHeader>
-          <ModalCloseButton size="sm" color="blue.400" />
+          {/* <ModalCloseButton size="sm" color="blue.400" /> */}
 
           <ModalBody p={3}>
-            <InputGroup>
+            <InputGroup
+              onClick={() => !newSearch && setNewSearch(true)}
+              onFocus={() => setNewSearch(true)}
+            >
               <InputLeftElement children={<SearchIcon mb="1" />} />
               <Input
-                ref={inputRef}
                 size="sm"
                 variant="filled"
                 type="text"
-                borderRadius="12"
-                placeholder="Search"
-                bgColor="whitesmoke"
-                _placeholder={{ color: "gray" }}
+                borderRadius="7"
+                placeholder="Search friends"
+                bgColor="#74748014"
+                _placeholder={{ color: "#3c3c434c" }}
+                focusBorderColor="transparent"
+                _hover={{ bgColor: "white" }}
+                _focus={{ bgColor: "#74748014" }}
                 onChange={searchUser}
               />
             </InputGroup>
             <Box>
-              <Flex p="2">
+              <Flex p="2" fontWeight={600}>
                 <Avatar size="sm" mr="5" />
                 New Group
               </Flex>

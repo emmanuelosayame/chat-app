@@ -1,0 +1,25 @@
+{/* <Button
+                ml="10"
+                borderRadius="17px"
+                variant="outline"
+                fontSize={17}
+                p="2"
+                size="sm"
+                color="#007affff"
+              >
+                Logout
+              </Button> */}
+
+
+              <Button
+            justifyContent="start"
+            leftIcon={<ArchiveIcon color="black" width={20} />}
+            variant="ghost"
+            m="1"
+            size="sm"
+            onClick={() => {
+              setBucket(true);
+            }}
+          >
+            My Bucket
+          </Button>

@@ -9,6 +9,7 @@ import {
   InputGroup,
   InputLeftElement,
   Text,
+  useDisclosure,
   useMediaQuery,
 } from "@chakra-ui/react";
 
@@ -28,6 +29,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import Chat from "./Chat";
@@ -60,11 +62,13 @@ const View = ({ Component, pageProps }: AppProps) => {
     return { chatId: chat?.id, recId };
   });
   const [userData] = useDocumentData(userRef);
-  const usersRef = ref(rdb, `Users/${user?.displayName?.toLowerCase()}`);
+  // const usersRef = ref(rdb, `Users/${user?.displayName?.toLowerCase()}`);
 
   const [chatsData, setChatsData] = useState<any>(null);
   const [chatList, setChatList] = useState<any>(null);
   const [search, setSearch] = useState<boolean>(false);
+  const [newSearch, setNewSearch] = useState<boolean>(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchRecsData = async () => {
     if (!chats) return;
@@ -80,38 +84,39 @@ const View = ({ Component, pageProps }: AppProps) => {
       res.push(await resolved);
     }
     setChatsData(res);
+    // console.log("i fetchd");
   };
-  // console.log(chatList);
 
   useEffect(() => {
-    fetchRecsData();
-  }, [chats]);
+    search && fetchRecsData();
+    newSearch && fetchRecsData();
+  }, [search, newSearch]);
+
+  const nameRef = ref(
+    rdb,
+    `Users/${
+      user?.displayName ? user?.displayName?.toLowerCase() + user?.uid : "user"
+    }`
+  );
 
   useEffect(() => {
-    if (user) {
-      UpdateUserData();
-    }
-  }, [user]);
-  // remember to wrap async code in useeffect
-
-  const UpdateUserData = async () => {
-    setDoc(
-      doc(db, "Users", `${user?.uid}`),
-      {
-        Uid: [`${user?.displayName}`, `${user?.email}`],
-        userName: `${user?.email}`,
+    if (userData === undefined) return;
+    if (!userData?.name) {
+      updateDoc(doc(db, "Users", `${user?.uid}`), {
         name: `${user?.displayName}`,
-        photoURL: user?.photoURL,
-      },
-      { merge: true }
-    );
+      });
 
-    set(usersRef, {
-      uid: user?.uid,
-      name: user?.displayName,
-      userName: user?.email,
-    });
-  };
+      set(nameRef, {
+        uid: user?.uid,
+        name: user?.displayName,
+      }); 
+    }
+    if (!userData?.photoURL) {
+      updateDoc(doc(db, "Users", `${user?.uid}`), {
+        photoURL: `${user?.photoURL}`,
+      });
+    }
+  }, [userData]);
 
   const searchChat = async (e: any) => {
     const input = e.target.value.toLowerCase();
@@ -126,187 +131,195 @@ const View = ({ Component, pageProps }: AppProps) => {
     if (!!router.query?.chat) return chatPage;
     else return noChatPage;
   };
-  // console.log(chatList)
 
   return (
-    <Flex
-      h="100vh"
-      w="full"
-      bgColor="#f2f2f7ff	"
-      pos="fixed"
-      maxW="-moz-initial"
-      mx="auto"
-      right="0"
-      left="0"
-    >
-      <Box
-        display={[
-          responsiveLayout("none", "block"),
-          responsiveLayout("none", "block"),
-          "block",
-        ]}
-        w={["full", "full", "45%", "45%", "32%"]}
-        position="relative"
+    <Flex bgColor="#000000" pt={isOpen ? "4" : "unset"}>
+      <Flex
+        h="100vh"
+        w={isOpen ? ["95%", "96%"] : "full"}
+        borderTopRadius={isOpen ? "10" : "unset"}
+        overflow="hidden"
+        zIndex={1000}
+        bgColor="#f2f2f7ff"
+        mx="auto"
+        transitionDelay="2s ease-in"
       >
-        <Box
-          sx={{
-            "&::-webkit-scrollbar": {
-              width: "4px",
-              backgroundColor: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              borderRadius: "18px",
-              backgroundColor: "transparent",
-            },
-          }}
-          w="full"
-          h="full"
-          overflowY="scroll"
-          // borderRight={["none", "none", "Scrollbar"]}
-          // // borderRightColor="orange.300"
-          // borderRightWidth="2px"
-          // borderRightColor="red"
-        >
-          {!search && (
-            <Header mappedChats={mappedChats}>
-              <NewChatComp
-                mappedChats={mappedChats}
-                chatsData={chatsData}
-                icon={<PencilAltIcon width={22} />}
-                color="#007affff"
-              />
-              <Settings userData={userData} />
-            </Header>
-          )}
-          <Flex
-            w="full"
-            mt={search ? 5 : 12}
-            h="auto"
-            px={2}
-            pb="3"
+        {router.pathname !== "/bucket" && (
+          <Box
+            display={[
+              responsiveLayout("none", "block"),
+              responsiveLayout("none", "block"),
+              "block",
+            ]}
+            w={["full", "full", "45%", "45%", "32%"]}
             position="relative"
           >
-            <InputGroup
-              onClick={() => {
-                setSearch(true);
+            <Box
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "4px",
+                  backgroundColor: "transparent",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  borderRadius: "4px",
+                  backgroundColor: "transparent",
+                },
               }}
+              w="full"
+              h="full"
+              overflowY="scroll"
             >
-              <InputLeftElement children={<SearchIcon w="4" mb="1.5" />} />
-              <Input
-                size="sm"
-                variant="filled"
-                type="text"
-                borderRadius="7"
-                placeholder="Search"
-                bgColor="#74748014"
-                _placeholder={{ color: "	#3c3c434c	" }}
-                focusBorderColor="transparent"
-                _hover={{ bgColor: "white" }}
-                _focus={{ bgColor: "white" }}
-                onChange={searchChat}
-              />
-            </InputGroup>
-            {search && (
-              <Button
-                size="xs"
-                onClick={() => {
-                  setSearch(false);
-                }}
-                color="#007affff"
-                variant="ghost"
-              >
-                Cancel
-              </Button>
-            )}
-          </Flex>
-          <Divider />
-          {chatList &&
-            search &&
-            chatList.map((user: any) => (
+              {!search && (
+                <Header>
+                  <NewChatComp
+                    newSearch={newSearch}
+                    setNewSearch={setNewSearch}
+                    mappedChats={mappedChats}
+                    chatsData={chatsData}
+                    icon={<PencilAltIcon width={22} />}
+                    color="#007affff"
+                  />
+                  <Settings
+                    userData={userData}
+                    isOpen={isOpen}
+                    onOpen={onOpen}
+                    onClose={onClose}
+                  />
+                </Header>
+              )}
               <Flex
-                onClick={() => {
-                  setSearch(false);
-                  router.push({
-                    pathname: user.item.chatId,
-                    query: {
-                      recId: user.item.recId,
-                      name: user.item.name,
-                      userName: user.item.userName,
-                    },
-                  });
-                }}
-                key={user.item.recId}
-                _hover={{ bgColor: "white" }}
-                cursor="pointer"
-                // justify="center"
-                py="1"
-                px="4"
+                w="full"
+                mt={search ? 5 : 12}
+                h="auto"
+                px={2}
+                pb="3"
+                position="relative"
               >
-                <Box>
-                  <Text fontSize={20} color="#007affff" fontWeight="600">
-                    {user.item.name}
-                  </Text>
-                  <Text fontSize={13}>{user.item.userName}</Text>
-                </Box>
+                <InputGroup
+                  onClick={() => {
+                    setSearch(true);
+                  }}
+                >
+                  <InputLeftElement children={<SearchIcon w="4" mb="1.5" />} />
+                  <Input
+                    size="sm"
+                    variant="filled"
+                    type="text"
+                    borderRadius="7"
+                    placeholder="Search"
+                    bgColor="#74748014"
+                    _placeholder={{ color: "	#3c3c434c	" }}
+                    focusBorderColor="transparent"
+                    _hover={{ bgColor: "white" }}
+                    _focus={{ bgColor: "white" }}
+                    onChange={searchChat}
+                  />
+                </InputGroup>
+                {search && (
+                  <Button
+                    size="xs"
+                    onClick={() => {
+                      setSearch(false);
+                    }}
+                    color="#007affff"
+                    variant="ghost"
+                  >
+                    Cancel
+                  </Button>
+                )}
               </Flex>
-            ))}
+              <Divider />
+              {chatList &&
+                search &&
+                chatList.map((user: any) => (
+                  <Flex
+                    onClick={() => {
+                      setSearch(false);
+                      router.push({
+                        pathname: user.item.chatId,
+                        query: {
+                          recId: user.item.recId,
+                          name: user.item.name,
+                          userName: user.item.userName,
+                        },
+                      });
+                    }}
+                    key={user.item.recId}
+                    _hover={{ bgColor: "white" }}
+                    cursor="pointer"
+                    // justify="center"
+                    py="1"
+                    px="4"
+                  >
+                    <Box>
+                      <Text fontSize={20} color="#007affff" fontWeight="600">
+                        {user.item.name}
+                      </Text>
+                      <Text fontSize={13}>{user.item.userName}</Text>
+                    </Box>
+                  </Flex>
+                ))}
 
-          <Box
-            pos="relative"
-            pt="2"
-            w="100%"
-            h="full"
-            display={search ? "none" : "unset"}
-          >
-            {!chats?.empty ? (
-              <Box pt="2">
-                {mappedChats?.map((chat: DocumentData | undefined) => {
-                  return (
-                    <Chat
-                      key={chat?.chatId}
-                      chatId={chat?.chatId}
-                      recId={chat?.recId}
+              <Box
+                pos="relative"
+                pt="2"
+                w="100%"
+                h="full"
+                display={search ? "none" : "unset"}
+              >
+                {!chats?.empty ? (
+                  <Box pt="2">
+                    {mappedChats?.map((chat: DocumentData | undefined) => {
+                      return (
+                        <Chat
+                          key={chat?.chatId}
+                          chatId={chat?.chatId}
+                          recId={chat?.recId}
+                        />
+                      );
+                    })}
+                  </Box>
+                ) : (
+                  <Flex h="full" justify="center" align="center">
+                    <NewChatComp
+                      newSearch={newSearch}
+                      setNewSearch={setNewSearch}
+                      mappedChats={mappedChats}
+                      chatsData={chatsData}
+                      text="Start Chat"
                     />
-                  );
-                })}
+                  </Flex>
+                )}
               </Box>
-            ) : (
-              <Flex h="full" justify="center" align="center">
-                <NewChatComp
-                  mappedChats={mappedChats}
-                  chatsData={chatsData}
-                  text="Start Chat"
-                />
-              </Flex>
-            )}
+            </Box>
           </Box>
-        </Box>
-      </Box>
-      {/* next */}
-      <Box
-        h="full"
-        bgColor="whiteAlpha.700"
-        w="full"
-        display={[
-          responsiveLayout("block", "none"),
-          responsiveLayout("block", "none"),
-          "block",
-        ]}
-        pos="relative"
-      >
-        {search ? (
+        )}
+        {/* next */}
+        <Box
+          h="full"
+          bgColor="whiteAlpha.700"
+          w="full"
+          display={[
+            responsiveLayout("block", "none"),
+            responsiveLayout("block", "none"),
+            "block",
+          ]}
+          pos="relative"
+        >
+          {/* {search ? ( */}
           <Box
             w="full"
             h="full"
             bgColor="#ffffffff	"
-            // bgGradient="linear(90deg, whitesmoke 0%, blue.100, whitesmoke)"
             opacity={0.6}
             filter="blur(20px)"
+            display={search ? "block" : "none"}
           />
-        ) : (
-          <Component {...pageProps} />
-        )}
-      </Box>
+          <Box h="full" w="full" display={search ? "none" : "block"}>
+            <Component userData={userData} {...pageProps} />
+          </Box>
+        </Box>
+      </Flex>
     </Flex>
   );
 };

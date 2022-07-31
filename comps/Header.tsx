@@ -1,26 +1,16 @@
 import {
-  Avatar,
-  Box,
+
   Flex,
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
+ 
   Text,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
-import { PencilAltIcon } from "@heroicons/react/solid";
-import NewChatComp from "./NewChat";
 import { ReactNode } from "react";
 
 const Header = ({
   children,
-  mappedChats,
 }: {
   children: ReactNode;
-  mappedChats: any;
 }) => {
-  // console.log(chatUsersList);
 
   return (
     <Flex
@@ -30,7 +20,7 @@ const Header = ({
       w="full"
       left={0}
       top={0}
-      bgColor="whiteAlpha.500"
+      bgColor="#f2f2f783"
       backdropFilter="auto"
       backdropBlur="md"
       zIndex={1000}
