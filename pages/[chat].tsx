@@ -267,7 +267,6 @@ export const Message = ({
   const time =
     !!timeSent &&
     timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
-  // console.log(time);
   const messageStyle = (userVal: string, recVal: string) => {
     if (sender === user?.uid) {
       return userVal;

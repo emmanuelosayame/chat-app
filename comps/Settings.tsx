@@ -51,6 +51,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
   const user = auth.currentUser;
   const router = useRouter();
   const [bucket, setBucket] = useState<boolean>(false);
+  const [userNameSet, setUserNameSet] = useState<boolean>(true);
   const {
     isOpen: profileIsOpen,
     onOpen: profileOnOpen,
@@ -65,7 +66,10 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
   useEffect(() => {
     if (userData) {
       if (!userData?.userName) {
+        setUserNameSet(false);
         onOpen();
+        profileOnOpen();
+        accountOnOpen();
       }
     }
   }, [userData]);
@@ -274,7 +278,13 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
         onClick={onOpen}
         size="sm"
       />
-      <Drawer isOpen={isOpen} placement="bottom" onClose={onClose} size="full">
+      <Drawer
+        isOpen={isOpen}
+        placement="bottom"
+        onClose={onClose}
+        size="full"
+        closeOnOverlayClick={userNameSet ? true : false}
+      >
         {/* <DrawerOverlay /> */}
         <DrawerContent
           border="2px solid white #2c2c2eff"
@@ -357,7 +367,13 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           ) : (
             <DrawerBody h="full" display="flex" flexWrap="wrap-reverse">
               {profileIsOpen ? (
-                <Profile profileOnClose={profileOnClose} userData={userData} />
+                <Profile
+                  profileOnClose={profileOnClose}
+                  userData={userData}
+                  userNameSet={userNameSet}
+                  setUserNameSet={setUserNameSet}
+                  onClose={onClose}
+                />
               ) : accountIsOpen ? (
                 <Account />
               ) : (

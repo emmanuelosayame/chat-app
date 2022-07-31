@@ -24,9 +24,16 @@ import Image from "next/image";
 import { useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
 
-const Profile = ({ profileOnClose, userData }: any) => {
+const Profile = ({
+  profileOnClose,
+  userData,
+  userNameSet,
+  onClose,
+  setUserNameSet,
+}: any) => {
   const user = auth.currentUser;
   const [error, setError] = useState(false);
+  const [userNameWarning, setUserNameWarning] = useState<boolean>(false);
   const [nameChange, setNameChange] = useState<any>(
     userData?.name && userData?.name
   );
@@ -41,8 +48,14 @@ const Profile = ({ profileOnClose, userData }: any) => {
   const nameRef = ref(rdb, `Users/${userData?.name.toLowerCase() + user?.uid}`);
 
   const handleUserNameChange = debounce(async (input) => {
+    setUserNameWarning(false);
     if (input === userData?.userName) {
       setUserNameChange({ exists: undefined, value: input });
+      return;
+    }
+
+    if (input.length < 4) {
+      setUserNameWarning(true);
       return;
     }
     await getDocsFromServer(
@@ -108,6 +121,7 @@ const Profile = ({ profileOnClose, userData }: any) => {
           Done
         </Button> */}
         <IconButton
+          display={userNameSet ? "flex" : "none"}
           aria-label="close-setting-page"
           icon={<ChevronLeftIcon width={40} />}
           variant="ghost"
@@ -124,19 +138,21 @@ const Profile = ({ profileOnClose, userData }: any) => {
           variant="ghost"
           // onClick={profileOnClose}
           // bgColor="white"
+          // alignSelf="end"
           m="2"
           size="sm"
           color="blue.300"
           borderRadius="15px"
           onClick={() => {
             handleProfileChanges();
-            profileOnClose();
+            userNameSet ? profileOnClose() : onClose();
+            setUserNameSet(true);
           }}
         >
           Save
         </Button>
       </Flex>
-      <Flex mx="auto">
+      <Flex mx="auto" mt={userNameSet ? "unset" : 5}>
         {userData?.photoURL ? (
           <Box
             borderRadius="50%"
@@ -192,12 +208,21 @@ const Profile = ({ profileOnClose, userData }: any) => {
               }}
               fontSize="22px"
               isInvalid={userNameChange?.exists}
-              focusBorderColor={
-                userNameChange?.exists ? "red.500" : "transparent"
-              }
+              focusBorderColor={userNameChange?.exists ? "red.500" : "gray"}
             />
-            {userNameChange?.exists === false ? (
-              <CheckCircleIcon width={30} color="green" />
+            {error ? (
+              <Text
+                fontSize={16}
+                color="whitesmoke"
+                borderRadius={10}
+                bgColor="red.500"
+                px="1"
+                h="fit-content"
+                m="1"
+                fontWeight={600}
+              >
+                offline
+              </Text>
             ) : userNameChange?.exists === true ? (
               <Text
                 fontSize={17}
@@ -209,20 +234,23 @@ const Profile = ({ profileOnClose, userData }: any) => {
               >
                 taken
               </Text>
+            ) : userNameWarning ? (
+              <Text
+                fontSize={14}
+                color="whitesmoke"
+                borderRadius={20}
+                bgColor="red.500"
+                px="2"
+                py="1"
+                h="fit-content"
+                m="1"
+                // fontWeight={600}
+              >
+                cannot be less than 4 chars.
+              </Text>
             ) : (
-              error && (
-                <Text
-                  fontSize={16}
-                  color="whitesmoke"
-                  borderRadius={10}
-                  bgColor="red.500"
-                  px="1"
-                  h="fit-content"
-                  m="1"
-                  fontWeight={600}
-                >
-                  offline
-                </Text>
+              userNameChange?.exists === false && (
+                <CheckCircleIcon width={30} color="green" />
               )
             )}
           </Flex>

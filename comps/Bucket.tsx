@@ -97,6 +97,9 @@ const Bucket = ({ setBucket }: any) => {
 export default Bucket;
 
 export const Container = ({ content }: any) => {
+  const time =
+    !!content.timeSent &&
+    content.timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
   return (
     <Flex
       h="auto"
@@ -122,7 +125,7 @@ export const Container = ({ content }: any) => {
         color="gray"
       >
         {content?.timeSent ? (
-          content?.timeSent
+          time
         ) : (
           <Box mb="1" mt="-1">
             <ClockIcon width={10} />
