@@ -7,30 +7,21 @@ import {
   Divider,
   Drawer,
   DrawerBody,
-  DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   Flex,
-  Icon,
   IconButton,
-  Input,
   Stack,
   Switch,
   Text,
-  Textarea,
   useDisclosure,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import {
   ArchiveIcon,
-  CheckCircleIcon,
-  CheckIcon,
-  DatabaseIcon,
   KeyIcon,
   MoonIcon,
-  PencilIcon,
-  UserCircleIcon,
   UserIcon,
 } from "@heroicons/react/outline";
 import {
@@ -39,6 +30,7 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@heroicons/react/solid";
+
 import { clearIndexedDbPersistence, terminate } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -52,6 +44,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
   const router = useRouter();
   const [bucket, setBucket] = useState<boolean>(false);
   const [userNameSet, setUserNameSet] = useState<boolean>(true);
+  const [profileLg, setProfileLg] = useState<boolean>(true);
   const {
     isOpen: profileIsOpen,
     onOpen: profileOnOpen,
@@ -83,7 +76,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
 
   const SettingsMenu = () => {
     return (
-      <Stack mx="0" w={["full", "full", "50%", "35%"]}>
+      <Stack mx="0" w="full">
         <Flex
           borderRadius={15}
           flexDir="column"
@@ -173,12 +166,11 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
     return (
       <Flex
         flexDirection="column"
-        // justify="space-between"
         align="center"
-        w={["full", "full", "50%", "65%"]} // h="200px"
         bgColor="whitesmoke"
         my="5"
         borderRadius={10}
+        w={["full", "full", "full", "40%", "35%"]}
       >
         {/* <IconButton
           aria-label="close-setting-page"
@@ -206,6 +198,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           Back
         </Button>
         <Button
+          display={["flex", "flex", "flex", "none"]}
           w="90%"
           my="5"
           bgColor="white"
@@ -222,14 +215,32 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
             Edit Profile
           </Flex>
         </Button>
-        <Container h="full">
+        <Button
+          display={["none", "none", "none", "flex"]}
+          w="90%"
+          my="5"
+          bgColor="white"
+          p="3"
+          borderRadius={12}
+          onClick={() => setProfileLg(false)}
+          justifyContent="space-between"
+          rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
+        >
+          <Flex align="center">
+            <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
+              <UserIcon fill="black" width={20} />
+            </Box>
+            Edit Profile
+          </Flex>
+        </Button>
+        <Box px="8" h="full" w="full">
           <Flex
             fontWeight={600}
             fontSize={17}
             p="2"
             bgColor="white"
             borderRadius={10}
-            m="2"
+            my="2"
           >
             <Text mx="2">Email:</Text>
             <Text>{user?.email}</Text>
@@ -243,13 +254,13 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
             p="2"
             bgColor="white"
             borderRadius={10}
-            m="2"
+            my="2"
             fontSize={17}
           >
             <Text mx="2">Last SignedIn:</Text>
             <Text>{user?.metadata.lastSignInTime}</Text>
           </Flex>
-        </Container>
+        </Box>
         <Button
           borderRadius="15px"
           bgColor="white"
@@ -260,7 +271,6 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           mx="auto"
           size="sm"
           onClick={logout}
-          // color="#007affff"
         >
           Logout
         </Button>
@@ -294,6 +304,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           w={bucket ? "full" : ["full", "99%"]}
           h={bucket ? "full" : ["95%", "96.5%"]}
           mx="auto"
+          bgColor="#ffffffff"
         >
           {!(bucket || profileIsOpen) && (
             <DrawerHeader
@@ -314,7 +325,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
                   >
                     <Image
                       referrerPolicy="no-referrer"
-                      loader={() => userData?.photoURL}
+                      loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
                       src={userData?.photoURL}
                       width="100%"
                       height="100%"
@@ -365,7 +376,12 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           {bucket ? (
             <Bucket setBucket={setBucket} />
           ) : (
-            <DrawerBody h="full" display="flex" flexWrap="wrap-reverse">
+            <DrawerBody
+              h="full"
+              display="flex"
+              flexWrap="wrap-reverse"
+              w="full"
+            >
               {profileIsOpen ? (
                 <Profile
                   profileOnClose={profileOnClose}
@@ -375,7 +391,22 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
                   onClose={onClose}
                 />
               ) : accountIsOpen ? (
-                <Account />
+                <Flex w="full">
+                  <Account />
+                  <Box
+                    display={["none", "none", "none", "block"]}
+                    pl={5}
+                    w={["full", "full", "full", "60%", "65%"]}
+                  >
+                    <Profile
+                      profileOnClose={profileOnClose}
+                      userData={userData}
+                      userNameSet={userNameSet}
+                      setUserNameSet={setUserNameSet}
+                      onClose={onClose}
+                    />
+                  </Box>
+                </Flex>
               ) : (
                 <SettingsMenu />
               )}
