@@ -39,17 +39,20 @@ import { auth, db } from "../firebase/firebase";
 import Bucket from "./Bucket";
 import Profile from "./Profile";
 
-const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
+const Settings = ({
+  userData,
+  isOpen,
+  onClose,
+  onOpen,
+  userNameSet,
+  setUserNameSet,
+}: any) => {
   const user = auth.currentUser;
   const router = useRouter();
   const [bucket, setBucket] = useState<boolean>(false);
-  const [userNameSet, setUserNameSet] = useState<boolean>(true);
-  const [profileLg, setProfileLg] = useState<boolean>(true);
-  const {
-    isOpen: profileIsOpen,
-    onOpen: profileOnOpen,
-    onClose: profileOnClose,
-  } = useDisclosure();
+
+  // const [profileLg, setProfileLg] = useState<boolean>(true);
+  const [profileOpen, setProfileOpen] = useState<boolean>(false);
   const {
     isOpen: accountIsOpen,
     onOpen: accountOnOpen,
@@ -57,20 +60,17 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
   } = useDisclosure();
 
   useEffect(() => {
-    if (userData) {
-      if (!userData?.userName) {
-        setUserNameSet(false);
-        onOpen();
-        profileOnOpen();
-        accountOnOpen();
-      }
+    if (!userNameSet) {
+      accountOnOpen();
+      setProfileOpen(true);
     }
-  }, [userData]);
+  }, [userNameSet]);
 
   const logout = () => {
     router.push("/");
-    terminate(db);
-    clearIndexedDbPersistence(db);
+    router.reload();
+    // terminate(db);
+    // clearIndexedDbPersistence(db);
     auth.signOut();
   };
 
@@ -88,7 +88,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           <Button
             onClick={() => {
               accountOnOpen();
-              profileIsOpen && profileOnClose();
+              // profileIsOpen && profileOnClose();
             }}
             borderRadius={12}
             justifyContent="space-between"
@@ -170,6 +170,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
         bgColor="whitesmoke"
         my="5"
         borderRadius={10}
+        display={profileOpen ? ["none", "none", "none", "flex"] : "flex"}
         w={["full", "full", "full", "40%", "35%"]}
       >
         {/* <IconButton
@@ -186,6 +187,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
         /> */}
         <Button
           aria-label="close-setting-page"
+          display={userNameSet?"block":"none"}
           variant="ghost"
           onClick={accountOnClose}
           alignSelf="start"
@@ -204,7 +206,7 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           bgColor="white"
           p="3"
           borderRadius={12}
-          onClick={profileOnOpen}
+          onClick={() => setProfileOpen(true)}
           justifyContent="space-between"
           rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
         >
@@ -215,24 +217,25 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
             Edit Profile
           </Flex>
         </Button>
-        <Button
+
+        <Flex
           display={["none", "none", "none", "flex"]}
           w="90%"
           my="5"
-          bgColor="white"
-          p="3"
+          bgColor="#e6e6e6d5"
+          py="1.5"
+          px="3"
           borderRadius={12}
-          onClick={() => setProfileLg(false)}
+          // onClick={() => setProfileLg(false)}
           justifyContent="space-between"
-          rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
         >
-          <Flex align="center">
+          <Flex align="center" fontWeight={600}>
             <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
               <UserIcon fill="black" width={20} />
             </Box>
             Edit Profile
           </Flex>
-        </Button>
+        </Flex>
         <Box px="8" h="full" w="full">
           <Flex
             fontWeight={600}
@@ -298,7 +301,6 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
         {/* <DrawerOverlay /> */}
         <DrawerContent
           border="2px solid white #2c2c2eff"
-          // boxShadow="md"
           pos="fixed"
           borderTopRadius={bucket ? "unset" : 10}
           w={bucket ? "full" : ["full", "99%"]}
@@ -306,15 +308,14 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
           mx="auto"
           bgColor="#ffffffff"
         >
-          {!(bucket || profileIsOpen) && (
+          {!bucket && (
             <DrawerHeader
-              display="flex"
-              // px="2"
+              display={profileOpen ? ["none", "none", "none", "flex"] : "flex"}
               justifyContent="space-between"
               w="full"
             >
               <Flex>
-                {userData?.photoURL ? (
+                {!!userData?.photoURL && userData?.photoURL !== "null" ? (
                   <Box
                     borderRadius="50%"
                     w="60px"
@@ -346,13 +347,14 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
                     >
                       {userData?.userName}
                     </Text>
-                    {!userData?.verified && (
+                    {userData?.verified && (
                       <BadgeCheckIcon fill="#007affff" width={20} />
                     )}
                   </Box>
                 </Box>
               </Flex>
               <Button
+                display={userNameSet ? "block" : "none"}
                 onClick={() => {
                   accountOnClose();
                   onClose();
@@ -363,7 +365,6 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
                 fontSize={[12, 16, 17]}
                 m="1"
                 size={["sm", "md", "md"]}
-                display="block"
                 textAlign="center"
               >
                 <ChevronUpIcon width="100%" height={20} />
@@ -382,30 +383,17 @@ const Settings = ({ userData, isOpen, onClose, onOpen }: any) => {
               flexWrap="wrap-reverse"
               w="full"
             >
-              {profileIsOpen ? (
-                <Profile
-                  profileOnClose={profileOnClose}
-                  userData={userData}
-                  userNameSet={userNameSet}
-                  setUserNameSet={setUserNameSet}
-                  onClose={onClose}
-                />
-              ) : accountIsOpen ? (
+              {accountIsOpen ? (
                 <Flex w="full">
                   <Account />
-                  <Box
-                    display={["none", "none", "none", "block"]}
-                    pl={5}
-                    w={["full", "full", "full", "60%", "65%"]}
-                  >
-                    <Profile
-                      profileOnClose={profileOnClose}
-                      userData={userData}
-                      userNameSet={userNameSet}
-                      setUserNameSet={setUserNameSet}
-                      onClose={onClose}
-                    />
-                  </Box>
+                  <Profile
+                    profileOpen={profileOpen}
+                    setProfileOpen={setProfileOpen}
+                    userData={userData}
+                    userNameSet={userNameSet}
+                    setUserNameSet={setUserNameSet}
+                    onClose={onClose}
+                  />
                 </Flex>
               ) : (
                 <SettingsMenu />

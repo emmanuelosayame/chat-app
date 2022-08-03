@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   set,
 } from "firebase/database";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
@@ -22,30 +22,11 @@ import en from "javascript-time-ago/locale/en.json";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
   const [user, loading] = useAuthState(auth);
-  const onlineRef = ref(rdb, `status/${user?.uid}/online`);
-  const lastSeenRef = ref(rdb, `status/${user?.uid}/lastSeen`);
-  const statusRef = ref(rdb, ".info/connected");
 
   useEffect(() => {
-    // router.push("/");
+    router.push("/");
     TimeAgo.addDefaultLocale(en);
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      onValue(statusRef, (snap) => {
-        if (snap.val() === true) {
-          const con = push(onlineRef);
-
-          onDisconnect(con).remove();
-
-          set(con, browserName);
-
-          onDisconnect(lastSeenRef).set(serverTimestamp());
-        }
-      });
-    }
-  }, [user]);
 
   if (loading) {
     return <Loading />;

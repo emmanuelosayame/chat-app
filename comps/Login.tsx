@@ -1,9 +1,12 @@
 import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import { auth, db, rdb } from "../firebase/firebase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { ref, set } from "firebase/database";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 
 const Login: NextPage = () => {
   const router = useRouter();
@@ -21,13 +24,42 @@ const Login: NextPage = () => {
 
     signInWithPopup(auth, provider)
       .then((result) => {
-        // // This gives you a Google Access Token. You can use it to access the Google API.
-        // const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential?.accessToken;
-        // setToken(token);
-        // The signed-in user info.
-        // const user = result.user;
-        // setSignedUser(user);
+        const user = result.user;
+        const nameRef = ref(
+          rdb,
+          `Users/${
+            user?.displayName
+              ? user?.displayName?.toLowerCase() + user?.uid
+              : "user"
+          }`
+        );
+        getDoc(doc(db, "Users", `${user.uid}`)).then((snapshot) => {
+          const userData = snapshot.data();
+          if (!userData?.name) {
+            setDoc(
+              doc(db, "Users", `${user?.uid}`),
+              {
+                name: `${user?.displayName}`,
+              },
+              { merge: true }
+            );
+
+            set(nameRef, {
+              uid: user?.uid,
+              name: user?.displayName,
+            });
+          }
+
+          if (!userData?.photoURL) {
+            setDoc(
+              doc(db, "Users", `${user?.uid}`),
+              {
+                photoURL: `${user?.photoURL && user?.photoURL}`,
+              },
+              { merge: true }
+            );
+          }
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -39,7 +71,6 @@ const Login: NextPage = () => {
       });
   };
 
-  // auth.signOut()
   return (
     <>
       <Flex

@@ -1,7 +1,9 @@
 import { Avatar, Box, Divider, Fade, Flex, Text } from "@chakra-ui/react";
+import { AtSymbolIcon } from "@heroicons/react/outline";
+import { BadgeCheckIcon } from "@heroicons/react/solid";
 import { doc, DocumentData, getDoc } from "firebase/firestore";
 import Image from "next/image";
-import Link from "next/link";
+// import Link from "next/link";
 import { useRouter } from "next/router";
 // import { useEffect } from "react";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -13,74 +15,88 @@ const Chat = ({ chatId, recId }: DocumentData) => {
   const recQuery = doc(db, "Users", `${recId}`);
   const [recData] = useDocumentData(recQuery);
   const dp = recData?.photoURL;
-  // console.log(router.query.chat)
-  // console.log("rendered")
-
-  return (
-    <Link
-      href={{
-        pathname: chatId,
+  const routerToChat = () => {
+    // if (router.asPath !== `/p/${recData?.userName}`)
+    router.push(
+      {
+        pathname: "/p/[chat]",
         query: {
+          chatId: chatId,
           recId: recId,
           name: recData?.name,
           userName: recData?.userName,
+          photoURL: recData?.photoURL,
         },
+      },
+      `/p/${recData?.userName}`
+    );
+  };
+
+  return (
+    <Flex
+      flexDirection="column"
+      role="group"
+      py="1"
+      pl="3"
+      borderRadius={8}
+      overflow="hidden"
+      // border="1px solid #5ac7faa2"
+      bgColor={router.query.chatId === chatId ? "#ffffff" : "unset"}
+      // color={router.query.chatId === chatId ? "#000000b7" : "unset"}
+      transform={router.query.chatId === chatId ? "scale(1.1)" : "unset"}
+      mx={router.query.chatId === chatId ? "5" : "unset"}
+      my={router.query.chatId === chatId ? "1" : "unset"}
+      _hover={{
+        bgColor: router.query.chatId === chatId ? "#5ac7fa8b" : "white",
+        transform:
+          router.query.chatId === chatId ? "scale(1.15)" : "scale(1.05)",
       }}
-      shallow={true}
-      scroll={false}
+      cursor="pointer"
+      onClick={routerToChat}
     >
-      <Box>
-        <Flex
-          flexDirection="column"
-          borderRadius={8}
-          overflow="hidden"
-          // border="1px solid #5ac7faa2"
-          mx="4"
-          // justify=
-          // onClick={openChat}
-          bgColor={router.query.chat === chatId ? "#5ac7faa2" : "unset"}
-          color={router.query.chat === chatId ? "whitesmoke" : "unset"}
-          transform={router.query.chat === chatId ? "scale(1.1)" : "unset"}
-          // pl={router.query.chat === chatId ? "4" : "unset"}
-          _hover={{
-            bgColor: router.query.chat === chatId ? "#5ac8faff" : "white",
-            transform: "scale(1.15)",
-            // pl: [4, 10, 4, 4, 6],
-          }}
-          cursor="pointer"
-        >
-          <Flex px="2" align="center">
-            {!dp ? (
-              <Avatar alignSelf="center" size="sm" />
-            ) : (
-              <Flex borderRadius="50%" w="40px" h="40px" overflow="hidden">
-                <Image
-                  referrerPolicy="no-referrer"
-                  loader={() => `${dp}?w=${40}&q=${75}`}
-                  src={dp}
-                  width="100%"
-                  height="100%"
-                />
-              </Flex>
-            )}
-            <Box mx="2" p="1" h={"12"}>
-              <Box fontWeight={600} fontSize="20" lineHeight="1">
-                {recData?.name}
-              </Box>
-              <Text color="#3c3c4399" fontSize={15}>
-                {recData?.userName}
-              </Text>
-            </Box>
+      <Flex align="center">
+        {!dp ? (
+          <Avatar alignSelf="center" size="sm" />
+        ) : (
+          <Flex borderRadius="50%" w="40px" h="40px" overflow="hidden">
+            <Image
+              referrerPolicy="no-referrer"
+              loader={() => `${dp}?w=${40}&q=${75}`}
+              src={dp}
+              width="100%"
+              height="100%"
+            />
           </Flex>
-          <Divider
-            display={router.query.chat === chatId ? "none" : "block"}
-            borderColor="#3c3c432d"
-            w={["85%", "90%"]}
-            alignSelf="end"
-          />
-        </Flex>
-      </Box>
-    </Link>
+        )}
+        <Box mx="2" py="2" h={"12"}>
+          <Text fontSize="17" fontWeight={600} lineHeight="1">
+            {recData?.name}
+          </Text>
+          <Box display="flex">
+            <Box my="auto" mx="0.07rem" color="#3c3c434e">
+              <AtSymbolIcon width={12} height={12} strokeWidth="3" />
+            </Box>
+            <Text color="#3c3c4399" fontSize={12} fontWeight={600}>
+              {recData?.userName}
+            </Text>
+            <Box mx="2" pb="1">
+              {recData?.verified && (
+                <BadgeCheckIcon fill="#007affff" width={15} />
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Flex>
+      <Divider
+        display={router.query.chatId === chatId ? "none" : "block"}
+        borderColor="#3c3c432d"
+        w={["85%", "90%"]}
+        alignSelf="end"
+        _groupHover={{
+          display: "none",
+        }}
+      />
+    </Flex>
   );
 };
 

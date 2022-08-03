@@ -1,15 +1,6 @@
 import {
-  ArrowUpIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  RepeatClockIcon,
-  RepeatIcon,
-  TimeIcon,
-} from "@chakra-ui/icons";
-import {
   Avatar,
   Box,
-  Button,
   Divider,
   Flex,
   IconButton,
@@ -27,9 +18,11 @@ import {
   collection,
   doc,
   DocumentData,
+  limit,
   orderBy,
   query,
   serverTimestamp,
+  startAt,
   Timestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
@@ -40,40 +33,48 @@ import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-import { SendIcon, StickerIcon } from "../comps/Icons";
-import { auth, db, rdb } from "../firebase/firebase";
+import { SendIcon, StickerIcon } from "../../comps/Icons";
+import { auth, db, rdb } from "../../firebase/firebase";
 import ReactTimeAgo from "react-time-ago";
 import { ClockIcon } from "@heroicons/react/outline";
 import { Database, ref, DataSnapshot } from "firebase/database";
 import { useListVals, useObjectVal } from "react-firebase-hooks/database";
+import Image from "next/image";
 // import TimeAgo from "timeago-react";
 
-const Chats: NextPage = () => {
+const Chats: NextPage = ({ showStatus }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
-  const messagesId = router.query.chat;
-  // const keepBottomRef = useRef<any>();
-  const messagesRef = collection(db, "chatGroup", `${messagesId}`, "messages");
-  const messagesQuery = query(messagesRef, orderBy("timeSent", "asc"));
-  const [messages] = useCollectionData(messagesQuery);
-  const [newMessage, setNewMessage] = useState("");
-  const [recStatus] = useObjectVal<{ lastSeen: number; online: DataSnapshot }>(
-    ref(rdb, `status/${router.query.recId}`)
+  const chatId = router.query.chatId;
+  const keepBottomRef = useRef<any>();
+  const messagesRef = collection(db, "chatGroup", `${chatId}`, "messages");
+  const messagesQuery = query(
+    messagesRef,
+    orderBy("timeSent", "asc"),
+    // startAt("timeStamp"),
+    limit(20)
   );
+  const [messages] = useCollection(messagesQuery);
+  const [newMessage, setNewMessage] = useState("");
+  const [recStatus, statusLoading, statusError] = useObjectVal<{
+    lastSeen: number;
+    online: DataSnapshot;
+  }>(ref(rdb, `status/${router.query.recId}`));
+
   const lastSeen = !!recStatus ? new Date(recStatus.lastSeen) : new Date();
 
-  // const keepBottom = () => {
-  //   keepBottomRef.current?.scrollIntoView({
-  //     behavior: "smooth",
-  //     block: "start",
-  //   });
-  // };
+  const keepBottom = () => {
+    keepBottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
-  // useEffect(() => {
-  //   if (!!messages) {
-  //     keepBottom();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (!!messages) {
+      keepBottom();
+    }
+  }, [router.pathname, messages]);
 
   const sendMessage = () => {
     if (!(newMessage.length === 0)) {
@@ -100,6 +101,7 @@ const Chats: NextPage = () => {
         bgColor="#ffffffff"
         justify="space-between"
         position={["fixed", "fixed", "unset"]}
+        // key={router.query.chatId?.toString()}
       >
         <Flex
           pos="absolute"
@@ -129,19 +131,24 @@ const Chats: NextPage = () => {
               // alignSelf="center"
             />
             <Box
-              fontSize={["12", "12", "15"]}
+              fontSize={showStatus ? ["12", "12", "15"] : "20"}
               borderRadius={10}
-              bgColor="#5ac8faff"
-              // opacity={0.7}
+              bgColor={showStatus ? "#5ac8faff" : "transparent"}
+              // opacity={0.2}
               alignSelf="center"
               // py="0.5"
+              w="60px"
               px="1"
-              fontWeight={700}
+              fontWeight={600}
               mx="2"
-              color="white"
+              color={showStatus ? "white" : "#5ac8faff"}
             >
-              {!!recStatus?.online ? (
-                <Box>online</Box>
+              {!showStatus ? (
+                <Text>...</Text>
+              ) : !!recStatus?.online ? (
+                <Text textAlign="center" w="full">
+                  online
+                </Text>
               ) : (
                 <ReactTimeAgo date={lastSeen} timeStyle="twitter-minute-now" />
                 // <TimeAgo datetime={lastSeen} />
@@ -149,7 +156,7 @@ const Chats: NextPage = () => {
             </Box>
           </Flex>
 
-          <Box display="flex" flexDir="column">
+          <Box display="flex" flexDir="column" justifyContent="center">
             <Text
               mx="auto"
               fontWeight={700}
@@ -160,6 +167,7 @@ const Chats: NextPage = () => {
               {router.query.name && router.query.name}
             </Text>
             <Text
+              mx="auto"
               fontWeight={600}
               fontSize={[11, 11, 13]}
               lineHeight="1"
@@ -170,7 +178,22 @@ const Chats: NextPage = () => {
           </Box>
           <Box>
             {!!router.query.photoURL ? (
-              <Box>image</Box>
+              <Box
+                borderRadius="50%"
+                h="35px"
+                w="35px"
+                overflow="hidden"
+                border="1px solid #3c3c432d"
+                mx="2"
+              >
+                <Image
+                  referrerPolicy="no-referrer"
+                  loader={() => `${router.query.photoURL}?w=${60}&q=${75}`}
+                  src={router.query.photoURL.toString()}
+                  width="100%"
+                  height="100%"
+                />
+              </Box>
             ) : (
               <Avatar size="sm" mx="2" />
             )}
@@ -196,15 +219,10 @@ const Chats: NextPage = () => {
           pt="14"
         >
           {!!messages &&
-            messages?.map((message: DocumentData) => (
-              <Message
-                key={message.id}
-                content={message.content}
-                sender={message.sender}
-                timeSent={message.timeSent}
-              />
+            messages?.docs.map((message: DocumentData) => (
+              <Message key={message.id} content={message.data()} />
             ))}
-          {/* <div ref={keepBottomRef} /> */}
+          <div ref={keepBottomRef} />
         </Flex>
 
         <Box px="5">
@@ -254,21 +272,13 @@ const Chats: NextPage = () => {
 };
 export default Chats;
 
-export const Message = ({
-  content,
-  sender,
-  timeSent,
-}: {
-  content: string;
-  sender: string | undefined;
-  timeSent: Timestamp;
-}) => {
+export const Message = ({ content }: { content: DocumentData }) => {
   const user = auth.currentUser;
   const time =
-    !!timeSent &&
-    timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
+    !!content.timeSent &&
+    content.timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
   const messageStyle = (userVal: string, recVal: string) => {
-    if (sender === user?.uid) {
+    if (content.sender === user?.uid) {
       return userVal;
     }
     return recVal;
@@ -294,7 +304,7 @@ export const Message = ({
         color={messageStyle("orange.50", "3c3c4399")}
         maxW="300px"
       >
-        {content}
+        {content.content}
       </Box>
       <Box
         mt="2"
@@ -305,7 +315,7 @@ export const Message = ({
         fontWeight={500}
         color={messageStyle("gray.50", "gray")}
       >
-        {timeSent ? (
+        {content.timeSent ? (
           time
         ) : (
           <Box mb="1" mt="-1">

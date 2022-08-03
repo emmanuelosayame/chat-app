@@ -23,11 +23,12 @@ import {
 import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import { debounce } from "lodash";
 import Image from "next/image";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { auth, db, rdb, storage } from "../firebase/firebase";
 
 const Profile = ({
-  profileOnClose,
+  profileOpen,
+  setProfileOpen,
   userData,
   userNameSet,
   onClose,
@@ -39,27 +40,23 @@ const Profile = ({
     false
   );
   const uploadRef = useRef<HTMLInputElement | null>(null);
-  // const [photoUploadFile, setPhotoUploadFile] = useState<File>();
-  // console.log(photoUploadFile);
   const [photoURL, setPhotoURL] = useState<string>(userData?.photoURL);
-  const [nameChange, setNameChange] = useState<any>(
-    userData?.name && userData?.name
-  );
-  const [userNameChange, setUserNameChange] = useState<
+  const [name, setName] = useState<any>("");
+  const [userName, setUserName] = useState<
     { exists: boolean | undefined; value: string } | undefined
-  >(undefined);
-  const [aboutChange, setAboutChange] = useState<any>(
-    userData?.about && userData?.about
-  );
-
-  const newNameRef = ref(rdb, `Users/${nameChange?.toLowerCase() + user?.uid}`);
-  const nameRef = ref(rdb, `Users/${userData?.name.toLowerCase() + user?.uid}`);
+  >({ exists: undefined, value: userData?.userName && userData?.userName });
+  const [about, setAbout] = useState<any>(userData?.about && userData?.about);
 
   const profilesRef = sref(storage, `profilePhoto/${user?.uid}`);
 
-  const photoChange = (photo: File | undefined) => {
+  useEffect(() => {
+    userData?.name && setName(userData?.name);
+    userData?.userName && setUserName(userData?.userName);
+    userData?.photoURL && setPhotoURL(userData?.photoURL);
+  }, [userData]);
+
+  const photoChange = async (photo: File | undefined) => {
     if (photo) {
-      // console.log(photo)
       uploadBytes(profilesRef, photo)
         .then((snap) => {
           setError(false);
@@ -69,10 +66,10 @@ const Profile = ({
     }
   };
 
-  const handleUserNameChange = debounce(async (input) => {
+  const handleUserName = debounce(async (input) => {
     setUserNameWarning(false);
     if (input === userData?.userName) {
-      setUserNameChange({ exists: undefined, value: input });
+      setUserName({ exists: undefined, value: input });
       return;
     }
 
@@ -89,75 +86,118 @@ const Profile = ({
     )
       .then((userName) => {
         setError(false);
-        setUserNameChange({ exists: !userName.empty, value: input });
+        setUserName({ exists: !userName.empty, value: input });
       })
       .catch(() => setError(true));
   }, 1000);
 
   const handleProfileChanges = () => {
-    if (photoURL !== userData?.photoURL) {
+    if (photoURL !== userData?.photoURL && photoURL !== null && photoURL) {
       updateDoc(doc(db, "Users", `${user?.uid}`), {
-        photoURL: photoURL,
+        photoURL: photoURL && photoURL,
       });
     }
 
-    if (nameChange !== userData?.name) {
+    if (name !== userData?.name && name.length < 20) {
+      const newNameRef = ref(rdb, `Users/${name?.toLowerCase() + user?.uid}`);
+      const nameRef = ref(
+        rdb,
+        `Users/${userData?.name.toLowerCase() + user?.uid}`
+      );
       updateDoc(doc(db, "Users", `${user?.uid}`), {
-        name: nameChange,
+        name: name,
       });
       remove(nameRef);
       set(newNameRef, {
         uid: user?.uid,
-        name: nameChange,
-        userName: user?.email,
+        name: name,
+        userName: userName?.value,
+        photoURL: photoURL && photoURL !== "null" ? photoURL : "",
       });
+      if (userData?.userName) {
+        const userNameRef = ref(
+          rdb,
+          `Users/${userData?.userName.toLowerCase()}`
+        );
+        update(userNameRef, {
+          name: name,
+        });
+      }
     }
     if (
-      userNameChange?.value !== userData.name &&
-      userNameChange?.exists === false &&
-      userNameChange.value.length >= 4 &&
-      userNameChange.value.length < 17
+      userName?.value !== userData.name &&
+      userName?.exists === false &&
+      userName.value.length >= 4 &&
+      userName.value.length < 17
     ) {
+      const newUserNameRef = ref(
+        rdb,
+        `Users/${userName?.value?.toLowerCase()}`
+      );
+      if (userData?.userName) {
+        const userNameRef = ref(
+          rdb,
+          `Users/${userData?.userName.toLowerCase()}`
+        );
+        remove(userNameRef);
+      }
       updateDoc(doc(db, "Users", `${user?.uid}`), {
-        userName: userNameChange?.value,
+        userName: userName?.value,
+      }).then(() => setUserNameSet(true));
+
+      set(newUserNameRef, {
+        uid: user?.uid,
+        name: name,
+        userName: userName,
+        photoURL: photoURL && photoURL !== "null" ? photoURL : "",
+      });
+      const nameRef = ref(
+        rdb,
+        `Users/${userData?.name.toLowerCase() + user?.uid}`
+      );
+      update(nameRef, {
+        userName: userName,
       });
     }
 
-    if (aboutChange !== userData.about) {
+    if (about !== userData.about) {
       updateDoc(doc(db, "Users", `${user?.uid}`), {
-        about: aboutChange,
+        about: about,
       });
     }
   };
 
   const toast = useToast();
-  !userNameSet &&
-    toast({
-      position: "bottom",
-      duration: 9000,
-      render: () => (
-        <Box
-          borderRadius={20}
-          bgColor="white"
-          p="1"
-          border="1px solid whitesmoke"
-        >
-          <Text textAlign="center" fontWeight={600}>
-            username not set
-          </Text>
-          <Text textAlign="center" fontWeight={600} fontSize="15">
-            setup username to get started
-          </Text>
-        </Box>
-      ),
-    });
+  useEffect(() => {
+    !userNameSet &&
+      toast({
+        position: "bottom",
+        duration: 9000,
+        render: () => (
+          <Box
+            borderRadius={20}
+            bgColor="white"
+            p="1"
+            border="1px solid whitesmoke"
+          >
+            <Text textAlign="center" fontWeight={600}>
+              username not set
+            </Text>
+            <Text textAlign="center" fontWeight={600} fontSize="15">
+              setup username to get started
+            </Text>
+          </Box>
+        ),
+      });
+  }, []);
 
   return (
     <Flex
       flexDirection="column"
       align="center"
-      // w={["full", "full", "full", "full", "65%"]}
-      w="full"
+      display={profileOpen ? "flex" : ["none", "none", "none", "flex"]}
+      ml={[0, 0, 0, 10]}
+      w={["full", "full", "full", "60%", "65%"]}
       bgColor="whitesmoke"
       my="5"
       borderRadius={10}
@@ -179,7 +219,7 @@ const Profile = ({
           Done
         </Button> */}
         <IconButton
-          display={userNameSet ? ["flex", "flex", "flex","none"] : "none"}
+          display={userNameSet ? ["flex", "flex", "flex", "none"] : "none"}
           aria-label="close-setting-page"
           icon={<ChevronLeftIcon width={40} />}
           variant="ghost"
@@ -188,7 +228,7 @@ const Profile = ({
           size="sm"
           color="blue.300"
           borderRadius="15px"
-          onClick={profileOnClose}
+          onClick={() => setProfileOpen(false)}
         />
         <Button
           aria-label="close-setting-page"
@@ -202,16 +242,21 @@ const Profile = ({
           color="blue.300"
           borderRadius="15px"
           onClick={() => {
+            // !userNameSet &&
+            //   userName &&
+            //   userName?.value.length >= 4 &&
+            //   userName?.value.length < 17 &&
+            //   setUserNameSet(true);
             handleProfileChanges();
-            userNameSet ? profileOnClose() : onClose();
-            setUserNameSet(true);
+            // userNameSet && profileOnClose();
+            userNameSet && setProfileOpen(false);
           }}
         >
           Save
         </Button>
       </Flex>
       <Flex mx="auto" mt={userNameSet ? "unset" : 5}>
-        {photoURL ? (
+        {photoURL && photoURL !== "null" ? (
           <Box
             borderRadius="50%"
             w="90px"
@@ -229,7 +274,7 @@ const Profile = ({
             />
           </Box>
         ) : (
-          <Avatar mr="2" />
+          <Avatar size="xl" mr="2" />
         )}
       </Flex>
       <Button
@@ -261,9 +306,9 @@ const Profile = ({
             w="90%"
             variant="flushed"
             aria-label="name"
-            value={nameChange}
+            value={name}
             fontSize="22px"
-            onChange={(e) => setNameChange(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
         </Box>
         <Box>
@@ -278,11 +323,11 @@ const Profile = ({
               aria-label="userName"
               defaultValue={userData?.userName}
               onChange={(e) => {
-                handleUserNameChange(e.target.value);
+                handleUserName(e.target.value);
               }}
               fontSize="22px"
-              isInvalid={userNameChange?.exists}
-              focusBorderColor={userNameChange?.exists ? "#ff9500ff" : "gray"}
+              isInvalid={userName?.exists}
+              focusBorderColor={userName?.exists ? "#ff9500ff" : "gray"}
               pos="relative"
             />
             <Box>
@@ -300,7 +345,7 @@ const Profile = ({
                 >
                   unable to connect
                 </Text>
-              ) : userNameChange?.exists === true ? (
+              ) : userName?.exists === true ? (
                 <Text
                   fontSize={17}
                   color="#ff9500ff"
@@ -328,7 +373,7 @@ const Profile = ({
                   {userNameWarning}
                 </Text>
               ) : (
-                userNameChange?.exists === false && (
+                userName?.exists === false && (
                   <CheckCircleIcon width={30} color="green" />
                 )
               )}
@@ -344,9 +389,9 @@ const Profile = ({
             w="90%"
             variant="flushed"
             aria-label="about"
-            value={aboutChange}
+            value={about}
             fontSize="22px"
-            onChange={(e) => setAboutChange(e.target.value)}
+            onChange={(e) => setAbout(e.target.value)}
             resize="none"
           />
         </Box>

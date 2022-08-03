@@ -23,3 +23,40 @@
           >
             My Bucket
           </Button>
+
+
+
+
+
+
+
+
+
+
+
+          const updateUserDataIf = async () => {
+          if (!userData?.name) {
+          setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+          name: `${user?.displayName}`,
+          },
+          { merge: true }
+          );
+          
+          set(nameRef, {
+          uid: user?.uid,
+          name: user?.displayName,
+          });
+          }
+          
+          if (!userData?.photoURL) {
+          setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+          photoURL: `${user?.photoURL && user?.photoURL}`,
+          },
+          { merge: true }
+          );
+          }
+          };

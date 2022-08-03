@@ -36,35 +36,17 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
-import algoliasearch from "algoliasearch/lite";
 import {
-  Hits,
-  HitsProps,
-  InstantSearch,
-  SearchBox,
-  useSearchBox,
-  UseSearchBoxProps,
-} from "react-instantsearch-hooks-web";
-import {
-  useList,
-  useListKeys,
-  useListVals,
-  useObject,
-  useObjectVal,
-} from "react-firebase-hooks/database";
-import {
-  child,
   endAt,
-  limitToLast,
   onValue,
   orderByKey,
-  orderByValue,
-  Query,
   query,
   ref,
   startAt,
 } from "firebase/database";
 import Fuse from "fuse.js";
+import { debounce } from "lodash";
+import Image from "next/image";
 
 const NewChatComp = ({
   newSearch,
@@ -81,7 +63,16 @@ const NewChatComp = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const usersRef = ref(rdb, `Users`);
   const [usersList, setUsersList] = useState<
-    [{ key: string; name: string; uid: string; userName: string }] | null
+    | [
+        {
+          key: string;
+          name: string;
+          uid: string;
+          userName: string;
+          photoURL: string;
+        }
+      ]
+    | null
   >(null);
   const [chatUsersList, setChatUsersList] = useState<any>([]);
   const recIds = mappedChats?.map(
@@ -89,10 +80,10 @@ const NewChatComp = ({
   );
 
   useEffect(() => {
-    !isOpen && setNewSearch(false);
+    setChatUsersList([]);
   }, [isOpen]);
 
-  const searchUser = (e: any) => {
+  const searchUser = debounce(async (e: any) => {
     const input = e.target.value.toLowerCase();
     if (!chatsData) return;
     const fuse = new Fuse(chatsData, {
@@ -119,7 +110,7 @@ const NewChatComp = ({
       },
       { onlyOnce: true }
     );
-  };
+  }, 700);
   // console.log(chatsData)
 
   const noChatUsersList = usersList?.filter(
@@ -208,75 +199,120 @@ const NewChatComp = ({
                 <Avatar size="sm" mr="5" />
                 New Group
               </Flex>
-              <Divider ml="10" w="90%" />
+              <Divider ml="10" mb="2" w="90%" />
 
-              <Text fontSize={13} fontWeight={600} my="3">
-                All
-              </Text>
               <Box
-                bgColor="whitesmoke"
                 borderRadius="15px"
                 overflowY="auto"
-                maxH="300px"
                 transitionDelay="1s ease-in-out"
-                key="local"
               >
+                {chatUsersList.length > 0 && (
+                  <Text fontSize={13} color="#3c3c434c" m="1">
+                    My Chats
+                  </Text>
+                )}
                 {chatUsersList &&
                   chatUsersList.map((user: any) => (
-                    <Flex
-                      onClick={() => {
-                        onClose();
-                        router.push({
-                          pathname: user.item.chatId,
-                          query: {
-                            recId: user.item.recId,
-                            name: user.item.name,
-                            userName: user.item.userName,
-                          },
-                        });
-                      }}
-                      key={user.item.recId}
-                      _hover={{ bgColor: "whitesmoke" }}
-                      cursor="pointer"
-                      justify="center"
-                    >
-                      <Box>
-                        <Text fontSize={20} color="red" fontWeight="600">
-                          {user.item.name}
-                        </Text>
-                        <Text fontSize={13}>{user.item.userName}</Text>
-                      </Box>
-                    </Flex>
+                    <>
+                      <Flex
+                        onClick={() => {
+                          onClose();
+                          router.push(
+                            {
+                              pathname: "/p/[chat]",
+                              query: {
+                                chatId: user.item.chatId,
+                                recId: user.item.recId,
+                                name: user.item.name,
+                                userName: user.item.userName,
+                              },
+                            },
+                            `/p/${user?.item.userName}`
+                          );
+                        }}
+                        key={user.item.recId}
+                        _hover={{ bgColor: "whitesmoke" }}
+                        cursor="pointer"
+                        // justify="center"
+                        h="auto"
+                        borderRadius={10}
+                        align="center"
+                      >
+                        {user.item.photoURL ? (
+                          <Flex
+                            borderRadius="50%"
+                            w="40px"
+                            h="40px"
+                            overflow="hidden"
+                            mx="3"
+                          >
+                            <Image
+                              referrerPolicy="no-referrer"
+                              loader={() =>
+                                `${user.item.photoURL}?w=${40}&q=${75}`
+                              }
+                              src={user.item.photoURL}
+                              width="100%"
+                              height="100%"
+                            />
+                          </Flex>
+                        ) : (
+                          <Avatar size="sm" mx="2" />
+                        )}
+                        <Box>
+                          <Text fontSize={20} fontWeight="600">
+                            {user.item.name}
+                          </Text>
+                          <Text fontSize={13}>{user.item.userName}</Text>
+                        </Box>
+                      </Flex>
+                      <Divider />
+                    </>
                   ))}
-              </Box>
-              <Box
-                bgColor="whitesmoke"
-                borderRadius="15px"
-                overflowY="auto"
-                maxH="300px"
-                transitionDelay="1s ease-in-out"
-                key="server"
-              >
-                {usersList &&
-                  noChatUsersList?.map((user) => (
-                    <Flex
-                      onClick={() => {
-                        handleNewChat(user.uid, user.name, user.userName);
-                        onClose();
-                      }}
-                      key={user.key}
-                      _hover={{ bgColor: "whitesmoke" }}
-                      cursor="pointer"
-                      justify="center"
-                    >
-                      <Box>
-                        <Text fontSize={20} fontWeight="600">
-                          {user.name}
-                        </Text>
-                        <Text fontSize={13}>{user.userName}</Text>
-                      </Box>
-                    </Flex>
-                  ))}
+
+                {noChatUsersList && noChatUsersList.length > 0 && (
+                  <Text fontSize={13} color="#3c3c434c" m="1">
+                    All
+                  </Text>
+                )}
+                {noChatUsersList?.map((user) => (
+                  <Flex
+                    onClick={() => {
+                      handleNewChat(user.uid, user.name, user.userName);
+                      onClose();
+                    }}
+                    key={user.key}
+                    _hover={{ bgColor: "whitesmoke" }}
+                    cursor="pointer"
+                    // justify="center"
+                  >
+                    {user?.photoURL ? (
+                      <Flex
+                        borderRadius="50%"
+                        w="40px"
+                        h="40px"
+                        overflow="hidden"
+                        mx="2"
+                      >
+                        <Image
+                          referrerPolicy="no-referrer"
+                          loader={() => `${user?.photoURL}?w=${40}&q=${75}`}
+                          src={user?.photoURL}
+                          width="100%"
+                          height="100%"
+                        />
+                      </Flex>
+                    ) : (
+                      <Avatar alignSelf="center" size="sm" />
+                    )}
+                    <Box>
+                      <Text fontSize={20} fontWeight="600">
+                        {user.name}
+                      </Text>
+                      <Text fontSize={13}>{user.userName}</Text>
+                    </Box>
+                  </Flex>
+                ))}
               </Box>
             </Box>
           </ModalBody>
