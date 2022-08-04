@@ -1,12 +1,16 @@
 import {
   Box,
   Button,
+  Checkbox,
+  CheckboxGroup,
   Divider,
   Flex,
   Input,
   InputGroup,
   InputLeftElement,
+  Stack,
   Text,
+  useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
 
@@ -18,10 +22,10 @@ import { useEffect, useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentData,
   getDoc,
-  getDocFromCache,
   orderBy,
   query,
   setDoc,
@@ -48,7 +52,6 @@ import {
 import Fuse from "fuse.js";
 import { AppProps } from "next/app";
 import { browserName } from "react-device-detect";
-import { Loading } from "../pages/_app";
 
 const View = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -74,12 +77,14 @@ const View = ({ Component, pageProps }: AppProps) => {
   const [newSearch, setNewSearch] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userNameSet, setUserNameSet] = useState<boolean>(true);
+  const [selectChat, setSelectChat] = useBoolean(false);
 
   const onlineRef = ref(rdb, `status/${user?.uid}/online`);
   const lastSeenRef = ref(rdb, `status/${user?.uid}/lastSeen`);
   const statusRef = ref(rdb, ".info/connected");
   const [showStatus, setShowStatus] = useState<boolean>(false);
-
+  const [deleteChats, setDeleteChats] = useState<(string | number)[]>([]);
+  // console.log(deleteChats)
   useEffect(() => {
     if (user) {
       onValue(statusRef, (snap) => {
@@ -143,6 +148,13 @@ const View = ({ Component, pageProps }: AppProps) => {
     else return noChatPage;
   };
 
+// const handleDeleteChats=()=>{
+//   if(deleteChats.length >0)
+//   deleteChats.map(id=>{
+//     deleteDoc()
+//   })
+// };
+
   // if (userDataLoading) return <Loading />;
 
   return (
@@ -166,6 +178,50 @@ const View = ({ Component, pageProps }: AppProps) => {
           w={["full", "full", "45%", "45%", "32%"]}
           position="relative"
         >
+          {selectChat && (
+            <Box
+              borderRadius={15}
+              position="absolute"
+              bottom={10}
+              left="auto"
+              right="auto"
+              w="full"
+              mx="auto"
+            >
+              {deleteChats && deleteChats.length > 0 ? (
+                <Text
+                  py="1"
+                  px="2"
+                  border="1px solid #ebebebc8"
+                  borderRadius={10}
+                  fontSize={15}
+                  fontWeight={600}
+                  bgColor="white"
+                  w="fit-content"
+                  mx="auto"
+                  cursor="pointer"
+                  onClick={handleDeleteChats}
+                >
+                  delete
+                </Text>
+              ) : (
+                <Text
+                  py="1"
+                  px="2"
+                  border="1px solid #ebebebc8"
+                  borderRadius={10}
+                  fontSize={15}
+                  fontWeight={600}
+                  bgColor="white"
+                  w="fit-content"
+                  mx="auto"
+                  opacity={0.5}
+                >
+                  delete
+                </Text>
+              )}
+            </Box>
+          )}
           <Box
             sx={{
               "&::-webkit-scrollbar": {
@@ -182,7 +238,7 @@ const View = ({ Component, pageProps }: AppProps) => {
             overflowY="scroll"
           >
             {!search && (
-              <Header>
+              <Header setSelectChat={setSelectChat}>
                 <NewChatComp
                   newSearch={newSearch}
                   setNewSearch={setNewSearch}
@@ -282,17 +338,20 @@ const View = ({ Component, pageProps }: AppProps) => {
               display={search ? "none" : "unset"}
             >
               {!chats?.empty ? (
-                <Box pt="2">
+                <CheckboxGroup
+                  onChange={(e: (string | number)[]) => setDeleteChats(e)}
+                >
                   {mappedChats?.map((chat: DocumentData | undefined) => {
                     return (
                       <Chat
                         key={chat?.chatId}
+                        selectChat={selectChat}
                         chatId={chat?.chatId}
                         recId={chat?.recId}
                       />
                     );
                   })}
-                </Box>
+                </CheckboxGroup>
               ) : (
                 <Flex h="full" justify="center" align="center">
                   <NewChatComp

@@ -78,7 +78,7 @@ const NewChatComp = ({
   const recIds = mappedChats?.map(
     (ids: { recId: string } | undefined) => ids?.recId
   );
-
+  // console.log(usersList)
   useEffect(() => {
     setChatUsersList([]);
   }, [isOpen]);
@@ -123,14 +123,18 @@ const NewChatComp = ({
       USID: [user?.uid, uid],
       timeStamp: serverTimestamp(),
     });
-    router.push({
-      pathname: newRef.id,
-      query: {
-        recId: uid,
-        name: name,
-        userName: userName,
+    router.push(
+      {
+        pathname: "/p/[chat]",
+        query: {
+          chatId: newRef.id,
+          recId: uid,
+          name: name,
+          userName: userName,
+        },
       },
-    });
+      `/p/${userName}`
+    );
   };
 
   return (
@@ -198,6 +202,9 @@ const NewChatComp = ({
               <Flex p="2" fontWeight={600}>
                 <Avatar size="sm" mr="5" />
                 New Group
+                <Text fontWeight={500} fontSize="13" ml="5" color="#ddddddcf">
+                  coming soon
+                </Text>
               </Flex>
               <Divider ml="10" mb="2" w="90%" />
 

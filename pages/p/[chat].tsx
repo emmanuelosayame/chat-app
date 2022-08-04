@@ -130,30 +130,46 @@ const Chats: NextPage = ({ showStatus }: any) => {
               variant="ghost"
               // alignSelf="center"
             />
-            <Box
-              fontSize={showStatus ? ["12", "12", "15"] : "20"}
-              borderRadius={10}
-              bgColor={showStatus ? "#5ac8faff" : "transparent"}
-              // opacity={0.2}
+            <Flex
               alignSelf="center"
-              // py="0.5"
               w="60px"
-              px="1"
               fontWeight={600}
               mx="2"
-              color={showStatus ? "white" : "#5ac8faff"}
+              justifyContent="start"
             >
               {!showStatus ? (
-                <Text>...</Text>
+                <Text
+                  textAlign="center"
+                  fontSize={20}
+                  bgColor="transparent"
+                  color="#5ac8faff"
+                >
+                  ...
+                </Text>
               ) : !!recStatus?.online ? (
-                <Text textAlign="center" w="full">
+                <Text textAlign="center" w="full" fontSize={["12", "12", "15"]}>
                   online
                 </Text>
               ) : (
-                <ReactTimeAgo date={lastSeen} timeStyle="twitter-minute-now" />
+                <Text
+                  textAlign="center"
+                  w="fit-content"
+                  color="whiteAlpha.900"
+                  bgColor="#5ac8faff"
+                  px="1"
+                  h="auto"
+                  py="0.5"
+                  borderRadius={9}
+                  fontSize={13}
+                >
+                  <ReactTimeAgo
+                    date={lastSeen}
+                    timeStyle="twitter-minute-now"
+                  />
+                </Text>
                 // <TimeAgo datetime={lastSeen} />
               )}
-            </Box>
+            </Flex>
           </Flex>
 
           <Box display="flex" flexDir="column" justifyContent="center">
@@ -177,7 +193,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
             </Text>
           </Box>
           <Box>
-            {!!router.query.photoURL ? (
+            {!!router.query.photoURL && router.query.photoURL !== "null" ? (
               <Box
                 borderRadius="50%"
                 h="35px"

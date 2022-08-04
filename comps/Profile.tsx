@@ -51,7 +51,8 @@ const Profile = ({
 
   useEffect(() => {
     userData?.name && setName(userData?.name);
-    userData?.userName && setUserName(userData?.userName);
+    userData?.userName &&
+      setUserName({ exists: undefined, value: userData?.userName });
     userData?.photoURL && setPhotoURL(userData?.photoURL);
   }, [userData]);
 
@@ -107,7 +108,7 @@ const Profile = ({
       updateDoc(doc(db, "Users", `${user?.uid}`), {
         name: name,
       });
-      remove(nameRef);
+      remove(nameRef).then(()=>console.log("removed"));
       set(newNameRef, {
         uid: user?.uid,
         name: name,
@@ -148,7 +149,7 @@ const Profile = ({
       set(newUserNameRef, {
         uid: user?.uid,
         name: name,
-        userName: userName,
+        userName: userName.value ? userName.value : "",
         photoURL: photoURL && photoURL !== "null" ? photoURL : "",
       });
       const nameRef = ref(
@@ -156,7 +157,7 @@ const Profile = ({
         `Users/${userData?.name.toLowerCase() + user?.uid}`
       );
       update(nameRef, {
-        userName: userName,
+        userName: userName.value ? userName.value : "",
       });
     }
 

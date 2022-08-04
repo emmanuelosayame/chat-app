@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
+import theme from "../theme";
 // import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
@@ -33,7 +34,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   }
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       {!user ? (
         <Login />
       ) : (
