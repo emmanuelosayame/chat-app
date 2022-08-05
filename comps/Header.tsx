@@ -1,9 +1,8 @@
 import { Flex, Text } from "@chakra-ui/react";
-import { Dispatch, ReactNode } from "react";
+import { ReactNode } from "react";
 
 const Header = ({
   children,
-  setSelectChat,
 }: {
   children: ReactNode;
   setSelectChat: any;
@@ -23,21 +22,7 @@ const Header = ({
       px="2"
       align="center"
     >
-      <Text
-        onClick={setSelectChat.toggle}
-        fontWeight={600}
-        fontSize={17}
-        color="#007affff"
-        cursor="pointer"
-      >
-        Edit
-      </Text>
-
-      <Text fontWeight={800} textAlign="center">
-        ChatApp
-      </Text>
-
-      <Flex align="center">{children}</Flex>
+      {children}
     </Flex>
   );
 };

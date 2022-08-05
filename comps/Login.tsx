@@ -47,6 +47,7 @@ const Login: NextPage = () => {
             set(nameRef, {
               uid: user?.uid,
               name: user?.displayName,
+              photoURL: `${user?.photoURL && user?.photoURL}`,
             });
           }
 

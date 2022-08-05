@@ -67,7 +67,8 @@ const Profile = ({
     }
   };
 
-  const handleUserName = debounce(async (input) => {
+  const handleUserName = debounce(async (e) => {
+    const input = e.toLowerCase();
     setUserNameWarning(false);
     if (input === userData?.userName) {
       setUserName({ exists: undefined, value: input });
@@ -95,7 +96,7 @@ const Profile = ({
   const handleProfileChanges = () => {
     if (photoURL !== userData?.photoURL && photoURL !== null && photoURL) {
       updateDoc(doc(db, "Users", `${user?.uid}`), {
-        photoURL: photoURL && photoURL,
+        photoURL: photoURL ? photoURL : null,
       });
     }
 
@@ -108,20 +109,23 @@ const Profile = ({
       updateDoc(doc(db, "Users", `${user?.uid}`), {
         name: name,
       });
-      remove(nameRef).then(()=>console.log("removed"));
+      remove(nameRef);
       set(newNameRef, {
         uid: user?.uid,
         name: name,
-        userName: userName?.value,
-        photoURL: photoURL && photoURL !== "null" ? photoURL : "",
+        userName: userName?.value ? userName?.value : null,
+        photoURL: photoURL && photoURL !== "null" ? photoURL : null,
       });
       if (userData?.userName) {
         const userNameRef = ref(
           rdb,
           `Users/${userData?.userName.toLowerCase()}`
         );
-        update(userNameRef, {
+        set(userNameRef, {
+          uid: user?.uid,
           name: name,
+          userName: userName?.value ? userName.value : null,
+          photoURL: photoURL && photoURL !== "null" ? photoURL : null,
         });
       }
     }
@@ -148,16 +152,19 @@ const Profile = ({
 
       set(newUserNameRef, {
         uid: user?.uid,
-        name: name,
-        userName: userName.value ? userName.value : "",
-        photoURL: photoURL && photoURL !== "null" ? photoURL : "",
+        name: name ? name : user?.displayName,
+        userName: userName.value ? userName.value : null,
+        photoURL: photoURL && photoURL !== "null" ? photoURL : null,
       });
       const nameRef = ref(
         rdb,
         `Users/${userData?.name.toLowerCase() + user?.uid}`
       );
-      update(nameRef, {
-        userName: userName.value ? userName.value : "",
+      set(nameRef, {
+        uid: user?.uid,
+        userName: userName.value ? userName.value : null,
+        name: name ? name : user?.displayName,
+        photoURL: photoURL && photoURL !== "null" ? photoURL : user?.photoURL,
       });
     }
 

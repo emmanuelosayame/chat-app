@@ -18,7 +18,7 @@ import Header from "../comps/Header";
 import NewChatComp from "../comps/NewChat";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PencilAltIcon } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { auth, db, rdb } from "../firebase/firebase";
 import {
   collection,
@@ -52,6 +52,7 @@ import {
 import Fuse from "fuse.js";
 import { AppProps } from "next/app";
 import { browserName } from "react-device-detect";
+// import RecordVN from "./RecordVN";
 
 const View = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -148,12 +149,12 @@ const View = ({ Component, pageProps }: AppProps) => {
     else return noChatPage;
   };
 
-// const handleDeleteChats=()=>{
-//   if(deleteChats.length >0)
-//   deleteChats.map(id=>{
-//     deleteDoc()
-//   })
-// };
+  // const handleDeleteChats=()=>{
+  //   if(deleteChats.length >0)
+  //   deleteChats.map(id=>{
+  //     deleteDoc()
+  //   })
+  // };
 
   // if (userDataLoading) return <Loading />;
 
@@ -175,7 +176,7 @@ const View = ({ Component, pageProps }: AppProps) => {
             responsiveLayout("none", "block"),
             "block",
           ]}
-          w={["full", "full", "45%", "45%", "32%"]}
+          w={["full", "full", "45%", "40%", "30%"]}
           position="relative"
         >
           {selectChat && (
@@ -200,9 +201,12 @@ const View = ({ Component, pageProps }: AppProps) => {
                   w="fit-content"
                   mx="auto"
                   cursor="pointer"
-                  onClick={handleDeleteChats}
+                  display="flex"
+                  alignContent="center"
+                  // onClick={handleDeleteChats}
                 >
                   delete
+                  <Text fontSize={10}>{deleteChats.length}</Text>
                 </Text>
               ) : (
                 <Text
@@ -239,14 +243,6 @@ const View = ({ Component, pageProps }: AppProps) => {
           >
             {!search && (
               <Header setSelectChat={setSelectChat}>
-                <NewChatComp
-                  newSearch={newSearch}
-                  setNewSearch={setNewSearch}
-                  mappedChats={mappedChats}
-                  chatsData={chatsData}
-                  icon={<PencilAltIcon width={22} />}
-                  color="#007affff"
-                />
                 <Settings
                   userData={userData}
                   isOpen={isOpen}
@@ -255,6 +251,29 @@ const View = ({ Component, pageProps }: AppProps) => {
                   userNameSet={userNameSet}
                   setUserNameSet={setUserNameSet}
                 />
+                <Text fontWeight={800} textAlign="center">
+                  ChatApp
+                </Text>
+                <Flex align="center">
+                  <NewChatComp
+                    newSearch={newSearch}
+                    setNewSearch={setNewSearch}
+                    mappedChats={mappedChats}
+                    chatsData={chatsData}
+                    icon={<PencilAltIcon width={22} />}
+                    color="#007affff"
+                  />
+                  <Text
+                    onClick={setSelectChat.toggle}
+                    fontWeight={600}
+                    fontSize={15}
+                    color="#007affff"
+                    cursor="pointer"
+                    ml="2"
+                  >
+                    Edit
+                  </Text>
+                </Flex>
               </Header>
             )}
             <Flex
@@ -341,6 +360,7 @@ const View = ({ Component, pageProps }: AppProps) => {
                 <CheckboxGroup
                   onChange={(e: (string | number)[]) => setDeleteChats(e)}
                 >
+                  <Box pt="3" />
                   {mappedChats?.map((chat: DocumentData | undefined) => {
                     return (
                       <Chat

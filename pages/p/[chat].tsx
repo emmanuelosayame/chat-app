@@ -5,6 +5,8 @@ import {
   Flex,
   IconButton,
   Input,
+  InputGroup,
+  InputRightElement,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -36,10 +38,17 @@ import {
 import { SendIcon, StickerIcon } from "../../comps/Icons";
 import { auth, db, rdb } from "../../firebase/firebase";
 import ReactTimeAgo from "react-time-ago";
-import { ClockIcon } from "@heroicons/react/outline";
+import {
+  ArrowUpIcon,
+  CameraIcon,
+  ClockIcon,
+  MicrophoneIcon,
+} from "@heroicons/react/outline";
 import { Database, ref, DataSnapshot } from "firebase/database";
 import { useListVals, useObjectVal } from "react-firebase-hooks/database";
 import Image from "next/image";
+import ReactTextareaAutosize from "react-textarea-autosize";
+import PickerInterface from "../../comps/PickerInterface";
 // import TimeAgo from "timeago-react";
 
 const Chats: NextPage = ({ showStatus }: any) => {
@@ -55,7 +64,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
     limit(20)
   );
   const [messages] = useCollection(messagesQuery);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState<string>("");
   const [recStatus, statusLoading, statusError] = useObjectVal<{
     lastSeen: number;
     online: DataSnapshot;
@@ -241,47 +250,88 @@ const Chats: NextPage = ({ showStatus }: any) => {
           <div ref={keepBottomRef} />
         </Flex>
 
-        <Box px="5">
-          <Divider mb="2" />
-          <Flex>
+        <Flex position="relative" py="1" px="5" align="center">
+          <PickerInterface input={newMessage} />
+          <IconButton
+            isRound
+            aria-label="sticker"
+            color="blue.400"
+            bgColor="transparent"
+            size="sm"
+            icon={<CameraIcon width={30} />}
+            mx="0.5"
+          />
+          <Flex
+            w="full"
+            borderRadius={20}
+            borderWidth="2px"
+            borderColor="#3c3c4349"
+          >
             <IconButton
-              aria-label="sticker"
-              color="blue.400"
-              bgColor="transparent"
-              size="md"
+              alignSelf="end"
+              m="1"
+              isRound
+              aria-label="send"
+              // bgColor=""
+              color="#007affff"
+              fontSize="1.1em"
+              size="xs"
               icon={<StickerIcon />}
             />
             <Textarea
-              borderRadius={15}
-              borderWidth="1px"
-              variant="filled"
+              as={ReactTextareaAutosize}
+              w="full"
+              maxRows={7}
+              placeholder="Message"
+              _placeholder={{
+                fontSize: 20,
+              }}
+              variant="unstyled"
               bgColor="white"
-              borderColor="gray.200"
               size="sm"
-              // h="auto"
               rows={1}
               resize="none"
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "4px",
+                  backgroundColor: "transparent",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  borderRadius: "4px",
+                  backgroundColor: "transparent",
+                },
+              }}
               p="1.5"
-              // maxH='14'
-              // placeholder=" yo..."
               onChange={(e) => setNewMessage(e.target.value)}
             />
-            <IconButton
-              isRound
-              aria-label="send"
-              // color="blue.500"
-              bgColor="blue.400"
-              // colorScheme="twitter"
-              size="md"
-              p="1"
-              icon={<SendIcon boxSize={7} stroke="white" strokeWidth="15" />}
-              onClick={sendMessage}
-              ml="3"
-              // alignSelf="center"
-              mr="5"
-            />
+
+            {newMessage.length > 0 ? (
+              <IconButton
+                isRound
+                alignSelf="end"
+                aria-label="send"
+                bgColor="#007affff"
+                fontSize="1.2em"
+                size="xs"
+                icon={<ArrowUpIcon width={20} color="white" />}
+                onClick={sendMessage}
+                m="1"
+              />
+            ) : (
+              <IconButton
+                alignSelf="end"
+                isRound
+                aria-label="send"
+                bgColor=""
+                fontSize="1.2em"
+                size="xs"
+                icon={<MicrophoneIcon width={25} color="#007affff" />}
+                // onClick={sendMessage}
+                m="1"
+              />
+            )}
           </Flex>
-        </Box>
+        </Flex>
       </Flex>
     </>
   );

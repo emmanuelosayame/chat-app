@@ -78,7 +78,7 @@ const NewChatComp = ({
   const recIds = mappedChats?.map(
     (ids: { recId: string } | undefined) => ids?.recId
   );
-  // console.log(usersList)
+  // console.log(noChatUsersList);
   useEffect(() => {
     setChatUsersList([]);
   }, [isOpen]);
@@ -288,7 +288,7 @@ const NewChatComp = ({
                       handleNewChat(user.uid, user.name, user.userName);
                       onClose();
                     }}
-                    key={user.key}
+                    key={user.uid}
                     _hover={{ bgColor: "whitesmoke" }}
                     cursor="pointer"
                     // justify="center"

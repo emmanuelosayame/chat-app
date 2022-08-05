@@ -14,8 +14,10 @@ import {
   useCollection,
   useCollectionData,
 } from "react-firebase-hooks/firestore";
+import ReactTextareaAutosize from "react-textarea-autosize";
 import { auth, db } from "../firebase/firebase";
 import { SendIcon2 } from "./Icons";
+import PickerInterface from "./PickerInterface";
 
 const Bucket = ({ setBucket }: any) => {
   const user = auth.currentUser;
@@ -77,11 +79,33 @@ const Bucket = ({ setBucket }: any) => {
         ))}
       </Flex>
 
-      <Flex position="fixed" left={0} right={0} bottom={0}>
+      <Flex position="fixed" left={0} right={0} bottom={0} align="center" >
+        <PickerInterface />
         <Textarea
+          as={ReactTextareaAutosize}
+          maxRows={7}
           rows={1}
           m="2"
+          p="2"
+          px="4"
+          borderRadius={20}
+          size="sm"
+          placeholder="Message"
+          _placeholder={{
+            pl: [2, 4, 6],
+            fontSize: 20,
+          }}
           resize="none"
+          sx={{
+            "&::-webkit-scrollbar": {
+              width: "4px",
+              backgroundColor: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              borderRadius: "4px",
+              backgroundColor: "transparent",
+            },
+          }}
           onChange={(e) => setBucketMessage(e.target.value)}
         />
         <IconButton

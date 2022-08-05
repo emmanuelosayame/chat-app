@@ -187,7 +187,7 @@ const Settings = ({
         /> */}
         <Button
           aria-label="close-setting-page"
-          display={userNameSet?"block":"none"}
+          display={userNameSet ? "block" : "none"}
           variant="ghost"
           onClick={accountOnClose}
           alignSelf="start"
@@ -283,14 +283,28 @@ const Settings = ({
 
   return (
     <>
-      <IconButton
-        color="#007affff"
-        aria-label="settings"
-        bgColor="transparent"
-        icon={<ChevronDownIcon boxSize={5} />}
-        onClick={onOpen}
-        size="sm"
-      />
+      <Button variant="ghost" p={0} m={0} rounded="full" onClick={onOpen}>
+        {!!userData?.photoURL && userData?.photoURL !== "null" ? (
+          <Box
+            borderRadius="50%"
+            w="38px"
+            h="38px"
+            overflow="hidden"
+            border="1px solid #7a7a811f"
+            mx="1"
+          >
+            <Image
+              referrerPolicy="no-referrer"
+              loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
+              src={userData?.photoURL}
+              width="100%"
+              height="100%"
+            />
+          </Box>
+        ) : (
+          <Avatar mr="2" />
+        )}
+      </Button>
       <Drawer
         isOpen={isOpen}
         placement="bottom"
