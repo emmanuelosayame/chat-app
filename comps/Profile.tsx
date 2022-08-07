@@ -24,6 +24,7 @@ import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import FileResizer from "react-image-file-resizer";
 import { auth, db, rdb, storage } from "../firebase/firebase";
 
 const Profile = ({
@@ -41,13 +42,18 @@ const Profile = ({
   );
   const uploadRef = useRef<HTMLInputElement | null>(null);
   const [photoURL, setPhotoURL] = useState<string>(userData?.photoURL);
+  const [photoPrev, setPhotoPrev] = useState<{
+    URL: string | ArrayBuffer | null | undefined;
+    file: File | null;
+  }>({ URL: userData?.photoURL, file: null });
+
   const [name, setName] = useState<any>("");
   const [userName, setUserName] = useState<
     { exists: boolean | undefined; value: string } | undefined
   >({ exists: undefined, value: userData?.userName && userData?.userName });
   const [about, setAbout] = useState<any>(userData?.about && userData?.about);
 
-  const profilesRef = sref(storage, `profilePhoto/${user?.uid}`);
+  // console.log(photoPrev);
 
   useEffect(() => {
     userData?.name && setName(userData?.name);
@@ -56,15 +62,32 @@ const Profile = ({
     userData?.photoURL && setPhotoURL(userData?.photoURL);
   }, [userData]);
 
-  const photoChange = async (photo: File | undefined) => {
+  const photoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const photo = e?.target?.files?.[0];
     if (photo) {
-      uploadBytes(profilesRef, photo)
-        .then((snap) => {
-          setError(false);
-          getDownloadURL(snap.ref).then((photoURL) => setPhotoURL(photoURL));
-        })
-        .catch(() => setError(true));
+      const photoRead = new FileReader();
+      photoRead.readAsDataURL(photo);
+      photoRead.onload = (event) => {
+        setPhotoPrev({ URL: event.target?.result, file: photo });
+      };
     }
+  };
+
+  const resizeImage = (file: File) => {
+    return new Promise<any>((resolve) => {
+      FileResizer.imageFileResizer(
+        file,
+        150,
+        150,
+        "WEBP",
+        100,
+        0,
+        (uri) => {
+          resolve(uri);
+        },
+        "file"
+      );
+    });
   };
 
   const handleUserName = debounce(async (e) => {
@@ -93,11 +116,30 @@ const Profile = ({
       .catch(() => setError(true));
   }, 1000);
 
-  const handleProfileChanges = () => {
-    if (photoURL !== userData?.photoURL && photoURL !== null && photoURL) {
-      updateDoc(doc(db, "Users", `${user?.uid}`), {
-        photoURL: photoURL ? photoURL : null,
-      });
+  const handleProfileChanges = async () => {
+    if (
+      photoPrev.URL !== userData?.photoURL &&
+      photoPrev.URL !== null &&
+      photoPrev.file
+    ) {
+      const profilePhotoRef = sref(storage, `profilePhotos/${user?.uid}`);
+
+      const optimizedPhoto =
+        photoPrev.file.type === "image/webp"
+          ? photoPrev.file
+          : await resizeImage(photoPrev.file);
+      // console.log(optimizedPhoto);
+      uploadBytes(profilePhotoRef, optimizedPhoto)
+        .then((snap) => {
+          setError(false);
+          getDownloadURL(snap.ref).then((URL) => {
+            // setPhotoURL(photoURL);
+            updateDoc(doc(db, "Users", `${user?.uid}`), {
+              photoURL: URL ? URL : null,
+            });
+          });
+        })
+        .catch(() => setError(true));
     }
 
     if (name !== userData?.name && name.length < 20) {
@@ -210,7 +252,6 @@ const Profile = ({
       my="5"
       borderRadius={10}
     >
-      {/* {showToast} */}
       <Flex justify="space-between" w="full">
         {/* <Button
           aria-label="close-setting-page"
@@ -250,13 +291,7 @@ const Profile = ({
           color="blue.300"
           borderRadius="15px"
           onClick={() => {
-            // !userNameSet &&
-            //   userName &&
-            //   userName?.value.length >= 4 &&
-            //   userName?.value.length < 17 &&
-            //   setUserNameSet(true);
             handleProfileChanges();
-            // userNameSet && profileOnClose();
             userNameSet && setProfileOpen(false);
           }}
         >
@@ -264,7 +299,7 @@ const Profile = ({
         </Button>
       </Flex>
       <Flex mx="auto" mt={userNameSet ? "unset" : 5}>
-        {photoURL && photoURL !== "null" ? (
+        {photoPrev.URL && photoPrev.URL !== "null" ? (
           <Box
             borderRadius="50%"
             w="90px"
@@ -275,8 +310,8 @@ const Profile = ({
           >
             <Image
               referrerPolicy="no-referrer"
-              loader={() => `${photoURL}?w=${60}&q=${75}`}
-              src={photoURL}
+              loader={() => `${photoPrev.URL}?w=${60}&q=${75}`}
+              src={photoPrev.URL.toString()}
               width="100%"
               height="100%"
             />
@@ -300,9 +335,7 @@ const Profile = ({
         multiple={false}
         type="file"
         accept="image/*"
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          photoChange(e.target?.files?.[0])
-        }
+        onChange={photoChange}
       />
       <Box my="5" color="#3c3c4399">
         <Box>

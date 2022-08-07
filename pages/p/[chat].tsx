@@ -7,8 +7,10 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  SlideFade,
   Text,
   Textarea,
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   ArrowCircleUpIcon,
@@ -49,12 +51,23 @@ import { useListVals, useObjectVal } from "react-firebase-hooks/database";
 import Image from "next/image";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import PickerInterface from "../../comps/PickerInterface";
+import StickerComp from "../../comps/StickerComp";
 // import TimeAgo from "timeago-react";
 
 const Chats: NextPage = ({ showStatus }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const chatId = router.query.chatId;
+  const {
+    isOpen: pickerIsOpen,
+    onOpen: pickerOnOpen,
+    onClose: pickerOnClose,
+  } = useDisclosure();
+  const {
+    isOpen: stickerIsOpen,
+    onOpen: stickerOnOpen,
+    onClose: stickerOnClose,
+  } = useDisclosure();
   const keepBottomRef = useRef<any>();
   const messagesRef = collection(db, "chatGroup", `${chatId}`, "messages");
   const messagesQuery = query(
@@ -65,7 +78,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
   );
   const [messages] = useCollection(messagesQuery);
   const [newMessage, setNewMessage] = useState<string>("");
-  const [recStatus, statusLoading, statusError] = useObjectVal<{
+  const [recStatus] = useObjectVal<{
     lastSeen: number;
     online: DataSnapshot;
   }>(ref(rdb, `status/${router.query.recId}`));
@@ -93,8 +106,8 @@ const Chats: NextPage = ({ showStatus }: any) => {
         timeSent: serverTimestamp(),
       });
       // keepBottom();
+      setNewMessage("");
     }
-    return;
   };
 
   const routeToChats = () => {
@@ -250,8 +263,14 @@ const Chats: NextPage = ({ showStatus }: any) => {
           <div ref={keepBottomRef} />
         </Flex>
 
-        <Flex position="relative" py="1" px="5" align="center">
-          <PickerInterface input={newMessage} />
+        <Flex position="relative" py="1" align="center">
+          <PickerInterface
+            isOpen={pickerIsOpen}
+            onOpen={pickerOnOpen}
+            onClose={pickerOnClose}
+            chatId={chatId}
+            user={user}
+          />
           <IconButton
             isRound
             aria-label="sticker"
@@ -266,18 +285,29 @@ const Chats: NextPage = ({ showStatus }: any) => {
             borderRadius={20}
             borderWidth="2px"
             borderColor="#3c3c4349"
+            mr="3"
+            position="relative"
           >
-            <IconButton
-              alignSelf="end"
-              m="1"
-              isRound
-              aria-label="send"
-              // bgColor=""
-              color="#007affff"
-              fontSize="1.1em"
-              size="xs"
-              icon={<StickerIcon />}
-            />
+            {stickerIsOpen ? (
+              <IconButton
+                aria-label=".../"
+                size="sm"
+                variant="ghost"
+                rounded="full"
+              />
+            ) : (
+              <IconButton
+                alignSelf="end"
+                m="1"
+                isRound
+                aria-label="send"
+                color="#007affff"
+                fontSize="1.1em"
+                size="xs"
+                icon={<StickerIcon />}
+                onClick={stickerOnOpen}
+              />
+            )}
             <Textarea
               as={ReactTextareaAutosize}
               w="full"
@@ -302,6 +332,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
                 },
               }}
               p="1.5"
+              value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             />
 
@@ -332,6 +363,11 @@ const Chats: NextPage = ({ showStatus }: any) => {
             )}
           </Flex>
         </Flex>
+        {stickerIsOpen && (
+          // <SlideFade in={stickerIsOpen}>
+          <StickerComp onClose={stickerOnClose} />
+          // </SlideFade>
+        )}
       </Flex>
     </>
   );

@@ -24,6 +24,8 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
   const recQuery = doc(db, "Users", `${recId}`);
   const [recData] = useDocumentData(recQuery);
   const dp = recData?.photoURL;
+  // console.log(chatId)
+
   const routerToChat = () => {
     if (selectChat) return;
     // if (router.asPath !== `/p/${recData?.userName}`)
