@@ -35,7 +35,9 @@ import {
 import prettyBytes from "pretty-bytes";
 import {
   ChangeEvent,
+  Dispatch,
   ForwardRefExoticComponent,
+  SetStateAction,
   useRef,
   useState,
 } from "react";
@@ -47,21 +49,21 @@ const PickerInterface = ({
   onOpen,
   chatId,
   user,
+  setProgress,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
   chatId: string | string[] | undefined;
   user: User | null;
+  setProgress: Dispatch<SetStateAction<number | undefined>>;
 }) => {
   const ref = useRef<any>(null);
   const documentRef = useRef<any>(null);
   useOutsideClick({ ref: ref, handler: onClose });
 
   const [document, setDocument] = useState<File | null>(null);
-  const [documentUploadProgress, setDocumentUploadProgress] = useState<
-    number | null
-  >(null);
+
   const [error, setError] = useState<{
     limit: string | null;
     upload: string | null;
@@ -85,7 +87,7 @@ const PickerInterface = ({
       const messageRef = await addDoc(
         collection(db, "chatGroup", `${chatId}`, "messages"),
         {
-          type: "Document",
+          type: "document",
           status: "uploading",
           sender: user?.uid,
           timeSent: serverTimestamp(),
@@ -96,23 +98,32 @@ const PickerInterface = ({
       );
       const ChatDocumentRef = sref(storage, `ChatDocuments/${messageRef.id}`);
       if (document) {
-        const uploadDocument = uploadBytesResumable(ChatDocumentRef, document);
+        const uploadDocument = uploadBytesResumable(ChatDocumentRef, document, {
+          contentType: document.type,
+          contentDisposition: `attachment; filename=${document.name}`,
+        });
         uploadDocument.on(
           "state_changed",
           (snapshot) => {
             const progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setDocumentUploadProgress(progress);
+            setProgress(progress);
           },
           () => setError({ upload: "failed", limit: null }),
           () => {
-            getDownloadURL(uploadDocument.snapshot.ref).then((url) => {
-              setError(null);
-              updateDoc(messageRef, {
-                documentURL: url,
-                status: "saved",
-              });
-            });
+            getDownloadURL(uploadDocument.snapshot.ref)
+              .then((url) => {
+                setError(null);
+                updateDoc(messageRef, {
+                  documentURL: url,
+                  status: "saved",
+                });
+              })
+              .catch(() =>
+                updateDoc(messageRef, {
+                  status: "failed",
+                })
+              );
           }
         );
       }

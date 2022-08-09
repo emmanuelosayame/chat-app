@@ -7,6 +7,8 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Link,
+  Progress,
   SlideFade,
   Text,
   Textarea,
@@ -44,6 +46,8 @@ import {
   ArrowUpIcon,
   CameraIcon,
   ClockIcon,
+  CloudDownloadIcon,
+  CloudIcon,
   MicrophoneIcon,
 } from "@heroicons/react/outline";
 import { Database, ref, DataSnapshot } from "firebase/database";
@@ -52,6 +56,8 @@ import Image from "next/image";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import PickerInterface from "../../comps/PickerInterface";
 import StickerComp from "../../comps/StickerComp";
+import prettyBytes from "pretty-bytes";
+import { SpinnerDotted, SpinnerInfinity } from "spinners-react";
 // import TimeAgo from "timeago-react";
 
 const Chats: NextPage = ({ showStatus }: any) => {
@@ -83,7 +89,13 @@ const Chats: NextPage = ({ showStatus }: any) => {
     online: DataSnapshot;
   }>(ref(rdb, `status/${router.query.recId}`));
 
+  const [docUploadProgress, setDocUploadProgress] = useState<
+    number | undefined
+  >(undefined);
+
   const lastSeen = !!recStatus ? new Date(recStatus.lastSeen) : new Date();
+
+  console.log(messages?.docs?.map((d) => d.data()));
 
   const keepBottom = () => {
     keepBottomRef.current?.scrollIntoView({
@@ -101,7 +113,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
   const sendMessage = () => {
     if (!(newMessage.length === 0)) {
       addDoc(messagesRef, {
-        content: newMessage,
+        text: newMessage,
         sender: user?.uid,
         timeSent: serverTimestamp(),
       });
@@ -258,7 +270,11 @@ const Chats: NextPage = ({ showStatus }: any) => {
         >
           {!!messages &&
             messages?.docs.map((message: DocumentData) => (
-              <Message key={message.id} content={message.data()} />
+              <Message
+                key={message.id}
+                content={message.data()}
+                docUploadProgress={docUploadProgress}
+              />
             ))}
           <div ref={keepBottomRef} />
         </Flex>
@@ -270,6 +286,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
             onClose={pickerOnClose}
             chatId={chatId}
             user={user}
+            setProgress={setDocUploadProgress}
           />
           <IconButton
             isRound
@@ -289,12 +306,16 @@ const Chats: NextPage = ({ showStatus }: any) => {
             position="relative"
           >
             {stickerIsOpen ? (
-              <IconButton
-                aria-label=".../"
-                size="sm"
-                variant="ghost"
+              <Box
+                alignSelf="center"
+                mx="1"
                 rounded="full"
-              />
+                aria-label="send"
+                color="#007affff"
+                fontSize="1.1em"
+              >
+                <StickerIcon />
+              </Box>
             ) : (
               <IconButton
                 alignSelf="end"
@@ -374,7 +395,13 @@ const Chats: NextPage = ({ showStatus }: any) => {
 };
 export default Chats;
 
-export const Message = ({ content }: { content: DocumentData }) => {
+export const Message = ({
+  content,
+  docUploadProgress,
+}: {
+  content: DocumentData;
+  docUploadProgress: number | undefined;
+}) => {
   const user = auth.currentUser;
   const time =
     !!content.timeSent &&
@@ -400,14 +427,42 @@ export const Message = ({ content }: { content: DocumentData }) => {
       maxW="320px"
       justify="end"
     >
-      <Box
-        fontSize={[14, 15, 16]}
-        fontWeight={600}
-        color={messageStyle("orange.50", "3c3c4399")}
-        maxW="300px"
-      >
-        {content.content}
-      </Box>
+      {content.type === "document" ? (
+        <Flex flexDirection="column" maxW="300px" align="center" color="#f2f2f7ff">
+          <Text fontSize={[14, 15, 16]} fontWeight={600}>
+            {content.documentName.slice(0, 15)}
+          </Text>
+          <Text fontSize={13}>{content.documentType}</Text>
+          <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
+          {content.status === "uploading" ? (
+            <Box w="50px" opacity={0.5} my="1">
+              <Progress
+                hasStripe
+                rounded="full"
+                value={docUploadProgress}
+                size="xs"
+                colorScheme="gray"
+              />
+            </Box>
+          ) : (
+            <Link
+              href={content.documentURL}
+              _hover={{ bgColor: "transparent", opacity: 0.5 }}
+            >
+              <CloudDownloadIcon width={30} color="#f2f2f7ff" />
+            </Link>
+          )}
+        </Flex>
+      ) : (
+        <Text
+          fontSize={[14, 15, 16]}
+          fontWeight={600}
+          color={messageStyle("#f2f2f7ff", "#3c3c4399")}
+          maxW="300px"
+        >
+          {content.text}
+        </Text>
+      )}
       <Box
         mt="2"
         ml="1.5"

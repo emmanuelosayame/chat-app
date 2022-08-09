@@ -13,6 +13,8 @@ specifiers:
   '@types/react-dom': 18.0.6
   '@types/react-timeago': ^4.1.3
   crypto-js: ^4.1.1
+  dexie: ^3.2.2
+  dexie-react-hooks: ^1.1.1
   eslint: 8.19.0
   eslint-config-next: 12.2.0
   firebase: ^9.8.4
@@ -46,6 +48,8 @@ dependencies:
   '@heroicons/react': 1.0.6_react@18.2.0
   '@types/lodash': 4.14.182
   crypto-js: 4.1.1
+  dexie: 3.2.2
+  dexie-react-hooks: 1.1.1_ugasl56bq7goab4h476ffxfsvu
   firebase: 9.8.4
   framer-motion: 6.3.16_biqbaboplfbrettd7655fr4n2y
   fuse.js: 6.6.2
@@ -2552,6 +2556,23 @@ packages:
 
   /detect-node-es/1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
+    dev: false
+
+  /dexie-react-hooks/1.1.1_ugasl56bq7goab4h476ffxfsvu:
+    resolution: {integrity: sha512-Cam5JP6PxHN564RvWEoe8cqLhosW0O4CAZ9XEVYeGHJBa6KEJlOpd9CUpV3kmU9dm2MrW97/lk7qkf1xpij7gA==}
+    peerDependencies:
+      '@types/react': '>=16'
+      dexie: '>=3.1.0-alpha.1 <5.0.0'
+      react: '>=16'
+    dependencies:
+      '@types/react': 18.0.15
+      dexie: 3.2.2
+      react: 18.2.0
+    dev: false
+
+  /dexie/3.2.2:
+    resolution: {integrity: sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==}
+    engines: {node: '>=6.0'}
     dev: false
 
   /dir-glob/3.0.1:

@@ -129,7 +129,9 @@ const Profile = ({
           ? photoPrev.file
           : await resizeImage(photoPrev.file);
       // console.log(optimizedPhoto);
-      uploadBytes(profilePhotoRef, optimizedPhoto)
+      uploadBytes(profilePhotoRef, optimizedPhoto, {
+        cacheControl: "public,max-age=1000000",
+      })
         .then((snap) => {
           setError(false);
           getDownloadURL(snap.ref).then((URL) => {
@@ -158,6 +160,7 @@ const Profile = ({
         userName: userName?.value ? userName?.value : null,
         photoURL: photoURL && photoURL !== "null" ? photoURL : null,
       });
+      
       if (userData?.userName) {
         const userNameRef = ref(
           rdb,

@@ -16,6 +16,8 @@
     "@heroicons/react": "^1.0.6",
     "@types/lodash": "^4.14.182",
     "crypto-js": "^4.1.1",
+    "dexie": "^3.2.2",
+    "dexie-react-hooks": "^1.1.1",
     "firebase": "^9.8.4",
     "framer-motion": "^6.3.16",
     "fuse.js": "^6.6.2",
