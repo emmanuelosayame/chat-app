@@ -37,13 +37,19 @@ import { auth, db, storage } from "../firebase/firebase";
 import { StickerIcon } from "./Icons";
 import { useLiveQuery } from "dexie-react-hooks";
 import { odb } from "./OfflineDB";
-import {
-  useDocumentData,
-  useDocumentDataOnce,
-} from "react-firebase-hooks/firestore";
 import { StarIcon } from "@heroicons/react/solid";
 
-const StickerComp = ({ onClose }: any) => {
+const StickerComp = ({
+  onClose,
+  chatId,
+  userData,
+}: // stickerOnClose,
+{
+  onClose: () => void;
+  chatId: string | string[] | undefined;
+  userData: DocumentData | undefined;
+  // stickerOnClose: () => void;
+}) => {
   const user = auth.currentUser;
   const ref = useRef<any>();
   const uploadRef = useRef<HTMLInputElement | null>(null);
@@ -75,7 +81,7 @@ const StickerComp = ({ onClose }: any) => {
       );
     });
   };
-
+  // console.log(userData)
   const pickSticker = (e: ChangeEvent<HTMLInputElement>) => {
     const img = e?.target.files?.[0];
     if (img && img?.size < 500000) {
@@ -84,6 +90,10 @@ const StickerComp = ({ onClose }: any) => {
   };
 
   const myStickers = useLiveQuery(() => odb.stickers.toArray());
+
+  const alreadyAdded = (ssid: string) => {
+    if (myStickers) return !!myStickers.find((msid) => msid.id === ssid);
+  };
 
   useEffect(() => {
     if (storePage)
@@ -99,8 +109,8 @@ const StickerComp = ({ onClose }: any) => {
   useEffect(() => {
     if (myStickers && myStickers?.length < 1) {
       (async () => {
-        const userData = await getDoc(doc(db, "Users", `${user?.uid}`));
-        if (userData.data()?.stickers)
+        // const userData = await getDoc(doc(db, "Users", `${user?.uid}`));
+        if (userData?.stickers)
           await odb.stickers.bulkAdd(userData.data()?.stickers);
       })();
     }
@@ -115,6 +125,7 @@ const StickerComp = ({ onClose }: any) => {
       const fsid = addDoc(collection(db, "comStickers"), {
         tag: selectSticker?.value,
         timeStamp: serverTimestamp(),
+        star: userData?.admin ? true : false,
       });
       uploadBytes(
         sref(storage, `stickers/${(await fsid).id}.webp`),
@@ -145,6 +156,36 @@ const StickerComp = ({ onClose }: any) => {
         .catch(async () => deleteDoc(await fsid));
       setUploadPage.off();
     }
+  };
+
+  const addSticker = async (id: string, tag: string, stickerURL: string) => {
+    if (!alreadyAdded(id)) {
+      await odb.stickers.add({
+        id: id,
+        tag: tag,
+        date: new Date(),
+        stickerURL: stickerURL,
+      });
+      updateDoc(doc(db, "Users", `${user?.uid}`), {
+        stickers: arrayUnion({
+          id: id,
+          tag: tag,
+          date: new Date(),
+          stickerURL: stickerURL,
+        }),
+      });
+    }
+  };
+
+  const sendSticker = (id: string, URL: string) => {
+    addDoc(collection(db, "chatGroup", `${chatId}`, "messages"), {
+      sender: user?.uid,
+      stickerId: id,
+      stickerURL: URL,
+      timeSent: serverTimestamp(),
+      type: "sticker",
+    });
+    // stickerOnClose();
   };
 
   return (
@@ -211,6 +252,16 @@ const StickerComp = ({ onClose }: any) => {
                     overflowY="auto"
                     mb="10"
                     mx="auto"
+                    sx={{
+                      "&::-webkit-scrollbar": {
+                        width: "4px",
+                        backgroundColor: "transparent",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        borderRadius: "4px",
+                        backgroundColor: "transparent",
+                      },
+                    }}
                   >
                     <Button
                       p="2"
@@ -393,6 +444,18 @@ const StickerComp = ({ onClose }: any) => {
                       bgColor="#000000ff"
                       key={sticker.id}
                       position="relative"
+                      cursor={alreadyAdded(sticker.id) ? "unset" : "pointer"}
+                      filter="auto"
+                      blur={alreadyAdded(sticker.id) ? "0.04rem" : "unset"}
+                      brightness={alreadyAdded(sticker.id) ? "40%" : "unset"}
+                      role="group"
+                      onClick={() =>
+                        addSticker(
+                          sticker.id,
+                          sticker.data().tag,
+                          sticker.data().stickerURL
+                        )
+                      }
                     >
                       {sticker.data().stickerURL && (
                         <Image
@@ -406,9 +469,39 @@ const StickerComp = ({ onClose }: any) => {
                         />
                       )}
 
-                      {sticker.data()?.tick && (
+                      <Flex
+                        display="none"
+                        position="absolute"
+                        align="center"
+                        w="full"
+                        h="full"
+                        bgColor="#00000090"
+                        _groupHover={{ display: "flex" }}
+                      >
+                        {alreadyAdded(sticker.id) ? (
+                          <Text
+                            opacity={0.8}
+                            fontSize={15}
+                            color="white"
+                            mx="auto"
+                          >
+                            Added
+                          </Text>
+                        ) : (
+                          <Text
+                            opacity={0.2}
+                            fontSize={15}
+                            color="white"
+                            mx="auto"
+                          >
+                            Add sticker
+                          </Text>
+                        )}
+                      </Flex>
+
+                      {sticker.data()?.star && (
                         <Box position="absolute" right={1} top={1}>
-                          <StarIcon width={15} color="#c6c6c8ff" />
+                          <StarIcon width={15} color="#ffcc00b2" />
                         </Box>
                       )}
                     </GridItem>
@@ -438,6 +531,10 @@ const StickerComp = ({ onClose }: any) => {
                       alignItems="center"
                       bgColor="#000000ff"
                       key={sticker.id}
+                      cursor="pointer"
+                      onClick={() =>
+                        sendSticker(sticker.id, sticker.stickerURL)
+                      }
                     >
                       <Image
                         referrerPolicy="no-referrer"

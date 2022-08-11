@@ -160,7 +160,7 @@ const Profile = ({
         userName: userName?.value ? userName?.value : null,
         photoURL: photoURL && photoURL !== "null" ? photoURL : null,
       });
-      
+
       if (userData?.userName) {
         const userNameRef = ref(
           rdb,
@@ -309,11 +309,10 @@ const Profile = ({
             h="90px"
             overflow="hidden"
             border="1px solid #3c3c432d"
-            mx="2"
           >
             <Image
               referrerPolicy="no-referrer"
-              loader={() => `${photoPrev.URL}?w=${60}&q=${75}`}
+              loader={() => `${photoPrev.URL}?w=${90}&q=${75}`}
               src={photoPrev.URL.toString()}
               width="100%"
               height="100%"

@@ -157,7 +157,7 @@ const NewChatComp = ({
         isOpen={isOpen}
         scrollBehavior="inside"
         motionPreset="slideInBottom"
-        size="sm"
+        size="xs"
       >
         <ModalOverlay />
         <ModalContent
@@ -166,6 +166,7 @@ const NewChatComp = ({
           border="2px solid #74748039"
           px="4"
           bgColor="#f2f2f7ff"
+          w="full"
         >
           <ModalHeader
             textAlign="center"
@@ -173,12 +174,13 @@ const NewChatComp = ({
             color="#3c3c4399"
             fontWeight={600}
             p="2"
+            w="full"
           >
             Start Chat
           </ModalHeader>
           {/* <ModalCloseButton size="sm" color="blue.400" /> */}
 
-          <ModalBody p={3}>
+          <ModalBody p={2} w="full">
             <InputGroup
               onClick={() => !newSearch && setNewSearch(true)}
               onFocus={() => setNewSearch(true)}
@@ -206,7 +208,7 @@ const NewChatComp = ({
                   coming soon
                 </Text>
               </Flex>
-              <Divider ml="10" mb="2" w="90%" />
+              <Divider mb="2" w="90%" />
 
               <Box
                 borderRadius="15px"
@@ -232,6 +234,7 @@ const NewChatComp = ({
                                 recId: user.item.recId,
                                 name: user.item.name,
                                 userName: user.item.userName,
+                                photoURL: user.item.photoURL,
                               },
                             },
                             `/p/${user?.item.userName}`

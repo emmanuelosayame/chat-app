@@ -52,6 +52,7 @@ import {
 import Fuse from "fuse.js";
 import { AppProps } from "next/app";
 import { browserName } from "react-device-detect";
+import { debounce } from "lodash";
 // import RecordVN from "./RecordVN";
 
 const View = ({ Component, pageProps }: AppProps) => {
@@ -133,16 +134,16 @@ const View = ({ Component, pageProps }: AppProps) => {
     } else {
       setUserNameSet(true);
     }
-  }, [userDataLoading, userDataError]);
+  }, [userDataLoading, userDataError])
 
-  const searchChat = async (e: any) => {
+  const searchChat = debounce(async (e: any) => {
     const input = e.target.value.toLowerCase();
     if (!chatsData) return;
     const fuse = new Fuse(chatsData, {
       keys: ["name", "userName"],
     });
     setChatList(fuse.search(`${input}`));
-  };
+  }, 500);
 
   const responsiveLayout = (chatPage: string, noChatPage: string) => {
     if (!!router.query?.chat) return chatPage;
@@ -324,14 +325,19 @@ const View = ({ Component, pageProps }: AppProps) => {
                 <Flex
                   onClick={() => {
                     setSearch(false);
-                    router.push({
-                      pathname: user.item.chatId,
-                      query: {
-                        recId: user.item.recId,
-                        name: user.item.name,
-                        userName: user.item.userName,
+                    router.push(
+                      {
+                        pathname: "/p/[chat]",
+                        query: {
+                          chatId: user.item.chatId,
+                          recId: user.item.recId,
+                          name: user.item.name,
+                          userName: user.item.userName,
+                          photoURL: user.item.photoURL,
+                        },
                       },
-                    });
+                      `/p/${user.item.userName}`
+                    );
                   }}
                   key={user.item.recId}
                   _hover={{ bgColor: "white" }}
@@ -410,7 +416,11 @@ const View = ({ Component, pageProps }: AppProps) => {
             filter="blur(2px)"
           />
           <Box h="full" w="full" display={search ? "none" : "block"}>
-            <Component showStatus={showStatus} {...pageProps} />
+            <Component
+              showStatus={showStatus}
+              userData={userData}
+              {...pageProps}
+            />
           </Box>
         </Box>
       </Flex>

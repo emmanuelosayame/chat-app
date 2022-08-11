@@ -1,17 +1,14 @@
 import {
   Avatar,
   Box,
-  Divider,
   Flex,
   IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
   Link,
   Progress,
   SlideFade,
   Text,
   Textarea,
+  useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
 import {
@@ -39,7 +36,7 @@ import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-import { SendIcon, StickerIcon } from "../../comps/Icons";
+import { MicWaveIcon, SendIcon, StickerIcon } from "../../comps/Icons";
 import { auth, db, rdb } from "../../firebase/firebase";
 import ReactTimeAgo from "react-time-ago";
 import {
@@ -58,9 +55,11 @@ import PickerInterface from "../../comps/PickerInterface";
 import StickerComp from "../../comps/StickerComp";
 import prettyBytes from "pretty-bytes";
 import { SpinnerDotted, SpinnerInfinity } from "spinners-react";
+import Webcam from "react-webcam";
+import WebCamComp from "../../comps/WebCamComp";
 // import TimeAgo from "timeago-react";
 
-const Chats: NextPage = ({ showStatus }: any) => {
+const Chats: NextPage = ({ showStatus, userData }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
   const chatId = router.query.chatId;
@@ -74,6 +73,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
     onOpen: stickerOnOpen,
     onClose: stickerOnClose,
   } = useDisclosure();
+
   const keepBottomRef = useRef<any>();
   const messagesRef = collection(db, "chatGroup", `${chatId}`, "messages");
   const messagesQuery = query(
@@ -95,7 +95,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
 
   const lastSeen = !!recStatus ? new Date(recStatus.lastSeen) : new Date();
 
-  console.log(messages?.docs?.map((d) => d.data()));
+  // console.log(messages?.docs?.map((d) => d.data()));
 
   const keepBottom = () => {
     keepBottomRef.current?.scrollIntoView({
@@ -116,6 +116,7 @@ const Chats: NextPage = ({ showStatus }: any) => {
         text: newMessage,
         sender: user?.uid,
         timeSent: serverTimestamp(),
+        type: "text",
       });
       // keepBottom();
       setNewMessage("");
@@ -144,9 +145,10 @@ const Chats: NextPage = ({ showStatus }: any) => {
           maxH="10"
           bgColor="whiteAlpha.500"
           backdropFilter="auto"
-          backdropBlur="lg"
+          backdropBlur="md"
           justify="space-between"
           align="center"
+          zIndex={1000}
         >
           <Flex mr="-14">
             <IconButton
@@ -181,7 +183,14 @@ const Chats: NextPage = ({ showStatus }: any) => {
                   ...
                 </Text>
               ) : !!recStatus?.online ? (
-                <Text textAlign="center" w="full" fontSize={["12", "12", "15"]}>
+                <Text
+                  textAlign="center"
+                  bgColor="#5ac8faff"
+                  rounded={10}
+                  w="full"
+                  fontSize={["12", "12", "15"]}
+                  color="#f5f5f5"
+                >
                   online
                 </Text>
               ) : (
@@ -279,24 +288,19 @@ const Chats: NextPage = ({ showStatus }: any) => {
           <div ref={keepBottomRef} />
         </Flex>
 
-        <Flex position="relative" py="1" align="center">
+        {/* {webCam &&  />} */}
+
+        <Flex py="1" align="center">
           <PickerInterface
             isOpen={pickerIsOpen}
             onOpen={pickerOnOpen}
             onClose={pickerOnClose}
-            chatId={chatId}
+            // chatId={chatId}
+            colRef={messagesRef}
             user={user}
             setProgress={setDocUploadProgress}
           />
-          <IconButton
-            isRound
-            aria-label="sticker"
-            color="blue.400"
-            bgColor="transparent"
-            size="sm"
-            icon={<CameraIcon width={30} />}
-            mx="0.5"
-          />
+          <WebCamComp colRef={messagesRef} user={user} />
           <Flex
             w="full"
             borderRadius={20}
@@ -374,10 +378,11 @@ const Chats: NextPage = ({ showStatus }: any) => {
                 alignSelf="end"
                 isRound
                 aria-label="send"
-                bgColor=""
+                bgColor="#78788033"
                 fontSize="1.2em"
                 size="xs"
-                icon={<MicrophoneIcon width={25} color="#007affff" />}
+                // icon={<MicrophoneIcon width={25} color="#007affff" />}
+                icon={<MicWaveIcon color="#007affff" />}
                 // onClick={sendMessage}
                 m="1"
               />
@@ -386,7 +391,12 @@ const Chats: NextPage = ({ showStatus }: any) => {
         </Flex>
         {stickerIsOpen && (
           // <SlideFade in={stickerIsOpen}>
-          <StickerComp onClose={stickerOnClose} />
+          <StickerComp
+            onClose={stickerOnClose}
+            chatId={chatId}
+            userData={userData}
+            // stickerOnClose={stickerOnClose}
+          />
           // </SlideFade>
         )}
       </Flex>
@@ -414,72 +424,155 @@ export const Message = ({
   };
 
   return (
-    <Flex
-      alignSelf={messageStyle("end", "start")}
-      bgColor={messageStyle("#5ac8faff", "#78788028")}
-      h="auto"
-      borderRadius={13}
-      px="2.5"
-      py="0.25rem"
-      m="1"
-      w="fit-content"
-      flexWrap="wrap"
-      maxW="320px"
-      justify="end"
-    >
-      {content.type === "document" ? (
-        <Flex flexDirection="column" maxW="300px" align="center" color="#f2f2f7ff">
-          <Text fontSize={[14, 15, 16]} fontWeight={600}>
-            {content.documentName.slice(0, 15)}
-          </Text>
-          <Text fontSize={13}>{content.documentType}</Text>
-          <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
-          {content.status === "uploading" ? (
-            <Box w="50px" opacity={0.5} my="1">
-              <Progress
-                hasStripe
-                rounded="full"
-                value={docUploadProgress}
-                size="xs"
-                colorScheme="gray"
+    <>
+      {content.type === "sticker" ? (
+        <Box alignSelf={messageStyle("end", "start")} maxWidth="100px" m="1">
+          <Image
+            referrerPolicy="no-referrer"
+            loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
+            src={content.stickerURL}
+            width="100px"
+            height="100px"
+            style={{
+              // zIndex: -1,
+              backgroundColor: "#000000ff",
+              borderRadius: 20,
+            }}
+          />
+          <Box
+            // mt="0.5"
+            p="1"
+            rounded="lg"
+            w="fit-content"
+            mx="auto"
+            alignSelf="end"
+            fontSize={9}
+            fontWeight={500}
+            bgColor={messageStyle("#5ac8faff", "#78788028")}
+            color={messageStyle("gray.50", "gray")}
+          >
+            {content.timeSent ? (
+              time
+            ) : (
+              <Box>
+                <ClockIcon width={10} />
+              </Box>
+            )}
+          </Box>
+        </Box>
+      ) : (
+        <Flex
+          flexDirection="column"
+          alignSelf={messageStyle("end", "start")}
+          bgColor={messageStyle("#5ac8faff", "#78788028")}
+          h="auto"
+          borderRadius={12}
+          m="1"
+          maxW="350px"
+        >
+          {content.type === "image" ? (
+            <Box
+              alignSelf={messageStyle("end", "start")}
+              mx="1"
+              mt="1"
+              mb="-1"
+            >
+              <Image
+                referrerPolicy="no-referrer"
+                loader={() => `${content.photoURL}?w=${100}&q=${75}`}
+                src={content.photoURL}
+                width="1280px"
+                height="720px"
+                style={{
+                  // zIndex: -1,
+                  backgroundColor: "#000000ff",
+                  borderRadius: 10,
+                }}
               />
             </Box>
-          ) : (
-            <Link
-              href={content.documentURL}
-              _hover={{ bgColor: "transparent", opacity: 0.5 }}
+          ) : content.type === "document" ? (
+            <Flex
+              flexDirection="column"
+              align="center"
+              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
+              m={1.5}
             >
-              <CloudDownloadIcon width={30} color="#f2f2f7ff" />
-            </Link>
+              <Text fontSize={[14, 15, 16]} fontWeight={600}>
+                {content.documentName.slice(0, 15)}
+              </Text>
+              <Text fontSize={13}>{content.documentType}</Text>
+              <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
+              {content.status === "uploading" ? (
+                <Box w="50px" opacity={0.5} my="1">
+                  <Progress
+                    hasStripe
+                    rounded="full"
+                    value={docUploadProgress}
+                    size="xs"
+                    colorScheme="gray"
+                  />
+                </Box>
+              ) : (
+                <Link
+                  href={content.documentURL}
+                  _hover={{ bgColor: "transparent", opacity: 0.5 }}
+                >
+                  <CloudDownloadIcon width={30} />
+                </Link>
+              )}
+            </Flex>
+          ) : (
+            <Box
+              fontSize={[14, 15, 16]}
+              fontWeight={600}
+              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
+              maxW="300px"
+              flexDirection="column"
+              mx="2"
+              my="0.25rem"
+              // minW="70px"
+              lineHeight={1}
+              // display="inline-block"
+            >
+              {content.text}
+              <Box
+                h="auto"
+                // alignSelf="end"
+                ml={1.5}
+                pt={1.5}
+                float="right"
+                w="fit-content"
+                fontSize={10}
+                fontWeight={500}
+                color={messageStyle("gray.50", "gray")}
+                // p
+                // mb="0"
+                // display="inline"
+              >
+                {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
+              </Box>
+            </Box>
+          )}
+          {content.type !== "text" && (
+            <Box
+              h="auto"
+              alignSelf="end"
+              mx={1.5}
+              pb={0.5}
+              // float="right"
+              w="fit-content"
+              fontSize={11}
+              fontWeight={500}
+              color={messageStyle("gray.50", "gray")}
+              // p
+              // mb="0"
+              // display="inline"
+            >
+              {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
+            </Box>
           )}
         </Flex>
-      ) : (
-        <Text
-          fontSize={[14, 15, 16]}
-          fontWeight={600}
-          color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-          maxW="300px"
-        >
-          {content.text}
-        </Text>
       )}
-      <Box
-        mt="2"
-        ml="1.5"
-        mr="1"
-        alignSelf="end"
-        fontSize={9}
-        fontWeight={500}
-        color={messageStyle("gray.50", "gray")}
-      >
-        {content.timeSent ? (
-          time
-        ) : (
-          <Box mb="1" mt="-1">
-            <ClockIcon width={10} />
-          </Box>
-        )}
-      </Box>
-    </Flex>
+    </>
   );
 };

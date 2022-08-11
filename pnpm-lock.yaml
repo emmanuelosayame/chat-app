@@ -36,6 +36,7 @@ specifiers:
   react-textarea-autosize: ^8.3.4
   react-time-ago: ^7.2.1
   react-timeago: ^7.1.0
+  react-webcam: ^7.0.1
   spinners-react: ^1.0.7
   timeago-react: ^3.0.5
   typescript: 4.7.4
@@ -69,6 +70,7 @@ dependencies:
   react-textarea-autosize: 8.3.4_3hx2ussxxho4jajbwrd6gq34qe
   react-time-ago: 7.2.1_6jxhcwa6e776bogvyohzxoo6pa
   react-timeago: 7.1.0_react@18.2.0
+  react-webcam: 7.0.1_biqbaboplfbrettd7655fr4n2y
   spinners-react: 1.0.7_v7vsrdtui4d36prbwvdnlb7tpq
   timeago-react: 3.0.5_react@18.2.0
 
@@ -4165,6 +4167,16 @@ packages:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
+    dev: false
+
+  /react-webcam/7.0.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-8E/Eb/7ksKwn5QdLn67tOR7+TdP9BZdu6E5/DSt20v8yfW/s0VGBigE6VA7R4278mBuBUowovAB3DkCfVmSPvA==}
+    peerDependencies:
+      react: '>=16.2.0'
+      react-dom: '>=16.2.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /react/18.2.0:

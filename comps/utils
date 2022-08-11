@@ -60,3 +60,74 @@
           );
           }
           };
+
+
+
+          {
+            alreadyAdded(sticker.id) && (
+              
+            );
+          }
+
+
+
+
+
+          <Flex
+      h="auto"
+      borderRadius={13}
+      px="2.5"
+      py="0.25rem"
+      m="1"
+      w="fit-content"
+      flexWrap="wrap"
+      maxW="320px"
+      bgColor="#5ac8faff"
+    >
+      <Box fontSize={[14, 15, 16]} fontWeight={600} color="white" maxW="300px">
+        {content?.text}
+      </Box>
+      <Box
+        mt="2"
+        ml="1.5"
+        mr="1"
+        alignSelf="end"
+        fontSize={9}
+        fontWeight={500}
+        color="gray"
+      >
+        {content?.timeSent ? (
+          time
+        ) : (
+          <Box mb="1" mt="-1">
+            <ClockIcon width={10} />
+          </Box>
+        )}
+      </Box>
+    </Flex>
+
+
+    : content.type === "image" ? (
+    <Box alignSelf={messageStyle("end", "start" )} maxWidth="100px" m="1">
+      <Image referrerPolicy="no-referrer" loader={()=> `${content.photoURL}?w=${100}&q=${75}`}
+        src={content.photoURL}
+        width="100px"
+        height="100px"
+        style={{
+        // zIndex: -1,
+        backgroundColor: "#000000ff",
+        borderRadius: 20,
+        }}
+        />
+        <Box // mt="0.5" p="1" rounded="lg" w="fit-content" mx="auto" alignSelf="end" fontSize={9} fontWeight={500}
+          bgColor={messageStyle("#5ac8faff", "#78788028" )} color={messageStyle("gray.50", "gray" )}>
+          {content.timeSent ? (
+          time
+          ) : (
+          <Box>
+            <ClockIcon width={10} />
+          </Box>
+          )}
+        </Box>
+    </Box>
+    ) :

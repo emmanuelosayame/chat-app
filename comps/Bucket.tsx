@@ -1,5 +1,18 @@
-import { Box, Button, Flex, IconButton, Textarea } from "@chakra-ui/react";
-import { ClockIcon } from "@heroicons/react/outline";
+import {
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Link,
+  Text,
+  Textarea,
+  useDisclosure,
+} from "@chakra-ui/react";
+import {
+  ArrowUpIcon,
+  ClockIcon,
+  CloudDownloadIcon,
+} from "@heroicons/react/outline";
 import { ChevronLeftIcon } from "@heroicons/react/solid";
 import {
   addDoc,
@@ -9,6 +22,8 @@ import {
   query,
   serverTimestamp,
 } from "firebase/firestore";
+import Image from "next/image";
+import prettyBytes from "pretty-bytes";
 import { useState } from "react";
 import {
   useCollection,
@@ -16,7 +31,7 @@ import {
 } from "react-firebase-hooks/firestore";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { auth, db } from "../firebase/firebase";
-import { SendIcon2 } from "./Icons";
+import { MicWaveIcon } from "./Icons";
 import PickerInterface from "./PickerInterface";
 
 const Bucket = ({ setBucket }: any) => {
@@ -26,6 +41,11 @@ const Bucket = ({ setBucket }: any) => {
   const [bucketList] = useCollectionData(bucketListQuery);
 
   const [bucketMessage, setBucketMessage] = useState<string>("");
+  const [docUploadProgress, setDocUploadProgress] = useState<
+    number | undefined
+  >(undefined);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleSendMessage = async () => {
     if (bucketMessage !== null && bucketMessage?.length > 0)
@@ -79,42 +99,92 @@ const Bucket = ({ setBucket }: any) => {
         ))}
       </Flex>
 
-      <Flex position="fixed" left={0} right={0} bottom={0} align="center" >
-        <PickerInterface />
-        <Textarea
-          as={ReactTextareaAutosize}
-          maxRows={7}
-          rows={1}
-          m="2"
-          p="2"
-          px="4"
-          borderRadius={20}
+      <Box position="absolute" bottom={0} right={0} left={0}>
+        <Flex position="relative" py="1" align="center">
+          <PickerInterface
+            isOpen={isOpen}
+            onOpen={onOpen}
+            onClose={onClose}
+            colRef={bucketListRef}
+            user={user}
+            setProgress={setDocUploadProgress}
+          />
+          {/* <IconButton
+          isRound
+          aria-label="sticker"
+          color="blue.400"
+          bgColor="transparent"
           size="sm"
-          placeholder="Message"
-          _placeholder={{
-            pl: [2, 4, 6],
-            fontSize: 20,
-          }}
-          resize="none"
-          sx={{
-            "&::-webkit-scrollbar": {
-              width: "4px",
-              backgroundColor: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              borderRadius: "4px",
-              backgroundColor: "transparent",
-            },
-          }}
-          onChange={(e) => setBucketMessage(e.target.value)}
-        />
-        <IconButton
-          aria-label="send-bucket-message"
-          onClick={handleSendMessage}
-        >
-          <SendIcon2 />
-        </IconButton>
-      </Flex>
+          icon={<CameraIcon width={30} />}
+          mx="0.5"
+        /> */}
+          <Flex
+            w="full"
+            borderRadius={20}
+            borderWidth="2px"
+            borderColor="#3c3c4349"
+            mr="3"
+            position="relative"
+            overflow="hidden"
+          >
+            <Textarea
+              as={ReactTextareaAutosize}
+              w="full"
+              maxRows={7}
+              placeholder="Message"
+              _placeholder={{
+                fontSize: 20,
+                pl: 2,
+              }}
+              variant="unstyled"
+              bgColor="white"
+              size="sm"
+              rows={1}
+              resize="none"
+              sx={{
+                "&::-webkit-scrollbar": {
+                  width: "4px",
+                  backgroundColor: "transparent",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  borderRadius: "4px",
+                  backgroundColor: "transparent",
+                },
+              }}
+              p="1.5"
+              value={bucketMessage}
+              onChange={(e) => setBucketMessage(e.target.value)}
+            />
+
+            {bucketMessage.length > 0 ? (
+              <IconButton
+                isRound
+                alignSelf="end"
+                aria-label="send"
+                bgColor="#007affff"
+                fontSize="1.2em"
+                size="xs"
+                icon={<ArrowUpIcon width={20} color="white" />}
+                onClick={handleSendMessage}
+                m="1"
+              />
+            ) : (
+              <IconButton
+                alignSelf="end"
+                isRound
+                aria-label="send"
+                bgColor="#78788033"
+                fontSize="1.2em"
+                size="xs"
+                // icon={<MicrophoneIcon width={25} color="#007affff" />}
+                icon={<MicWaveIcon color="#007affff" />}
+                // onClick={sendMessage}
+                m="1"
+              />
+            )}
+          </Flex>
+        </Flex>
+      </Box>
     </Box>
   );
 };
@@ -125,37 +195,116 @@ export const Container = ({ content }: any) => {
     !!content.timeSent &&
     content.timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
   return (
-    <Flex
-      h="auto"
-      borderRadius={13}
-      px="2.5"
-      py="0.25rem"
-      m="1"
-      w="fit-content"
-      flexWrap="wrap"
-      maxW="320px"
-      bgColor="#5ac8faff"
-    >
-      <Box fontSize={[14, 15, 16]} fontWeight={600} color="white" maxW="300px">
-        {content?.text}
-      </Box>
-      <Box
-        mt="2"
-        ml="1.5"
-        mr="1"
-        alignSelf="end"
-        fontSize={9}
-        fontWeight={500}
-        color="gray"
-      >
-        {content?.timeSent ? (
-          time
-        ) : (
-          <Box mb="1" mt="-1">
-            <ClockIcon width={10} />
+    <>
+      {content.type === "sticker" ? (
+        <Box alignSelf="end" maxWidth="100px" m="1">
+          <Image
+            referrerPolicy="no-referrer"
+            loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
+            src={content.stickerURL}
+            width="100px"
+            height="100px"
+            style={{
+              // zIndex: -1,
+              backgroundColor: "#000000ff",
+              borderRadius: 20,
+            }}
+          />
+          <Box
+            // mt="0.5"
+            p="1"
+            rounded="lg"
+            w="fit-content"
+            mx="auto"
+            alignSelf="end"
+            fontSize={9}
+            fontWeight={500}
+            bgColor="#5ac8faff"
+            color="gray"
+          >
+            {content.timeSent ? (
+              time
+            ) : (
+              <Box>
+                <ClockIcon width={10} />
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
-    </Flex>
+        </Box>
+      ) : (
+        <Flex
+          // alignSelf={messageStyle("end", "start")}
+          bgColor="#5ac8faff"
+          h="auto"
+          borderRadius={13}
+          px="2.5"
+          py="0.25rem"
+          m="1"
+          w="fit-content"
+          flexWrap="wrap"
+          maxW="320px"
+          justify="end"
+        >
+          {content.type === "document" ? (
+            <Flex
+              flexDirection="column"
+              maxW="300px"
+              align="center"
+              color="#f2f2f7ff"
+            >
+              <Text fontSize={[14, 15, 16]} fontWeight={600}>
+                {content.documentName.slice(0, 15)}
+              </Text>
+              <Text fontSize={13}>{content.documentType}</Text>
+              <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
+              {content.status === "uploading" ? (
+                <Box w="50px" opacity={0.5} my="1">
+                  {/* <Progress
+                    hasStripe
+                    rounded="full"
+                    value={docUploadProgress}
+                    size="xs"
+                    colorScheme="gray"
+                  /> */}
+                </Box>
+              ) : (
+                <Link
+                  href={content.documentURL}
+                  _hover={{ bgColor: "transparent", opacity: 0.5 }}
+                >
+                  <CloudDownloadIcon width={30} />
+                </Link>
+              )}
+            </Flex>
+          ) : (
+            <Text
+              fontSize={[14, 15, 16]}
+              fontWeight={600}
+              color="#f2f2f7ff"
+              maxW="300px"
+            >
+              {content.text}
+            </Text>
+          )}
+          <Box
+            mt="2"
+            ml="1.5"
+            mr="1"
+            alignSelf="end"
+            fontSize={9}
+            fontWeight={500}
+            color="gray.50"
+          >
+            {content.timeSent ? (
+              time
+            ) : (
+              <Box mb="1" mt="-1">
+                <ClockIcon width={10} />
+              </Box>
+            )}
+          </Box>
+        </Flex>
+      )}
+    </>
   );
 };

@@ -23,7 +23,9 @@ import { User } from "firebase/auth";
 import {
   addDoc,
   collection,
+  CollectionReference,
   doc,
+  DocumentData,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -47,14 +49,14 @@ const PickerInterface = ({
   isOpen,
   onClose,
   onOpen,
-  chatId,
+  colRef,
   user,
   setProgress,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
-  chatId: string | string[] | undefined;
+  colRef: CollectionReference<DocumentData>;
   user: User | null;
   setProgress: Dispatch<SetStateAction<number | undefined>>;
 }) => {
@@ -84,21 +86,19 @@ const PickerInterface = ({
     if (document && document.size < 1600000) {
       onClose();
 
-      const messageRef = await addDoc(
-        collection(db, "chatGroup", `${chatId}`, "messages"),
-        {
-          type: "document",
-          status: "uploading",
-          sender: user?.uid,
-          timeSent: serverTimestamp(),
-          documentName: document.name,
-          documentSize: document.size,
-          documentType: document.type,
-        }
-      );
-      const ChatDocumentRef = sref(storage, `ChatDocuments/${messageRef.id}`);
+      const messageRef = await addDoc(colRef, {
+        type: "document",
+        status: "uploading",
+        sender: user?.uid,
+        timeSent: serverTimestamp(),
+        documentName: document.name,
+        documentSize: document.size,
+        documentType: document.type,
+      });
+      
+      const chatDocumentRef = sref(storage, `ChatDocuments/${messageRef.id}`);
       if (document) {
-        const uploadDocument = uploadBytesResumable(ChatDocumentRef, document, {
+        const uploadDocument = uploadBytesResumable(chatDocumentRef, document, {
           contentType: document.type,
           contentDisposition: `attachment; filename=${document.name}`,
         });
@@ -228,7 +228,7 @@ const PickerInterface = ({
                 mx="auto"
                 w="95%"
               >
-                <Button
+                {/* <Button
                   mx="auto"
                   as={GridItem}
                   w="full"
@@ -241,10 +241,11 @@ const PickerInterface = ({
                   justifyContent={["start", "start", "center"]}
                 >
                   Camera
-                </Button>
+                </Button> */}
                 <Button
                   mx="auto"
                   as={GridItem}
+                  colSpan={2}
                   w="full"
                   h={[10, 10, "auto"]}
                   leftIcon={<PhotographIcon color="#007affff" width={20} />}
