@@ -1,8 +1,10 @@
 import { Box, Flex, Link, Progress, Text } from "@chakra-ui/react";
 import { ClockIcon, CloudDownloadIcon } from "@heroicons/react/outline";
 import { DocumentData } from "firebase/firestore";
+import { UploadTask } from "firebase/storage";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
+import { Dispatch, SetStateAction } from "react";
 import {
   SpinnerDotted,
   SpinnerCircular,
@@ -84,25 +86,31 @@ const Message = ({
               mx="1"
               mt="1"
               mb="1"
-              w="330px"
+              w={content.photoURL || content.mediaURL ? "330px" : "fit-content"}
               display="block"
             >
-              {(content.photoURL || content.mediaURL) && (
-                <Image
-                  referrerPolicy="no-referrer"
-                  alt="captureImg"
-                  loader={() => `${content.photoURL || content.mediaURL}`}
-                  src={content.photoURL || content.mediaURL}
-                  width="100%"
-                  height="100%"
-                  layout="responsive"
-                  style={{
-                    // zIndex: -1,
-                    backgroundColor: "#000000ff",
-                    borderRadius: 10,
-                    // maxWidth: "350px",
-                  }}
-                />
+              {content.status === "saved" ? (
+                <>
+                  {(content.photoURL || content.mediaURL) && (
+                    <Image
+                      referrerPolicy="no-referrer"
+                      alt="captureImg"
+                      loader={() => `${content.photoURL || content.mediaURL}`}
+                      src={content.photoURL || content.mediaURL}
+                      width="100%"
+                      height="100%"
+                      layout="responsive"
+                      style={{
+                        // zIndex: -1,
+                        backgroundColor: "#000000ff",
+                        borderRadius: 10,
+                        // maxWidth: "350px",
+                      }}
+                    />
+                  )}
+                </>
+              ) : (
+                <SpinnerRound color="#7676801e" />
               )}
             </Box>
           ) : content.type === "video" ? (
@@ -114,7 +122,10 @@ const Message = ({
                   style={{ borderRadius: 10 }}
                 />
               ) : (
-                <SpinnerRound color="#7676801e" />
+                <SpinnerRound
+                  color="#7676801e"
+                  // onClick={() => upload?.resume()}
+                />
               )}
             </Box>
           ) : content.type === "document" ? (

@@ -24,6 +24,7 @@ import {
   addDoc,
   collection,
   CollectionReference,
+  deleteDoc,
   doc,
   DocumentData,
   serverTimestamp,
@@ -33,6 +34,7 @@ import {
   getDownloadURL,
   ref as sref,
   uploadBytesResumable,
+  UploadTask,
 } from "firebase/storage";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
@@ -117,6 +119,7 @@ const PickerInterface = ({
           cacheControl: "private,max-age=345600,immutable",
           contentDisposition: `attachment; filename=${media?.file.name}`,
         });
+        // setUpload(uploadMedia);
         uploadMedia.on(
           "state_changed",
           (snapshot) => {
@@ -124,7 +127,12 @@ const PickerInterface = ({
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(progress);
           },
-          () => setError({ upload: "failed", limit: null }),
+          () => {
+            setError({ upload: "failed", limit: null });
+            updateDoc(messageRef, {
+              status: "failed",
+            });
+          },
           () => {
             getDownloadURL(uploadMedia.snapshot.ref)
               .then((url) => {
@@ -141,8 +149,8 @@ const PickerInterface = ({
               );
           }
         );
+        uploadMedia.cancel();
       }
-      setMedia(null);
     }
   };
 
@@ -173,7 +181,12 @@ const PickerInterface = ({
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(progress);
           },
-          () => setError({ upload: "failed", limit: null }),
+          () => {
+            setError({ upload: "failed", limit: null });
+            updateDoc(messageRef, {
+              status: "failed",
+            });
+          },
           () => {
             getDownloadURL(uploadDocument.snapshot.ref)
               .then((url) => {
@@ -320,7 +333,14 @@ const PickerInterface = ({
                   Send
                 </Button>
               </Flex>
-              <Box mx="auto" w="full" rounded="lg" overflow="hidden" h="full" boxShadow="2xl">
+              <Box
+                mx="auto"
+                w="full"
+                rounded="lg"
+                overflow="hidden"
+                h="full"
+                boxShadow="2xl"
+              >
                 {error && (
                   <Text fontWeight={600} textAlign="center" color="#3c3c432d">
                     {error.limit}

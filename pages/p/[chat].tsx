@@ -57,6 +57,7 @@ import prettyBytes from "pretty-bytes";
 
 import Message from "../../comps/Message";
 import WebCamComp from "../../comps/WebCamComp";
+import { UploadTask } from "firebase/storage";
 // import TimeAgo from "timeago-react";
 
 const Chats: NextPage = ({ showStatus, userData }: any) => {
