@@ -54,8 +54,8 @@ import ReactTextareaAutosize from "react-textarea-autosize";
 import PickerInterface from "../../comps/PickerInterface";
 import StickerComp from "../../comps/StickerComp";
 import prettyBytes from "pretty-bytes";
-import { SpinnerDotted, SpinnerInfinity } from "spinners-react";
-import Webcam from "react-webcam";
+
+import Message from "../../comps/Message";
 import WebCamComp from "../../comps/WebCamComp";
 // import TimeAgo from "timeago-react";
 
@@ -182,12 +182,14 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
                 >
                   ...
                 </Text>
-              ) : !!recStatus?.online ? (
+              ) : recStatus?.online && showStatus ? (
                 <Text
                   textAlign="center"
                   bgColor="#5ac8faff"
                   rounded={10}
-                  w="full"
+                  w="fit-content"
+                  px="1"
+                  py={0.5}
                   fontSize={["12", "12", "15"]}
                   color="#f5f5f5"
                 >
@@ -300,7 +302,12 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
             user={user}
             setProgress={setDocUploadProgress}
           />
-          <WebCamComp colRef={messagesRef} user={user} />
+          <WebCamComp
+            colRef={messagesRef}
+            user={user}
+            top={9}
+            direction={["column", "column", "column", "column"]}
+          />
           <Flex
             w="full"
             borderRadius={20}
@@ -404,175 +411,3 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
   );
 };
 export default Chats;
-
-export const Message = ({
-  content,
-  docUploadProgress,
-}: {
-  content: DocumentData;
-  docUploadProgress: number | undefined;
-}) => {
-  const user = auth.currentUser;
-  const time =
-    !!content.timeSent &&
-    content.timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
-  const messageStyle = (userVal: string, recVal: string) => {
-    if (content.sender === user?.uid) {
-      return userVal;
-    }
-    return recVal;
-  };
-
-  return (
-    <>
-      {content.type === "sticker" ? (
-        <Box alignSelf={messageStyle("end", "start")} maxWidth="100px" m="1">
-          <Image
-            referrerPolicy="no-referrer"
-            loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
-            src={content.stickerURL}
-            width="100px"
-            height="100px"
-            style={{
-              // zIndex: -1,
-              backgroundColor: "#000000ff",
-              borderRadius: 20,
-            }}
-          />
-          <Box
-            // mt="0.5"
-            p="1"
-            rounded="lg"
-            w="fit-content"
-            mx="auto"
-            alignSelf="end"
-            fontSize={9}
-            fontWeight={500}
-            bgColor={messageStyle("#5ac8faff", "#78788028")}
-            color={messageStyle("gray.50", "gray")}
-          >
-            {content.timeSent ? (
-              time
-            ) : (
-              <Box>
-                <ClockIcon width={10} />
-              </Box>
-            )}
-          </Box>
-        </Box>
-      ) : (
-        <Flex
-          flexDirection="column"
-          alignSelf={messageStyle("end", "start")}
-          bgColor={messageStyle("#5ac8faff", "#78788028")}
-          h="auto"
-          borderRadius={12}
-          m="1"
-          maxW="350px"
-        >
-          {content.type === "image" ? (
-            <Box
-              alignSelf={messageStyle("end", "start")}
-              mx="1"
-              mt="1"
-              mb="-1"
-            >
-              <Image
-                referrerPolicy="no-referrer"
-                loader={() => `${content.photoURL}?w=${100}&q=${75}`}
-                src={content.photoURL}
-                width="1280px"
-                height="720px"
-                style={{
-                  // zIndex: -1,
-                  backgroundColor: "#000000ff",
-                  borderRadius: 10,
-                }}
-              />
-            </Box>
-          ) : content.type === "document" ? (
-            <Flex
-              flexDirection="column"
-              align="center"
-              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-              m={1.5}
-            >
-              <Text fontSize={[14, 15, 16]} fontWeight={600}>
-                {content.documentName.slice(0, 15)}
-              </Text>
-              <Text fontSize={13}>{content.documentType}</Text>
-              <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
-              {content.status === "uploading" ? (
-                <Box w="50px" opacity={0.5} my="1">
-                  <Progress
-                    hasStripe
-                    rounded="full"
-                    value={docUploadProgress}
-                    size="xs"
-                    colorScheme="gray"
-                  />
-                </Box>
-              ) : (
-                <Link
-                  href={content.documentURL}
-                  _hover={{ bgColor: "transparent", opacity: 0.5 }}
-                >
-                  <CloudDownloadIcon width={30} />
-                </Link>
-              )}
-            </Flex>
-          ) : (
-            <Box
-              fontSize={[14, 15, 16]}
-              fontWeight={600}
-              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-              maxW="300px"
-              flexDirection="column"
-              mx="2"
-              my="0.25rem"
-              // minW="70px"
-              lineHeight={1}
-              // display="inline-block"
-            >
-              {content.text}
-              <Box
-                h="auto"
-                // alignSelf="end"
-                ml={1.5}
-                pt={1.5}
-                float="right"
-                w="fit-content"
-                fontSize={10}
-                fontWeight={500}
-                color={messageStyle("gray.50", "gray")}
-                // p
-                // mb="0"
-                // display="inline"
-              >
-                {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
-              </Box>
-            </Box>
-          )}
-          {content.type !== "text" && (
-            <Box
-              h="auto"
-              alignSelf="end"
-              mx={1.5}
-              pb={0.5}
-              // float="right"
-              w="fit-content"
-              fontSize={11}
-              fontWeight={500}
-              color={messageStyle("gray.50", "gray")}
-              // p
-              // mb="0"
-              // display="inline"
-            >
-              {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
-            </Box>
-          )}
-        </Flex>
-      )}
-    </>
-  );
-};

@@ -94,7 +94,7 @@ const View = ({ Component, pageProps }: AppProps) => {
           setShowStatus(true);
           const con = push(onlineRef);
 
-          onDisconnect(con).remove();
+          onDisconnect(con).set(null);
 
           set(con, browserName);
 
@@ -134,7 +134,7 @@ const View = ({ Component, pageProps }: AppProps) => {
     } else {
       setUserNameSet(true);
     }
-  }, [userDataLoading, userDataError])
+  }, [userDataLoading, userDataError]);
 
   const searchChat = debounce(async (e: any) => {
     const input = e.target.value.toLowerCase();
