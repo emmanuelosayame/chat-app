@@ -87,6 +87,11 @@ const View = ({ Component, pageProps }: AppProps) => {
   const [showStatus, setShowStatus] = useState<boolean>(false);
   const [deleteChats, setDeleteChats] = useState<(string | number)[]>([]);
   // console.log(deleteChats)
+
+  useEffect(() => {
+    router.push("/");
+  }, []);
+  
   useEffect(() => {
     if (user) {
       onValue(statusRef, (snap) => {

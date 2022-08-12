@@ -92,7 +92,10 @@ const WebCamCompLg = ({
           imageWidth: imgSrc.width,
         });
         const photosRef = sref(storage, `captures/${messageRef.id}`);
-        uploadBytes(photosRef, file)
+        uploadBytes(photosRef, file, {
+          cacheControl: "private,max-age=345600,immutable",
+          contentDisposition: `attachment; filename=${file.name}`,
+        })
           .then((snap) =>
             getDownloadURL(snap.ref).then((URL) => {
               updateDoc(messageRef, {
@@ -158,6 +161,7 @@ const WebCamCompLg = ({
                       position="relative"
                     >
                       <Image
+                        alt="captureImg"
                         src={imgSrc.data}
                         width="1200px"
                         height="720px"
@@ -182,6 +186,7 @@ const WebCamCompLg = ({
                   ) : (
                     <Box position="relative" mx="1">
                       <Image
+                        alt="captureImg"
                         src={imgSrc.data}
                         width="1280px"
                         height="720px"
@@ -359,6 +364,7 @@ const WebCamCompLg = ({
                       position="relative"
                     >
                       <Image
+                        alt="captureImg"
                         src={imgSrc.data}
                         height="720px"
                         width="720px"
@@ -383,6 +389,7 @@ const WebCamCompLg = ({
                   ) : (
                     <Box position="relative" mx="1">
                       <Image
+                        alt="captureImg"
                         src={imgSrc.data}
                         width="720px"
                         height="720px"

@@ -311,6 +311,7 @@ const Profile = ({
             border="1px solid #3c3c432d"
           >
             <Image
+              alt="userProfileImg"
               referrerPolicy="no-referrer"
               loader={() => `${photoPrev.URL}?w=${90}&q=${75}`}
               src={photoPrev.URL.toString()}

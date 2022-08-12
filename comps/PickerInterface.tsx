@@ -34,6 +34,7 @@ import {
   ref as sref,
   uploadBytesResumable,
 } from "firebase/storage";
+import Image from "next/image";
 import prettyBytes from "pretty-bytes";
 import {
   ChangeEvent,
@@ -62,9 +63,11 @@ const PickerInterface = ({
 }) => {
   const ref = useRef<any>(null);
   const documentRef = useRef<any>(null);
+  const mediaRef = useRef<any>(null);
   useOutsideClick({ ref: ref, handler: onClose });
 
   const [document, setDocument] = useState<File | null>(null);
+  const [media, setMedia] = useState<{ file: File; URL: string } | null>(null);
 
   const [error, setError] = useState<{
     limit: string | null;
@@ -82,6 +85,67 @@ const PickerInterface = ({
     }
   };
 
+  // console.log(media);
+
+  const handleMedia = (e: ChangeEvent<HTMLInputElement>) => {
+    const toBeUploadedMedia = e.target?.files?.[0];
+    if (toBeUploadedMedia && toBeUploadedMedia.size > 1600000) {
+      setError({ limit: "cannot send files above 15mb", upload: null });
+    }
+    if (toBeUploadedMedia)
+      setMedia({
+        file: toBeUploadedMedia,
+        URL: URL.createObjectURL(toBeUploadedMedia),
+      });
+  };
+
+  const sendMedia = async () => {
+    if (media && media.file.size < 1600000) {
+      onClose();
+      const messageRef = await addDoc(colRef, {
+        type: media.file.type.slice(0, 5),
+        status: "uploading",
+        sender: user?.uid,
+        timeSent: serverTimestamp(),
+        imageName: media.file.name,
+        imageSize: media.file.size,
+      });
+      const mediaRef = sref(storage, `media/${messageRef.id}`);
+      if (media) {
+        const uploadMedia = uploadBytesResumable(mediaRef, media.file, {
+          contentType: media.file.type,
+          cacheControl: "private,max-age=345600,immutable",
+          contentDisposition: `attachment; filename=${media?.file.name}`,
+        });
+        uploadMedia.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progress);
+          },
+          () => setError({ upload: "failed", limit: null }),
+          () => {
+            getDownloadURL(uploadMedia.snapshot.ref)
+              .then((url) => {
+                setError(null);
+                updateDoc(messageRef, {
+                  mediaURL: url,
+                  status: "saved",
+                });
+              })
+              .catch(() =>
+                updateDoc(messageRef, {
+                  status: "failed",
+                })
+              );
+          }
+        );
+      }
+      setMedia(null);
+    }
+  };
+
   const sendDocument = async () => {
     if (document && document.size < 1600000) {
       onClose();
@@ -95,12 +159,12 @@ const PickerInterface = ({
         documentSize: document.size,
         documentType: document.type,
       });
-      
+
       const chatDocumentRef = sref(storage, `ChatDocuments/${messageRef.id}`);
       if (document) {
         const uploadDocument = uploadBytesResumable(chatDocumentRef, document, {
           contentType: document.type,
-          contentDisposition: `attachment; filename=${document.name}`,
+          contentDisposition: `attachment; filename=${media?.file.name}`,
         });
         uploadDocument.on(
           "state_changed",
@@ -149,7 +213,7 @@ const PickerInterface = ({
           as={SlideFade}
           in={isOpen}
           style={{
-            zIndex: 100,
+            zIndex: 1000,
             position: "absolute",
             bottom: 55,
             right: "auto",
@@ -213,6 +277,80 @@ const PickerInterface = ({
                 </Stack>
               )}
             </Box>
+          ) : media ? (
+            <Box
+              // w="fit-content"
+              // rounded="lg"
+              m={1}
+              // overflow="hidden"
+              h="full"
+            >
+              <Flex
+                w="full"
+                justify="space-between"
+                h="fit-content"
+                my="1"
+                bgColor="white"
+                boxShadow="lg"
+                rounded="xl"
+              >
+                <Button
+                  onClick={() => {
+                    setError(null);
+                    setMedia(null);
+                    URL.revokeObjectURL(media.URL);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  color="#007affff"
+                  fontSize={14}
+                  rounded="xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  color="#007affff"
+                  fontSize={14}
+                  rounded="xl"
+                  onClick={sendMedia}
+                  isDisabled={error?.limit ? true : false}
+                >
+                  Send
+                </Button>
+              </Flex>
+              <Box mx="auto" w="full" rounded="lg" overflow="hidden" h="full" boxShadow="2xl">
+                {error && (
+                  <Text fontWeight={600} textAlign="center" color="#3c3c432d">
+                    {error.limit}
+                  </Text>
+                )}
+                {media.file.type.slice(0, 5) === "image" ? (
+                  <Image
+                    alt="photo/video-prev"
+                    src={media.URL}
+                    loader={() => media.URL}
+                    width="100%"
+                    height="100%"
+                    layout="responsive"
+                    style={{ margin: "auto" }}
+                  />
+                ) : (
+                  media.file.type.slice(0, 5) === "video" && (
+                    <video
+                      autoPlay
+                      controls
+                      controlsList="nodownload noremoteplayback"
+                      src={media.URL}
+                      width="100%"
+                      height="auto"
+                      style={{ margin: "auto" }}
+                    />
+                  )
+                )}
+              </Box>
+            </Box>
           ) : (
             <>
               <Box
@@ -228,6 +366,33 @@ const PickerInterface = ({
                 mx="auto"
                 w="95%"
               >
+                <Button
+                  mx="auto"
+                  as={GridItem}
+                  colSpan={2}
+                  w="full"
+                  h={[10, 10, "auto"]}
+                  leftIcon={<PhotographIcon color="#007affff" width={20} />}
+                  borderBottom="1px solid #74748014"
+                  borderRadius={0}
+                  fontSize={17}
+                  variant="ghost"
+                  borderLeft="1px solid #74748014"
+                  justifyContent={["start", "start", "center"]}
+                  onClick={() => mediaRef?.current?.click()}
+                >
+                  Photo/Video
+                </Button>
+                <Input
+                  ref={mediaRef}
+                  hidden
+                  multiple={true}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleMedia(e)
+                  }
+                />
                 {/* <Button
                   mx="auto"
                   as={GridItem}
@@ -242,22 +407,6 @@ const PickerInterface = ({
                 >
                   Camera
                 </Button> */}
-                <Button
-                  mx="auto"
-                  as={GridItem}
-                  colSpan={2}
-                  w="full"
-                  h={[10, 10, "auto"]}
-                  leftIcon={<PhotographIcon color="#007affff" width={20} />}
-                  borderBottom="1px solid #74748014"
-                  borderRadius={0}
-                  fontSize={17}
-                  variant="ghost"
-                  borderLeft="1px solid #74748014"
-                  justifyContent={["start", "start", "center"]}
-                >
-                  Photo/Video
-                </Button>
                 <Button
                   mx="auto"
                   colSpan={2}

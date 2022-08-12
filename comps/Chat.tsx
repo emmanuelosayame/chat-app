@@ -98,6 +98,7 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
           ) : (
             <Flex borderRadius="50%" w="40px" h="40px" overflow="hidden">
               <Image
+              alt="recProfileImg"
                 referrerPolicy="no-referrer"
                 loader={() => `${dp}?w=${40}&q=${75}`}
                 src={dp}

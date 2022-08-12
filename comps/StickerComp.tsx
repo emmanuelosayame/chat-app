@@ -357,6 +357,7 @@ const StickerComp = ({
                     justify="center"
                   >
                     <Image
+                    alt="sticker"
                       referrerPolicy="no-referrer"
                       loader={() => `${preview}?w=${60}&q=${75}`}
                       src={preview}
@@ -459,6 +460,7 @@ const StickerComp = ({
                     >
                       {sticker.data().stickerURL && (
                         <Image
+                        alt="sticker"
                           referrerPolicy="no-referrer"
                           loader={() =>
                             `${sticker.data().stickerURL}?w=${60}&q=${75}`
@@ -537,6 +539,7 @@ const StickerComp = ({
                       }
                     >
                       <Image
+                      alt="sticker"
                         referrerPolicy="no-referrer"
                         loader={() => `${sticker.stickerURL}?w=${60}&q=${75}`}
                         src={sticker.stickerURL}

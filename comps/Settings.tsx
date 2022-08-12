@@ -294,6 +294,7 @@ const Settings = ({
             mx="1"
           >
             <Image
+              alt="userProfileImg"
               referrerPolicy="no-referrer"
               loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
               src={userData?.photoURL}
@@ -339,6 +340,7 @@ const Settings = ({
                     mx="2"
                   >
                     <Image
+                      alt="userProfileImg"
                       referrerPolicy="no-referrer"
                       loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
                       src={userData?.photoURL}

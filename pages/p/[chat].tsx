@@ -248,6 +248,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
                 mx="2"
               >
                 <Image
+                  alt="recProfile"
                   referrerPolicy="no-referrer"
                   loader={() => `${router.query.photoURL}?w=${60}&q=${75}`}
                   src={router.query.photoURL.toString()}

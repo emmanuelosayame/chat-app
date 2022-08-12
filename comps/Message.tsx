@@ -3,6 +3,13 @@ import { ClockIcon, CloudDownloadIcon } from "@heroicons/react/outline";
 import { DocumentData } from "firebase/firestore";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
+import {
+  SpinnerDotted,
+  SpinnerCircular,
+  SpinnerRound,
+  SpinnerRomb,
+  SpinnerDiamond,
+} from "spinners-react";
 import { auth } from "../firebase/firebase";
 
 const Message = ({
@@ -29,6 +36,7 @@ const Message = ({
         <Box alignSelf={messageStyle("end", "start")} maxWidth="100px" m="1">
           <Image
             referrerPolicy="no-referrer"
+            alt="stickerImg"
             loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
             src={content.stickerURL}
             width="100px"
@@ -71,20 +79,42 @@ const Message = ({
           maxW="350px"
         >
           {content.type === "image" ? (
-            <Box alignSelf={messageStyle("end", "start")} mx="1" mt="1" mb="-1">
-              {content.photoURL && (
+            <Box
+              alignSelf={messageStyle("end", "start")}
+              mx="1"
+              mt="1"
+              mb="1"
+              w="330px"
+              display="block"
+            >
+              {(content.photoURL || content.mediaURL) && (
                 <Image
                   referrerPolicy="no-referrer"
-                  loader={() => `${content.photoURL}?w=${100}&q=${75}`}
-                  src={content.photoURL}
-                  width="1280px"
-                  height={content.imageWidth === "sm" ? "1280px" : "720px"}
+                  alt="captureImg"
+                  loader={() => `${content.photoURL || content.mediaURL}`}
+                  src={content.photoURL || content.mediaURL}
+                  width="100%"
+                  height="100%"
+                  layout="responsive"
                   style={{
                     // zIndex: -1,
                     backgroundColor: "#000000ff",
                     borderRadius: 10,
+                    // maxWidth: "350px",
                   }}
                 />
+              )}
+            </Box>
+          ) : content.type === "video" ? (
+            <Box maxW="330px" p="1">
+              {content.status === "saved" ? (
+                <video
+                  controls
+                  src={content.mediaURL}
+                  style={{ borderRadius: 10 }}
+                />
+              ) : (
+                <SpinnerRound color="#7676801e" />
               )}
             </Box>
           ) : content.type === "document" ? (
@@ -155,7 +185,7 @@ const Message = ({
               h="auto"
               alignSelf="end"
               mx={1.5}
-              pb={0.5}
+              pb={1}
               // float="right"
               w="fit-content"
               fontSize={11}

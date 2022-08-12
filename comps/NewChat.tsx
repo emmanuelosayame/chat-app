@@ -257,6 +257,7 @@ const NewChatComp = ({
                             mx="3"
                           >
                             <Image
+                              alt="recProfileImg"
                               referrerPolicy="no-referrer"
                               loader={() =>
                                 `${user.item.photoURL}?w=${40}&q=${75}`
@@ -305,6 +306,7 @@ const NewChatComp = ({
                         mx="2"
                       >
                         <Image
+                          alt="recProfileImg"
                           referrerPolicy="no-referrer"
                           loader={() => `${user?.photoURL}?w=${40}&q=${75}`}
                           src={user?.photoURL}

@@ -25,7 +25,6 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   const [user, loading] = useAuthState(auth);
 
   useEffect(() => {
-    router.push("/");
     TimeAgo.addDefaultLocale(en);
   }, []);
 
