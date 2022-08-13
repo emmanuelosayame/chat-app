@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Divider,
   Flex,
   IconButton,
   Link,
@@ -156,7 +157,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               display={["block", "block", "none"]}
               aria-label="back-btn"
               size="md"
-              icon={<ChevronLeftIcon width={40} height={40} />}
+              icon={<ChevronLeftIcon width={40} height={50} />}
               mr="-4"
               // mb="2"
               onClick={routeToChats}
@@ -177,11 +178,17 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               {!showStatus ? (
                 <Text
                   textAlign="center"
-                  fontSize={20}
-                  bgColor="transparent"
-                  color="#5ac8faff"
+                  w="fit-content"
+                  color="whiteAlpha.900"
+                  bgColor="#5ac8faff"
+                  px="1"
+                  h="auto"
+                  py="0.5"
+                  borderRadius={9}
+                  fontSize={10}
+                  opacity={0.15}
                 >
-                  ...
+                  ~
                 </Text>
               ) : recStatus?.online && showStatus ? (
                 <Text
@@ -222,16 +229,16 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
             <Text
               mx="auto"
               fontWeight={700}
-              fontSize={[18, 18, 20]}
+              fontSize={[15, 15, 16]}
               lineHeight="1.2"
-              color="#000000ff"
+              color="#000000da"
             >
               {router.query.name && router.query.name}
             </Text>
             <Text
               mx="auto"
               fontWeight={600}
-              fontSize={[11, 11, 13]}
+              fontSize={[12, 12, 14]}
               lineHeight="1"
               color="#3c3c4399"
             >
@@ -293,8 +300,8 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
         </Flex>
 
         {/* {webCam &&  />} */}
-
-        <Flex py="1" align="center">
+        <Divider />
+        <Flex py="1" align="center" bgColor="#f2f2f7ff">
           <PickerInterface
             isOpen={pickerIsOpen}
             onOpen={pickerOnOpen}
@@ -313,15 +320,19 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
           <Flex
             w="full"
             borderRadius={20}
-            borderWidth="2px"
-            borderColor="#3c3c4349"
+            borderWidth="1px"
+            bgColor="#ffffffff"
+            borderColor="#74748014"
             mr="3"
             position="relative"
+            align="center"
+            h="fit-content"
           >
             {stickerIsOpen ? (
               <Box
                 alignSelf="center"
-                mx="1"
+                my="1"
+                mx="1.5"
                 rounded="full"
                 aria-label="send"
                 color="#007affff"
@@ -332,7 +343,8 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
             ) : (
               <IconButton
                 alignSelf="end"
-                m="1"
+                my="1"
+                mx="1.5"
                 isRound
                 aria-label="send"
                 color="#007affff"
@@ -349,9 +361,9 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               placeholder="Message"
               _placeholder={{
                 fontSize: 20,
+                h: "full",
               }}
               variant="unstyled"
-              bgColor="white"
               size="sm"
               rows={1}
               resize="none"
@@ -368,6 +380,8 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               p="1.5"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
+              fontSize="100%"
+              h="full"
             />
 
             {newMessage.length > 0 ? (
@@ -387,7 +401,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
                 alignSelf="end"
                 isRound
                 aria-label="send"
-                bgColor="#78788033"
+                bgColor="#74748014"
                 fontSize="1.2em"
                 size="xs"
                 // icon={<MicrophoneIcon width={25} color="#007affff" />}

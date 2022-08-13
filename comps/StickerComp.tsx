@@ -10,11 +10,7 @@ import {
   useBoolean,
   useOutsideClick,
 } from "@chakra-ui/react";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
-} from "@heroicons/react/outline";
+
 import {
   addDoc,
   arrayUnion,
@@ -22,19 +18,15 @@ import {
   deleteDoc,
   doc,
   DocumentData,
-  getDoc,
-  getDocs,
   onSnapshot,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
-import prettyBytes from "pretty-bytes";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import FileResizer from "react-image-file-resizer";
 import { auth, db, storage } from "../firebase";
-import { StickerIcon } from "./Icons";
 import { useLiveQuery } from "dexie-react-hooks";
 import { odb } from "./OfflineDB";
 import { StarIcon } from "@heroicons/react/solid";
@@ -196,10 +188,19 @@ const StickerComp = ({
         ref={ref}
         w="full"
         minH="250px"
-        py="1"
-        px="2"
+        // py="1"
+        // px="2"
+        bgColor="#f2f2f7ff"
       >
-        <Box overflowY={uploadPage ? "unset" : "auto"} w="full" h="full">
+        <Box
+          overflowY={uploadPage ? "unset" : "auto"}
+          w="full"
+          h="full"
+          bgColor="#ffffff"
+          rounded="md"
+          px="2"
+          py="2"
+        >
           {uploadPage ? (
             <>
               <Flex justify="space-between">
@@ -357,7 +358,7 @@ const StickerComp = ({
                     justify="center"
                   >
                     <Image
-                    alt="sticker"
+                      alt="sticker"
                       referrerPolicy="no-referrer"
                       loader={() => `${preview}?w=${60}&q=${75}`}
                       src={preview}
@@ -460,7 +461,7 @@ const StickerComp = ({
                     >
                       {sticker.data().stickerURL && (
                         <Image
-                        alt="sticker"
+                          alt="sticker"
                           referrerPolicy="no-referrer"
                           loader={() =>
                             `${sticker.data().stickerURL}?w=${60}&q=${75}`
@@ -512,7 +513,7 @@ const StickerComp = ({
             </>
           ) : (
             <>
-              <Text fontSize="15" m="1" color="#3c3c43b0">
+              <Text fontSize="15" fontWeight={500} m="1" color="#3c3c43b0">
                 My Stickers
               </Text>
               <Grid
@@ -539,7 +540,7 @@ const StickerComp = ({
                       }
                     >
                       <Image
-                      alt="sticker"
+                        alt="sticker"
                         referrerPolicy="no-referrer"
                         loader={() => `${sticker.stickerURL}?w=${60}&q=${75}`}
                         src={sticker.stickerURL}

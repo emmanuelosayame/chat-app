@@ -1,35 +1,15 @@
-import {
-  Box,
-  Button,
-  Flex,
-  IconButton,
-  Link,
-  Show,
-  Text,
-  Textarea,
-  useDisclosure,
-} from "@chakra-ui/react";
-import {
-  ArrowUpIcon,
-  ClockIcon,
-  CloudDownloadIcon,
-} from "@heroicons/react/outline";
+import { Flex, IconButton, Textarea, useDisclosure } from "@chakra-ui/react";
+import { ArrowUpIcon } from "@heroicons/react/outline";
 import { ChevronLeftIcon } from "@heroicons/react/solid";
 import {
   addDoc,
   collection,
-  doc,
   orderBy,
   query,
   serverTimestamp,
 } from "firebase/firestore";
-import Image from "next/image";
-import prettyBytes from "pretty-bytes";
 import { useState } from "react";
-import {
-  useCollection,
-  useCollectionData,
-} from "react-firebase-hooks/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { auth, db } from "../firebase";
 import { MicWaveIcon } from "./Icons";
@@ -168,6 +148,7 @@ const Bucket = ({ setBucket }: any) => {
             p="1.5"
             value={bucketMessage}
             onChange={(e) => setBucketMessage(e.target.value)}
+            fontSize="100%"
           />
 
           {bucketMessage.length > 0 ? (

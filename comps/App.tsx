@@ -165,7 +165,7 @@ const View = ({ Component, pageProps }: AppProps) => {
   // if (userDataLoading) return <Loading />;
 
   return (
-    <Flex bgColor="#000000" pt={isOpen ? "4" : "unset"}>
+    <Flex bgColor="#000000" pt={isOpen ? "2.5" : "unset"}>
       <Flex
         h="100vh"
         w={isOpen ? ["95%", "96%"] : "full"}
@@ -175,6 +175,7 @@ const View = ({ Component, pageProps }: AppProps) => {
         bgColor="#f2f2f7ff"
         mx="auto"
         transitionDelay="2s ease-in"
+        maxW="7xl"
       >
         <Box
           display={[
@@ -257,8 +258,8 @@ const View = ({ Component, pageProps }: AppProps) => {
                   userNameSet={userNameSet}
                   setUserNameSet={setUserNameSet}
                 />
-                <Text fontWeight={800} textAlign="center">
-                  ChatApp
+                <Text fontWeight={600} textAlign="center">
+                  wagwan
                 </Text>
                 <Flex align="center">
                   <NewChatComp

@@ -157,7 +157,7 @@ const NewChatComp = ({
         isOpen={isOpen}
         scrollBehavior="inside"
         motionPreset="slideInBottom"
-        size="sm"
+        size={["xs", "sm"]}
       >
         <ModalOverlay />
         <ModalContent

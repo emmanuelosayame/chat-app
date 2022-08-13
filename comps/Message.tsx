@@ -1,17 +1,9 @@
 import { Box, Flex, Link, Progress, Text } from "@chakra-ui/react";
 import { ClockIcon, CloudDownloadIcon } from "@heroicons/react/outline";
 import { DocumentData } from "firebase/firestore";
-import { UploadTask } from "firebase/storage";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
-import { Dispatch, SetStateAction } from "react";
-import {
-  SpinnerDotted,
-  SpinnerCircular,
-  SpinnerRound,
-  SpinnerRomb,
-  SpinnerDiamond,
-} from "spinners-react";
+import { SpinnerRound } from "spinners-react";
 import { auth } from "../firebase";
 
 const Message = ({
@@ -78,7 +70,7 @@ const Message = ({
           h="auto"
           borderRadius={12}
           m="1"
-          maxW="350px"
+          maxW="280px"
         >
           {content.type === "image" ? (
             <Box
@@ -86,7 +78,7 @@ const Message = ({
               mx="1"
               mt="1"
               mb="1"
-              w={content.photoURL || content.mediaURL ? "330px" : "fit-content"}
+              w={content.photoURL || content.mediaURL ? "270px" : "fit-content"}
               display="block"
             >
               {content.status === "saved" ? (
@@ -114,7 +106,7 @@ const Message = ({
               )}
             </Box>
           ) : content.type === "video" ? (
-            <Box maxW="330px" p="1">
+            <Box maxW="280px" p="1">
               {content.status === "saved" ? (
                 <video
                   controls
@@ -134,6 +126,7 @@ const Message = ({
               align="center"
               color={messageStyle("#f2f2f7ff", "#3c3c4399")}
               m={1.5}
+              maxW="280px"
             >
               <Text fontSize={[14, 15, 16]} fontWeight={600}>
                 {content.documentName.slice(0, 15)}
@@ -164,13 +157,14 @@ const Message = ({
               fontSize={[14, 15, 16]}
               fontWeight={600}
               color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-              maxW="300px"
+              maxW="280px"
               flexDirection="column"
               mx="2"
               my="0.25rem"
               // minW="70px"
               lineHeight={1}
               // display="inline-block"
+              py="0.5"
             >
               {content.text}
               <Box
@@ -206,7 +200,7 @@ const Message = ({
               // mb="0"
               // display="inline"
             >
-              {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
+              {content.timeSent ? time : <ClockIcon width={10} />}
             </Box>
           )}
         </Flex>

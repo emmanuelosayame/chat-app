@@ -199,43 +199,45 @@ const Settings = ({
         >
           Back
         </Button>
-        <Button
-          display={["flex", "flex", "flex", "none"]}
-          w="90%"
-          my="5"
-          bgColor="white"
-          p="3"
-          borderRadius={12}
-          onClick={() => setProfileOpen(true)}
-          justifyContent="space-between"
-          rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
-        >
-          <Flex align="center">
-            <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
-              <UserIcon fill="black" width={20} />
-            </Box>
-            Edit Profile
-          </Flex>
-        </Button>
+        <Stack w="full" px="8">
+          <Button
+            display={["flex", "flex", "flex", "none"]}
+            w="full"
+            my="5"
+            bgColor="white"
+            p="2"
+            borderRadius={12}
+            onClick={() => setProfileOpen(true)}
+            justifyContent="space-between"
+            rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
+          >
+            <Flex align="center">
+              <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
+                <UserIcon fill="black" width={20} />
+              </Box>
+              Edit Profile
+            </Flex>
+          </Button>
 
-        <Flex
-          display={["none", "none", "none", "flex"]}
-          w="90%"
-          my="5"
-          bgColor="#e6e6e6d5"
-          py="1.5"
-          px="3"
-          borderRadius={12}
-          // onClick={() => setProfileLg(false)}
-          justifyContent="space-between"
-        >
-          <Flex align="center" fontWeight={600}>
-            <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
-              <UserIcon fill="black" width={20} />
-            </Box>
-            Edit Profile
+          <Flex
+            display={["none", "none", "none", "flex"]}
+            w="full"
+            my="5"
+            bgColor="#ececece6"
+            py="1.5"
+            px="3"
+            borderRadius={12}
+            // onClick={() => setProfileLg(false)}
+            justifyContent="space-between"
+          >
+            <Flex align="center" fontWeight={600}>
+              <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
+                <UserIcon fill="black" width={20} />
+              </Box>
+              Edit Profile
+            </Flex>
           </Flex>
-        </Flex>
+        </Stack>
         <Box px="8" h="full" w="full">
           <Flex
             fontWeight={600}
@@ -319,7 +321,7 @@ const Settings = ({
           pos="fixed"
           borderTopRadius={bucket ? "unset" : 10}
           w={bucket ? "full" : ["full", "99%"]}
-          h={bucket ? "full" : ["95%", "96.5%"]}
+          h={bucket ? "full" : ["97.3%", "96.5%"]}
           mx="auto"
           bgColor="#ffffffff"
         >
@@ -332,7 +334,7 @@ const Settings = ({
               <Flex>
                 {!!userData?.photoURL && userData?.photoURL !== "null" ? (
                   <Box
-                    borderRadius="50%"
+                    rounded="full"
                     w="60px"
                     h="60px"
                     overflow="hidden"
@@ -346,6 +348,7 @@ const Settings = ({
                       src={userData?.photoURL}
                       width="100%"
                       height="100%"
+                      layout="responsive"
                     />
                   </Box>
                 ) : (
@@ -354,7 +357,6 @@ const Settings = ({
                 <Box>
                   <Text fontSize="md">{userData?.name}</Text>
                   <Box display="flex">
-                    {/* <AtSymbolIcon width={20} /> */}
                     <Text
                       fontWeight="thin"
                       color="#3c3c4399"
@@ -382,6 +384,7 @@ const Settings = ({
                 m="1"
                 size={["sm", "md", "md"]}
                 textAlign="center"
+                w="fit-content"
               >
                 <ChevronUpIcon width="100%" height={20} />
                 <Text display={["none", "block", "block"]} mx="-2">

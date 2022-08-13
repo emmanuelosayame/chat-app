@@ -1,12 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
-const Header = ({
-  children,
-}: {
-  children: ReactNode;
-  setSelectChat: any;
-}) => {
+const Header = ({ children }: { children: ReactNode; setSelectChat: any }) => {
   return (
     <Flex
       justify="space-between"
@@ -19,7 +14,7 @@ const Header = ({
       backdropFilter="auto"
       backdropBlur="md"
       zIndex={1000}
-      px="2"
+      p="2"
       align="center"
     >
       {children}
