@@ -285,7 +285,7 @@ const Settings = ({
 
   return (
     <>
-      <Button variant="ghost" p={0} m={0} rounded="full" onClick={onOpen}>
+      <Button variant="ghost" p={1} m={1} rounded="full" onClick={onOpen}>
         {!!userData?.photoURL && userData?.photoURL !== "null" ? (
           <Box
             borderRadius="50%"
@@ -317,6 +317,7 @@ const Settings = ({
       >
         {/* <DrawerOverlay /> */}
         <DrawerContent
+          maxW="7xl"
           border="2px solid white #2c2c2eff"
           pos="fixed"
           borderTopRadius={bucket ? "unset" : 10}
@@ -355,16 +356,24 @@ const Settings = ({
                   <Avatar mr="2" />
                 )}
                 <Box>
-                  <Text fontSize="md">{userData?.name}</Text>
+                  {userData?.name ? (
+                    <Text fontSize="md">{userData?.name}</Text>
+                  ) : (
+                    <Text opacity={0}>name</Text>
+                  )}
                   <Box display="flex">
-                    <Text
-                      fontWeight="thin"
-                      color="#3c3c4399"
-                      fontSize="sm"
-                      mr="1"
-                    >
-                      {userData?.userName}
-                    </Text>
+                    {userData?.userName ? (
+                      <Text
+                        fontWeight="thin"
+                        color="#3c3c4399"
+                        fontSize="sm"
+                        mr="1"
+                      >
+                        {userData?.userName}
+                      </Text>
+                    ) : (
+                      <Text opacity={0}>name</Text>
+                    )}
                     {userData?.verified && (
                       <BadgeCheckIcon fill="#007affff" width={20} />
                     )}

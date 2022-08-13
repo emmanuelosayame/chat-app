@@ -5,7 +5,7 @@ const Header = ({ children }: { children: ReactNode; setSelectChat: any }) => {
   return (
     <Flex
       justify="space-between"
-      h="9"
+      h="10"
       position="absolute"
       w="full"
       left={0}
