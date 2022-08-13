@@ -198,6 +198,7 @@ const NewChatComp = ({
                 _hover={{ bgColor: "white" }}
                 _focus={{ bgColor: "#74748014" }}
                 onChange={searchUser}
+                fontSize="100%"
               />
             </InputGroup>
             <Box>

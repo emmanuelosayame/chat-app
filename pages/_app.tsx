@@ -19,6 +19,7 @@ import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import theme from "../theme";
+import Head from "next/head";
 // import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
@@ -47,8 +48,16 @@ export default MyApp;
 
 export const Loading = () => {
   return (
-    <Flex h="100vh" w="full" align="center" justify="center">
-      <SpinnerDotted color="#007affff" />
-    </Flex>
+    <>
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
+        />
+      </Head>
+      <Flex h="100vh" w="full" align="center" justify="center">
+        <SpinnerDotted color="#007affff" />
+      </Flex>
+    </>
   );
 };

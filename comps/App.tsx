@@ -91,7 +91,7 @@ const View = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
     router.push("/");
   }, []);
-  
+
   useEffect(() => {
     if (user) {
       onValue(statusRef, (snap) => {
@@ -307,6 +307,7 @@ const View = ({ Component, pageProps }: AppProps) => {
                   focusBorderColor="transparent"
                   _hover={{ bgColor: "white" }}
                   _focus={{ bgColor: "white" }}
+                  fontSize="100%"
                   onChange={searchChat}
                 />
               </InputGroup>
