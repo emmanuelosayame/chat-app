@@ -12,13 +12,12 @@ module.exports = withPwa({
       "http://localhost:9199/v0/b/chatapp-levi.appspot.com",
       "https://firebasestorage.googleapis.com/v0/b/chatapp-levi.appspot.com",
     ],
-    minimumCacheTTL: 1000,
+    minimumCacheTTL: 100000,
   },
   pwa: {
     dest: "public",
     register: true,
     skipWaiting: true,
     disable: process.env.NODE_ENV === "development",
-    reloadOnOnline: false,
   },
 });

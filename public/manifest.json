@@ -1,7 +1,7 @@
 {
     "theme_color": "#007affff",
     "background_color": "#fdfaf8",
-    "display": "standalone",
+    "display": "fullscreen",
     "scope": "/",
     "start_url": "/",
     "name": "wagwan",

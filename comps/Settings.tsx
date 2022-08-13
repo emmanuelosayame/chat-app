@@ -211,7 +211,7 @@ const Settings = ({
             justifyContent="space-between"
             rightIcon={<ChevronRightIcon width={30} color="#3c3c434c" />}
           >
-            <Flex align="center">
+            <Flex align="center" fontSize={[14, 15, 17]}>
               <Box mx="2" bgColor="#007bff89" borderRadius={15} p="1.5">
                 <UserIcon fill="black" width={20} />
               </Box>
@@ -241,7 +241,7 @@ const Settings = ({
         <Box px="8" h="full" w="full">
           <Flex
             fontWeight={600}
-            fontSize={17}
+            fontSize={[14, 15, 17]}
             p="2"
             bgColor="white"
             borderRadius={10}
@@ -260,7 +260,7 @@ const Settings = ({
             bgColor="white"
             borderRadius={10}
             my="2"
-            fontSize={17}
+            fontSize={[14, 15, 17]}
           >
             <Text mx="2">Last SignedIn:</Text>
             <Text>{user?.metadata.lastSignInTime}</Text>
@@ -357,7 +357,9 @@ const Settings = ({
                 )}
                 <Box>
                   {userData?.name ? (
-                    <Text fontSize="md">{userData?.name}</Text>
+                    <Text fontSize={15} fontWeight={600}>
+                      {userData?.name}
+                    </Text>
                   ) : (
                     <Text opacity={0}>name</Text>
                   )}
@@ -389,13 +391,13 @@ const Settings = ({
                 color="#007affff"
                 borderRadius={["15px", "19px"]}
                 variant="outline"
-                fontSize={[12, 16, 17]}
+                fontSize={[0, 12, 16, 17]}
                 m="1"
                 size={["sm", "md", "md"]}
                 textAlign="center"
                 w="fit-content"
               >
-                <ChevronUpIcon width="100%" height={20} />
+                <ChevronUpIcon height={20} />
                 <Text display={["none", "block", "block"]} mx="-2">
                   Chats
                 </Text>
