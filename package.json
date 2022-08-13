@@ -25,7 +25,7 @@
     "lodash": "^4.17.21",
     "mic-recorder-to-mp3": "^2.2.2",
     "next": "12.2.0",
-    "next-pwa": "^5.5.5",
+    "next-pwa": "5.5.4",
     "pretty-bytes": "^6.0.0",
     "react": "18.2.0",
     "react-device-detect": "^2.2.2",

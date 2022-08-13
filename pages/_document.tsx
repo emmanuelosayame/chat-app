@@ -5,8 +5,10 @@ import theme from "../theme";
 export default function Document() {
   return (
     <Html>
-      <Head />
-      <body style={{ position: "fixed" , right:0, left:0,top:0}}>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
+      <body style={{ position: "fixed", right: 0, left: 0, top: 0 }}>
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Main />
         <NextScript />

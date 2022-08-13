@@ -36,3 +36,6 @@ yarn-error.log*
 
 firebase
 /firebase
+
+/public/sw.js
+/public/workbox-4d30eff7.js
