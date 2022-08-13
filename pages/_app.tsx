@@ -1,7 +1,7 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
-import { auth, db, rdb } from "./firebase";
+import { auth, db, rdb } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "../comps/Login";
 import { SpinnerDotted } from "spinners-react";

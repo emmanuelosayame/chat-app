@@ -35,7 +35,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { auth, db, rdb } from "../pages/firebase";
+import { auth, db, rdb } from "../firebase";
 import {
   endAt,
   onValue,

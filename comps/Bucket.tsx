@@ -31,7 +31,7 @@ import {
   useCollectionData,
 } from "react-firebase-hooks/firestore";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { auth, db } from "../pages/firebase";
+import { auth, db } from "../firebase";
 import { MicWaveIcon } from "./Icons";
 import Message from "./Message";
 import PickerInterface from "./PickerInterface";

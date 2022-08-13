@@ -25,7 +25,7 @@ import { debounce } from "lodash";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import FileResizer from "react-image-file-resizer";
-import { auth, db, rdb, storage } from "../pages/firebase";
+import { auth, db, rdb, storage } from "../firebase";
 
 const Profile = ({
   profileOpen,

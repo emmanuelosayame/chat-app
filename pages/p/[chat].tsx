@@ -37,7 +37,7 @@ import {
   useDocumentData,
 } from "react-firebase-hooks/firestore";
 import { MicWaveIcon, SendIcon, StickerIcon } from "../../comps/Icons";
-import { auth, db, rdb } from "../firebase";
+import { auth, db, rdb } from "../../firebase";
 import ReactTimeAgo from "react-time-ago";
 import {
   ArrowUpIcon,

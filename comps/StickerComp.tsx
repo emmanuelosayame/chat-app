@@ -33,7 +33,7 @@ import Image from "next/image";
 import prettyBytes from "pretty-bytes";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import FileResizer from "react-image-file-resizer";
-import { auth, db, storage } from "../pages/firebase";
+import { auth, db, storage } from "../firebase";
 import { StickerIcon } from "./Icons";
 import { useLiveQuery } from "dexie-react-hooks";
 import { odb } from "./OfflineDB";
