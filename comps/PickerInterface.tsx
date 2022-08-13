@@ -46,7 +46,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { db, storage } from "../firebase/firebase";
+import { db, storage } from "../pages/firebase";
 
 const PickerInterface = ({
   isOpen,

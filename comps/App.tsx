@@ -19,7 +19,7 @@ import NewChatComp from "../comps/NewChat";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { Suspense, useEffect, useState } from "react";
-import { auth, db, rdb } from "../firebase/firebase";
+import { auth, db, rdb } from "../pages/firebase";
 import {
   collection,
   deleteDoc,

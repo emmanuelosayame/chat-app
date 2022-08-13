@@ -1,7 +1,7 @@
 import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
 import { CogIcon } from "@heroicons/react/outline";
 import { NextPage } from "next";
-import { auth } from "../firebase/firebase";
+import { auth } from "./firebase";
 
 const Home: NextPage = ({ userData }: any) => {
   // console.log(userData)

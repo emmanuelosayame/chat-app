@@ -35,7 +35,7 @@ import { clearIndexedDbPersistence, terminate } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../pages/firebase";
 import Bucket from "./Bucket";
 import Profile from "./Profile";
 

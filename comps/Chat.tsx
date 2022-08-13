@@ -16,7 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 // import { useEffect } from "react";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { db } from "../firebase/firebase";
+import { db } from "../pages/firebase";
 
 const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
   // const user = auth.currentUser;

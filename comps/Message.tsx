@@ -12,7 +12,7 @@ import {
   SpinnerRomb,
   SpinnerDiamond,
 } from "spinners-react";
-import { auth } from "../firebase/firebase";
+import { auth } from "../pages/firebase";
 
 const Message = ({
   content,

@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, db, rdb } from "../firebase/firebase";
+import { auth, db, rdb } from "../pages/firebase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc, setDoc } from "firebase/firestore";

@@ -9,21 +9,18 @@ import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBU_Ee-_PCNHsUlyV80GNoXCz0g1pT1Lrg",
-  authDomain: "chatapp-levi.firebaseapp.com",
-  projectId: "chatapp-levi",
-  storageBucket: "chatapp-levi.appspot.com",
-  messagingSenderId: "281849870118",
-  appId: "1:281849870118:web:12572e4700d727ba6d73e7",
-  measurementId: "G-505MS6V11B",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 const apps = getApps();
 
 const app = !apps.length ? initializeApp(firebaseConfig) : apps[0];
-// const fuego = new Fuego(firebaseConfig);
-
-// const db = fuego.db;
 const db = getFirestore();
 const auth = getAuth();
 const rdb = getDatabase();
