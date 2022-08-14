@@ -6,16 +6,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "../comps/Login";
 import { SpinnerDotted } from "spinners-react";
 import App from "../comps/App";
-import {
-  onDisconnect,
-  onValue,
-  push,
-  ref,
-  serverTimestamp,
-  set,
-} from "firebase/database";
 import { useEffect, useState } from "react";
-import { browserName } from "react-device-detect";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import theme from "../theme";
