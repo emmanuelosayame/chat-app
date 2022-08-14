@@ -114,7 +114,7 @@ const StickerComp = ({
         stickerFile.type === "image/webp"
           ? stickerFile
           : await resizeImage(stickerFile);
-      const fsid = addDoc(collection(db, "comStickers"), {
+      const fsid = addDoc(collection(db, "stickers"), {
         tag: selectSticker?.value,
         timeStamp: serverTimestamp(),
         star: userData?.admin ? true : false,
