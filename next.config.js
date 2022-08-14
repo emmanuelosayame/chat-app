@@ -20,6 +20,7 @@ module.exports = withPwa({
     skipWaiting: true,
     cacheStartUrl: false,
     dynamicStartUrl: false,
+    reloadOnOnline: false,
     runtimeCaching: [
       {
         urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
