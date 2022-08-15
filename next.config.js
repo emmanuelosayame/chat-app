@@ -79,7 +79,7 @@ module.exports = withPwa({
       },
       {
         urlPattern: /\.(?:mp3|wav|ogg)$/i,
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           rangeRequests: true,
           cacheName: "static-audio-assets",
@@ -91,7 +91,7 @@ module.exports = withPwa({
       },
       {
         urlPattern: /\.(?:mp4)$/i,
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           rangeRequests: true,
           cacheName: "static-video-assets",
@@ -103,7 +103,7 @@ module.exports = withPwa({
       },
       {
         urlPattern: /\.(?:js)$/i,
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           cacheName: "static-js-assets",
           expiration: {
@@ -125,7 +125,7 @@ module.exports = withPwa({
       },
       {
         urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           cacheName: "next-data",
           expiration: {
@@ -136,7 +136,7 @@ module.exports = withPwa({
       },
       {
         urlPattern: /\.(?:json|xml|csv)$/i,
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           cacheName: "static-data-assets",
           expiration: {
@@ -157,7 +157,7 @@ module.exports = withPwa({
           if (pathname.startsWith("/api/")) return true;
           return false;
         },
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         method: "GET",
         options: {
           cacheName: "apis",
@@ -175,7 +175,7 @@ module.exports = withPwa({
           if (pathname.startsWith("/api/")) return false;
           return true;
         },
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           cacheName: "others",
           expiration: {
@@ -189,7 +189,7 @@ module.exports = withPwa({
           const isSameOrigin = self.origin === url.origin;
           return !isSameOrigin;
         },
-        handler: "CacheFirst",
+        handler: "StaleWhileRevalidate",
         options: {
           cacheName: "cross-origin",
           expiration: {
