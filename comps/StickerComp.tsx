@@ -4,7 +4,6 @@ import {
   Flex,
   Grid,
   GridItem,
-  IconButton,
   Input,
   Text,
   useBoolean,
@@ -147,6 +146,7 @@ const StickerComp = ({
         )
         .catch(async () => deleteDoc(await fsid));
       setUploadPage.off();
+      setStickerFile(null);
     }
   };
 
@@ -438,7 +438,7 @@ const StickerComp = ({
                 {stickersStore &&
                   stickersStore?.map((sticker: DocumentData) => (
                     <GridItem
-                      rounded="17"
+                      rounded={["10", "10", "13"]}
                       overflow="hidden"
                       display="flex"
                       justifyContent="center"

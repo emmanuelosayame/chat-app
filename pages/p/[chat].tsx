@@ -174,6 +174,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               fontWeight={600}
               mx="2"
               justifyContent="start"
+              align="center"
             >
               {!showStatus ? (
                 <Text

@@ -320,6 +320,9 @@ const View = ({ Component, pageProps }: AppProps) => {
                   }}
                   color="#007affff"
                   variant="ghost"
+                  bgColor="transparent"
+                  _active={{ bgColor: "transparent" }}
+                  _hover={{ bgColor: "transparent" }}
                 >
                   Cancel
                 </Button>

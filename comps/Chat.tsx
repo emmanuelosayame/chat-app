@@ -9,22 +9,48 @@ import {
   useStyleConfig,
 } from "@chakra-ui/react";
 import { AtSymbolIcon } from "@heroicons/react/outline";
-import { BadgeCheckIcon } from "@heroicons/react/solid";
-import { doc, DocumentData, getDoc } from "firebase/firestore";
+import {
+  BadgeCheckIcon,
+  CameraIcon,
+  DocumentIcon,
+  VideoCameraIcon,
+} from "@heroicons/react/solid";
+import {
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  limit,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore";
 import Image from "next/image";
 // import Link from "next/link";
 import { useRouter } from "next/router";
 // import { useEffect } from "react";
-import { useDocumentData } from "react-firebase-hooks/firestore";
+import {
+  useCollectionData,
+  useDocumentData,
+} from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
+import { StickerIcon } from "./Icons";
 
 const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
   // const user = auth.currentUser;
   const router = useRouter();
   const recQuery = doc(db, "Users", `${recId}`);
   const [recData] = useDocumentData(recQuery);
+  const latestMessageQuery = query(
+    collection(db, "chatGroup", `${chatId}`, "messages"),
+    orderBy("timeSent", "desc"),
+    limit(1)
+  );
+  const [latestMessage] = useCollectionData(latestMessageQuery);
+  const localeTime = (timeSent: Timestamp) =>
+    timeSent.toDate().toLocaleTimeString("en", { timeStyle: "short" });
   const dp = recData?.photoURL;
-  // console.log(chatId)
+  // console.log(latestMessage && latestMessage[0]);
 
   const routerToChat = () => {
     if (selectChat) return;
@@ -92,38 +118,82 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
         cursor="pointer"
         onClick={routerToChat}
       >
-        <Flex align="center">
+        <Flex align="center" w="full">
           {!dp || dp === "null" ? (
             <Avatar alignSelf="center" size="sm" />
           ) : (
-            <Flex borderRadius="50%" w="40px" h="40px" overflow="hidden">
+            <Flex rounded="full" w="50px" overflow="hidden">
               <Image
-              alt="recProfileImg"
+                alt="recProfileImg"
                 referrerPolicy="no-referrer"
-                loader={() => `${dp}?w=${40}&q=${75}`}
+                loader={() => `${dp}?w=${60}&q=${75}`}
                 src={dp}
                 width="100%"
                 height="100%"
               />
             </Flex>
           )}
-          <Box mx="2" py="2" h={"12"}>
-            <Text fontSize="17" fontWeight={600} lineHeight="1">
-              {recData?.name}
-            </Text>
-            <Box display="flex">
-              <Box my="auto" mx="0.07rem" color="#3c3c434e">
-                <AtSymbolIcon width={12} height={12} strokeWidth="3" />
-              </Box>
-              <Text color="#3c3c4399" fontSize={12} fontWeight={600}>
-                {recData?.userName}
+          <Box mx="2" py="2" h={"12"} w="full">
+            <Flex>
+              <Text fontSize="17" fontWeight={600} mr="1" lineHeight="1">
+                {recData?.name}
               </Text>
-              <Box mx="2" pb="1">
+              {recData?.verified && (
+                <BadgeCheckIcon fill="#007affff" width={15} />
+              )}
+            </Flex>
+            <Box display="flex">
+              {/* <Box my="auto" mx="0.07rem" color="#3c3c434e">
+                <AtSymbolIcon width={12} height={12} strokeWidth="3" />
+              </Box> */}
+              {/* <Text color="#3c3c4399" fontSize={12} fontWeight={600}>
+                {recData?.userName}
+              </Text> */}
+              {/* <Box mx="2" pb="1">
                 {recData?.verified && (
                   <BadgeCheckIcon fill="#007affff" width={15} />
                 )}
-              </Box>
+              </Box> */}
             </Box>
+            {latestMessage && latestMessage.length > 0 && (
+              <Flex
+                justify="space-between"
+                fontSize={14}
+                p="0.5"
+                color="#3c3c4399"
+              >
+                {latestMessage[0].type === "document" ? (
+                  <Flex>
+                    <DocumentIcon width={12} />
+                    <Text mx="0.5">document</Text>
+                  </Flex>
+                ) : latestMessage[0].type === "sticker" ? (
+                  <Flex>
+                    <StickerIcon boxSize="2.5" m="1" />
+                    <Text>sticker</Text>
+                  </Flex>
+                ) : latestMessage[0].type === "video" ? (
+                  <Flex>
+                    <VideoCameraIcon width={12} />
+                    <Text mx="0.5">video</Text>
+                  </Flex>
+                ) : latestMessage[0].type === "image" ? (
+                  <Flex>
+                    <CameraIcon width={12} />
+                    <Text mx="0.5">picture</Text>
+                  </Flex>
+                ) : (
+                  latestMessage[0].type === "text" && (
+                    <Text>{latestMessage[0].text.slice(0, 20)}</Text>
+                  )
+                )}
+                {latestMessage[0].timeSent && (
+                  <Text fontSize={11}>
+                    {localeTime(latestMessage[0].timeSent)}
+                  </Text>
+                )}
+              </Flex>
+            )}
           </Box>
         </Flex>
         <Divider

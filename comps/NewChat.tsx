@@ -142,6 +142,9 @@ const NewChatComp = ({
       <Button
         aria-label="create-chat-button"
         variant="ghost"
+        bgColor="transparent"
+        _active={{ bgColor: "transparent" }}
+        _hover={{ bgColor: "transparent" }}
         size="sm"
         mr={-3}
         leftIcon={icon}

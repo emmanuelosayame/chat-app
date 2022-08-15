@@ -8,7 +8,15 @@ export default function Document() {
       <Head>
         <link rel="manifest" href="/manifest.json" />
       </Head>
-      <body style={{ position: "fixed", right: 0, left: 0, top: 0 }}>
+      <body
+        style={{
+          position: "fixed",
+          right: 0,
+          left: 0,
+          top: 0,
+          WebkitTapHighlightColor: "rgba(0,0,0,0)",
+        }}
+      >
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Main />
         <NextScript />

@@ -1,22 +1,17 @@
-import { ChevronDownIcon, SettingsIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
   Button,
-  Container,
   Divider,
   Drawer,
   DrawerBody,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay,
   Flex,
-  IconButton,
   Stack,
   Switch,
   Text,
   useDisclosure,
-  useMediaQuery,
 } from "@chakra-ui/react";
 import {
   ArchiveIcon,
@@ -25,13 +20,11 @@ import {
   UserIcon,
 } from "@heroicons/react/outline";
 import {
-  AtSymbolIcon,
   BadgeCheckIcon,
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@heroicons/react/solid";
 
-import { clearIndexedDbPersistence, terminate } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -93,6 +86,9 @@ const Settings = ({
             borderRadius={12}
             justifyContent="space-between"
             variant="ghost"
+            bgColor="transparent"
+            _active={{ bgColor: "transparent" }}
+            _hover={{ bgColor: "transparent" }}
             mt="1"
             px="1"
             size="sm"
@@ -119,6 +115,9 @@ const Settings = ({
             borderRadius={12}
             justifyContent="space-between"
             variant="ghost"
+            bgColor="transparent"
+            _active={{ bgColor: "transparent" }}
+            _hover={{ bgColor: "transparent" }}
             mb="1"
             px="1"
             size="sm"
@@ -189,6 +188,9 @@ const Settings = ({
           aria-label="close-setting-page"
           display={userNameSet ? "block" : "none"}
           variant="ghost"
+          bgColor="transparent"
+          _active={{ bgColor: "transparent" }}
+          _hover={{ bgColor: "transparent" }}
           onClick={accountOnClose}
           alignSelf="start"
           // bgColor="white"
@@ -285,7 +287,16 @@ const Settings = ({
 
   return (
     <>
-      <Button variant="ghost" p={1} m={1} rounded="full" onClick={onOpen}>
+      <Button
+        variant="ghost"
+        bgColor="transparent"
+        _active={{ bgColor: "transparent" }}
+        _hover={{ bgColor: "transparent" }}
+        p={1}
+        m={1}
+        rounded="full"
+        onClick={onOpen}
+      >
         {!!userData?.photoURL && userData?.photoURL !== "null" ? (
           <Box
             borderRadius="50%"
@@ -391,6 +402,9 @@ const Settings = ({
                 color="#007affff"
                 borderRadius={["15px", "19px"]}
                 variant="outline"
+                bgColor="transparent"
+                _active={{ bgColor: "transparent" }}
+                _hover={{ bgColor: "transparent" }}
                 fontSize={[0, 12, 16, 17]}
                 m="1"
                 size={["sm", "md", "md"]}

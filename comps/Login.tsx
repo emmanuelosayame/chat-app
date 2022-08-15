@@ -2,11 +2,12 @@ import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, db, rdb } from "../firebase";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { ref, set } from "firebase/database";
-import { useDocumentData } from "react-firebase-hooks/firestore";
+import Image from "next/image";
+import logo from "../public/logo-sign-in.png";
 
 const Login: NextPage = () => {
   const router = useRouter();
@@ -83,8 +84,18 @@ const Login: NextPage = () => {
         top="0"
         bottom="0"
         justify="center"
+        bgColor="#f2f2f7ff"
       >
-        <Button onClick={signIn}>Login</Button>
+        <Button
+          size="lg"
+          rounded="2xl"
+          _active={{ bgColor: "transparent" }}
+          onClick={signIn}
+          // _hover={{ bgColor: "#007affff" }}
+        >
+          <Image src={logo} width="40px" height="40px" />
+          <Text mx={2}>Login</Text>
+        </Button>
       </Flex>
     </>
   );

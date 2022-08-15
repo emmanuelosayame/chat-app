@@ -25,20 +25,6 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   }
 
   return (
-    <ChakraProvider theme={theme}>
-      {!user ? (
-        <Login />
-      ) : (
-        <App router={router} Component={Component} pageProps={pageProps} />
-      )}
-    </ChakraProvider>
-  );
-}
-
-export default MyApp;
-
-export const Loading = () => {
-  return (
     <>
       <Head>
         <meta
@@ -46,9 +32,24 @@ export const Loading = () => {
           content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
         />
       </Head>
-      <Flex h="100vh" w="full" align="center" justify="center">
-        <SpinnerDotted color="#007affff" />
-      </Flex>
+
+      <ChakraProvider theme={theme}>
+        {user ? (
+          <Login />
+        ) : (
+          <App router={router} Component={Component} pageProps={pageProps} />
+        )}
+      </ChakraProvider>
     </>
+  );
+}
+
+export default MyApp;
+
+export const Loading = () => {
+  return (
+    <Flex h="100vh" w="full" align="center" justify="center">
+      <SpinnerDotted color="#007affff" />
+    </Flex>
   );
 };

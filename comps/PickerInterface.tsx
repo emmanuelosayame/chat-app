@@ -34,7 +34,6 @@ import {
   getDownloadURL,
   ref as sref,
   uploadBytesResumable,
-  UploadTask,
 } from "firebase/storage";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
