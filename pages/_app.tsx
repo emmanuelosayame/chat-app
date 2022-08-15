@@ -34,7 +34,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
       </Head>
 
       <ChakraProvider theme={theme}>
-        {user ? (
+        {!user ? (
           <Login />
         ) : (
           <App router={router} Component={Component} pageProps={pageProps} />
