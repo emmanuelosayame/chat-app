@@ -14,8 +14,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import Header from "../comps/Header";
-import NewChatComp from "../comps/NewChat";
+import Header from "./Header";
+import NewChatComp from "./NewChat";
 import { SearchIcon } from "@chakra-ui/icons";
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { Suspense, useEffect, useState } from "react";
@@ -53,7 +53,6 @@ import Fuse from "fuse.js";
 import { AppProps } from "next/app";
 import { browserName } from "react-device-detect";
 import { debounce } from "lodash";
-// import RecordVN from "./RecordVN";
 
 const View = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -72,6 +71,17 @@ const View = ({ Component, pageProps }: AppProps) => {
     return { chatId: chat?.id, recId };
   });
   const [userData, userDataLoading, userDataError] = useDocumentData(userRef);
+
+  // auth.signOut();
+
+  // const userData = userDat?.name
+  //   ? userDat
+  //   : {
+  //       ...userDat,
+  //       name: "Someone Special",
+  //       about:
+  //         "Hi 😃, welcome to my project. Really nice having you here. Hope you have fun chatting 😜 ",
+  //     };
 
   const [chatsData, setChatsData] = useState<any>(null);
   const [chatList, setChatList] = useState<any>(null);
@@ -123,7 +133,6 @@ const View = ({ Component, pageProps }: AppProps) => {
       res.push(await resolved);
     }
     setChatsData(res);
-    // console.log("i fetchd");
   };
 
   useEffect(() => {
@@ -165,18 +174,17 @@ const View = ({ Component, pageProps }: AppProps) => {
   // if (userDataLoading) return <Loading />;
 
   return (
-    <Flex bgColor="#000000" pt={isOpen ? "2.5" : "unset"}>
+    <Flex bgColor='#000000' pt={isOpen ? "2.5" : "unset"}>
       <Flex
-        h="100vh"
+        h='100vh'
         w={isOpen ? ["95%", "96%"] : "full"}
         borderTopRadius={isOpen ? "10" : "unset"}
-        overflow="hidden"
+        overflow='hidden'
         zIndex={1000}
-        bgColor="#f2f2f7ff"
-        mx="auto"
-        transitionDelay="2s ease-in"
-        maxW="7xl"
-      >
+        bgColor={["white", "white", "#f2f2f7ff"]}
+        mx='auto'
+        transitionDelay='2s ease-in'
+        maxW='1440px'>
         <Box
           display={[
             responsiveLayout("none", "block"),
@@ -184,32 +192,30 @@ const View = ({ Component, pageProps }: AppProps) => {
             "block",
           ]}
           w={["full", "full", "45%", "40%", "30%"]}
-          position="relative"
-        >
+          position='relative'>
           {selectChat && (
             <Box
               borderRadius={15}
-              position="absolute"
+              position='absolute'
               bottom={10}
-              left="auto"
-              right="auto"
-              w="full"
-              mx="auto"
-            >
+              left='auto'
+              right='auto'
+              w='full'
+              mx='auto'>
               {deleteChats && deleteChats.length > 0 ? (
                 <Text
-                  py="1"
-                  px="2"
-                  border="1px solid #ebebebc8"
+                  py='1'
+                  px='2'
+                  border='1px solid #ebebebc8'
                   borderRadius={10}
                   fontSize={15}
                   fontWeight={600}
-                  bgColor="white"
-                  w="fit-content"
-                  mx="auto"
-                  cursor="pointer"
-                  display="flex"
-                  alignContent="center"
+                  bgColor='white'
+                  w='fit-content'
+                  mx='auto'
+                  cursor='pointer'
+                  display='flex'
+                  alignContent='center'
                   // onClick={handleDeleteChats}
                 >
                   delete
@@ -217,17 +223,16 @@ const View = ({ Component, pageProps }: AppProps) => {
                 </Text>
               ) : (
                 <Text
-                  py="1"
-                  px="2"
-                  border="1px solid #ebebebc8"
+                  py='1'
+                  px='2'
+                  border='1px solid #ebebebc8'
                   borderRadius={10}
                   fontSize={15}
                   fontWeight={600}
-                  bgColor="white"
-                  w="fit-content"
-                  mx="auto"
-                  opacity={0.5}
-                >
+                  bgColor='white'
+                  w='fit-content'
+                  mx='auto'
+                  opacity={0.5}>
                   delete
                 </Text>
               )}
@@ -244,10 +249,9 @@ const View = ({ Component, pageProps }: AppProps) => {
                 backgroundColor: "transparent",
               },
             }}
-            w="full"
-            h="full"
-            overflowY="scroll"
-          >
+            w='full'
+            h='full'
+            overflowY='scroll'>
             {!search && (
               <Header setSelectChat={setSelectChat}>
                 <Settings
@@ -258,72 +262,70 @@ const View = ({ Component, pageProps }: AppProps) => {
                   userNameSet={userNameSet}
                   setUserNameSet={setUserNameSet}
                 />
-                <Text fontWeight={600} textAlign="center">
+                <Text fontWeight={600} textAlign='center'>
                   wagwan
                 </Text>
-                <Flex align="center">
+                <Flex align='center'>
                   <NewChatComp
                     newSearch={newSearch}
                     setNewSearch={setNewSearch}
                     mappedChats={mappedChats}
                     chatsData={chatsData}
                     icon={<PencilAltIcon width={22} />}
-                    color="#007affff"
+                    color='#007affff'
                   />
                   <Text
                     onClick={setSelectChat.toggle}
                     fontWeight={600}
                     fontSize={15}
-                    color="#007affff"
-                    cursor="pointer"
-                    ml="2"
-                  >
+                    color='#007affff'
+                    cursor='pointer'
+                    ml='2'>
                     Edit
                   </Text>
                 </Flex>
               </Header>
             )}
             <Flex
-              w="full"
+              w='full'
               mt={search ? 5 : 12}
-              h="auto"
+              h='auto'
               px={2}
-              pb="3"
-              position="relative"
-            >
+              pb='3'
+              position='relative'>
               <InputGroup
                 onClick={() => {
                   setSearch(true);
-                }}
-              >
-                <InputLeftElement children={<SearchIcon w="4" mb="1.5" />} />
+                }}>
+                <InputLeftElement>
+                  <SearchIcon w='4' mb='1.5' />
+                </InputLeftElement>
                 <Input
-                  size="sm"
-                  variant="filled"
-                  type="text"
-                  borderRadius="7"
-                  placeholder="Search"
-                  bgColor="#74748014"
+                  size='sm'
+                  variant='filled'
+                  type='text'
+                  borderRadius='7'
+                  placeholder='Search'
+                  bgColor='#74748014'
                   _placeholder={{ color: "	#3c3c434c	" }}
-                  focusBorderColor="transparent"
+                  focusBorderColor='transparent'
                   _hover={{ bgColor: "white" }}
                   _focus={{ bgColor: "white" }}
-                  fontSize="100%"
+                  fontSize='100%'
                   onChange={searchChat}
                 />
               </InputGroup>
               {search && (
                 <Button
-                  size="xs"
+                  size='xs'
                   onClick={() => {
                     setSearch(false);
                   }}
-                  color="#007affff"
-                  variant="ghost"
-                  bgColor="transparent"
+                  color='#007affff'
+                  variant='ghost'
+                  bgColor='transparent'
                   _active={{ bgColor: "transparent" }}
-                  _hover={{ bgColor: "transparent" }}
-                >
+                  _hover={{ bgColor: "transparent" }}>
                   Cancel
                 </Button>
               )}
@@ -351,13 +353,12 @@ const View = ({ Component, pageProps }: AppProps) => {
                   }}
                   key={user.item.recId}
                   _hover={{ bgColor: "white" }}
-                  cursor="pointer"
+                  cursor='pointer'
                   // justify="center"
-                  py="1"
-                  px="4"
-                >
+                  py='1'
+                  px='4'>
                   <Box>
-                    <Text fontSize={20} color="#007affff" fontWeight="600">
+                    <Text fontSize={20} color='#007affff' fontWeight='600'>
                       {user.item.name}
                     </Text>
                     <Text fontSize={13}>{user.item.userName}</Text>
@@ -366,17 +367,15 @@ const View = ({ Component, pageProps }: AppProps) => {
               ))}
 
             <Box
-              pos="relative"
-              pt="2"
-              w="100%"
-              h="full"
-              display={search ? "none" : "unset"}
-            >
+              pos='relative'
+              pt='2'
+              w='100%'
+              h='full'
+              display={search ? "none" : "unset"}>
               {!chats?.empty ? (
                 <CheckboxGroup
-                  onChange={(e: (string | number)[]) => setDeleteChats(e)}
-                >
-                  <Box pt="3" />
+                  onChange={(e: (string | number)[]) => setDeleteChats(e)}>
+                  <Box pt='3' />
                   {mappedChats?.map((chat: DocumentData | undefined) => {
                     return (
                       <Chat
@@ -389,13 +388,13 @@ const View = ({ Component, pageProps }: AppProps) => {
                   })}
                 </CheckboxGroup>
               ) : (
-                <Flex h="full" justify="center" align="center">
+                <Flex h='full' justify='center' align='center'>
                   <NewChatComp
                     newSearch={newSearch}
                     setNewSearch={setNewSearch}
                     mappedChats={mappedChats}
                     chatsData={chatsData}
-                    text="Start Chat"
+                    text='Start Chat'
                   />
                 </Flex>
               )}
@@ -404,28 +403,27 @@ const View = ({ Component, pageProps }: AppProps) => {
         </Box>
         {/* next */}
         <Box
-          h="full"
-          bgColor="whiteAlpha.700"
-          w="full"
+          h='full'
+          bgColor='whiteAlpha.700'
+          w='full'
           display={[
             responsiveLayout("block", "none"),
             responsiveLayout("block", "none"),
             "block",
           ]}
-          pos="relative"
-        >
+          pos='relative'>
           {/* {search ? ( */}
           <Box
             display={search ? "block" : "none"}
-            w="full"
-            h="full"
+            w='full'
+            h='full'
             bgImage="url('https://firebasestorage.googleapis.com/v0/b/chatapp-levi.appspot.com/o/profilePhoto%2Fpexels-abdullah-ghatasheh-1631677.jpg?alt=media&token=b2aadf0a-372e-4d69-a3bb-77ed7bf32bf8')"
             // bgPos=""
-            bgSize="cover"
-            bgRepeat="no-repeat"
-            filter="blur(2px)"
+            bgSize='cover'
+            bgRepeat='no-repeat'
+            filter='blur(2px)'
           />
-          <Box h="full" w="full" display={search ? "none" : "block"}>
+          <Box h='full' w='full' display={search ? "none" : "block"}>
             <Component
               showStatus={showStatus}
               userData={userData}

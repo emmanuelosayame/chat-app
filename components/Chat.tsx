@@ -34,7 +34,7 @@ import {
   useDocumentData,
 } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
-import { StickerIcon } from "./Icons";
+import { StickerIcon } from "./Svgs";
 
 const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
   // const user = auth.currentUser;
@@ -72,15 +72,15 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
 
   return (
     <Flex>
-      {selectChat && <Checkbox value={chatId} ml="2" size="lg" />}
+      {selectChat && <Checkbox value={chatId} ml='2' size='lg' />}
       <Flex
-        w="full"
-        flexDirection="column"
-        role="group"
-        py="1"
-        pl="3"
+        w='full'
+        flexDirection='column'
+        role='group'
+        py='1'
+        pl='3'
         borderRadius={8}
-        overflow="hidden"
+        overflow='hidden'
         // border="1px solid #5ac7faa2"
         bgColor={
           selectChat
@@ -115,34 +115,33 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
             ? "scale(1.15)"
             : "scale(1.05)",
         }}
-        cursor="pointer"
-        onClick={routerToChat}
-      >
-        <Flex align="center" w="full">
+        cursor='pointer'
+        onClick={routerToChat}>
+        <Flex align='center' w='full'>
           {!dp || dp === "null" ? (
-            <Avatar alignSelf="center" size="sm" />
+            <Avatar alignSelf='center' size='sm' />
           ) : (
-            <Flex rounded="full" w="50px" overflow="hidden">
+            <Flex rounded='full' w='50px' overflow='hidden'>
               <Image
-                alt="recProfileImg"
-                referrerPolicy="no-referrer"
+                alt='recProfileImg'
+                referrerPolicy='no-referrer'
                 loader={() => `${dp}?w=${60}&q=${75}`}
                 src={dp}
-                width="100%"
-                height="100%"
+                width='100%'
+                height='100%'
               />
             </Flex>
           )}
-          <Box mx="2" py="2" h={"12"} w="full">
+          <Box mx='2' py='2' h={"12"} w='full'>
             <Flex>
-              <Text fontSize="17" fontWeight={600} mr="1" lineHeight="1">
+              <Text fontSize='17' fontWeight={600} mr='1' lineHeight='1'>
                 {recData?.name}
               </Text>
               {recData?.verified && (
-                <BadgeCheckIcon fill="#007affff" width={15} />
+                <BadgeCheckIcon fill='#007affff' width={15} />
               )}
             </Flex>
-            <Box display="flex">
+            <Box display='flex'>
               {/* <Box my="auto" mx="0.07rem" color="#3c3c434e">
                 <AtSymbolIcon width={12} height={12} strokeWidth="3" />
               </Box> */}
@@ -157,30 +156,29 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
             </Box>
             {latestMessage && latestMessage.length > 0 && (
               <Flex
-                justify="space-between"
+                justify='space-between'
                 fontSize={14}
-                p="0.5"
-                color="#3c3c4399"
-              >
+                p='0.5'
+                color='#3c3c4399'>
                 {latestMessage[0].type === "document" ? (
                   <Flex>
                     <DocumentIcon width={12} />
-                    <Text mx="0.5">document</Text>
+                    <Text mx='0.5'>document</Text>
                   </Flex>
                 ) : latestMessage[0].type === "sticker" ? (
                   <Flex>
-                    <StickerIcon boxSize="2.5" m="1" />
+                    <StickerIcon boxSize='2.5' m='1' />
                     <Text>sticker</Text>
                   </Flex>
                 ) : latestMessage[0].type === "video" ? (
                   <Flex>
                     <VideoCameraIcon width={12} />
-                    <Text mx="0.5">video</Text>
+                    <Text mx='0.5'>video</Text>
                   </Flex>
                 ) : latestMessage[0].type === "image" ? (
                   <Flex>
                     <CameraIcon width={12} />
-                    <Text mx="0.5">picture</Text>
+                    <Text mx='0.5'>picture</Text>
                   </Flex>
                 ) : (
                   latestMessage[0].type === "text" && (
@@ -204,9 +202,9 @@ const Chat = ({ selectChat, chatId, recId }: DocumentData) => {
               ? "none"
               : "block"
           }
-          borderColor="#3c3c432d"
+          borderColor='#3c3c432d'
           w={["85%", "90%"]}
-          alignSelf="end"
+          alignSelf='end'
           _groupHover={{
             display: selectChat ? "unset" : "none",
           }}

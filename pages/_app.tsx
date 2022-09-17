@@ -3,9 +3,9 @@ import "../styles/globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
 import { auth, db, rdb } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
-import Login from "../comps/Login";
+import Login from "../components/Login";
 import { SpinnerDotted } from "spinners-react";
-import App from "../comps/App";
+import App from "../components/App";
 import { useEffect, useState } from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
@@ -15,6 +15,10 @@ import Head from "next/head";
 
 function MyApp({ Component, pageProps, router }: AppProps) {
   const [user, loading] = useAuthState(auth);
+
+  // user?.getIdTokenResult().then((t) => console.log(t.claims.admin));
+
+  // console.log(auth.currentUser);
 
   useEffect(() => {
     TimeAgo.addDefaultLocale(en);
@@ -28,8 +32,8 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     <>
       <Head>
         <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
+          name='viewport'
+          content='width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0'
         />
       </Head>
 
@@ -48,8 +52,8 @@ export default MyApp;
 
 export const Loading = () => {
   return (
-    <Flex h="100vh" w="full" align="center" justify="center">
-      <SpinnerDotted color="#007affff" />
+    <Flex h='100vh' w='full' align='center' justify='center'>
+      <SpinnerDotted color='#007affff' />
     </Flex>
   );
 };

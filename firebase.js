@@ -28,10 +28,10 @@ const rdb = getDatabase();
 const storage = getStorage();
 
 if (!apps.length) {
-  // connectAuthEmulator(auth, "http://localhost:9099");
-  // connectFirestoreEmulator(db, "localhost", 8080);
-  // connectDatabaseEmulator(rdb, "localhost", 9000);
-  // connectStorageEmulator(storage, "localhost", 9199);
+  connectAuthEmulator(auth, "http://localhost:9099");
+  connectFirestoreEmulator(db, "localhost", 8080);
+  connectDatabaseEmulator(rdb, "localhost", 9000);
+  connectStorageEmulator(storage, "localhost", 9199);
   enableMultiTabIndexedDbPersistence(db, rdb).catch((err) => {
     if (err.code == "failed-precondition") {
       console.log(

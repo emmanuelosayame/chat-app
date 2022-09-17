@@ -188,7 +188,9 @@ const NewChatComp = ({
               onClick={() => !newSearch && setNewSearch(true)}
               onFocus={() => setNewSearch(true)}
             >
-              <InputLeftElement children={<SearchIcon mb="1" />} />
+              <InputLeftElement>
+              <SearchIcon mb="1" />
+              </InputLeftElement>
               <Input
                 size="sm"
                 variant="filled"

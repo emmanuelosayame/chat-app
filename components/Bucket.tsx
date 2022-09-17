@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { auth, db } from "../firebase";
-import { MicWaveIcon } from "./Icons";
+import { MicWaveIcon } from "./Svgs";
 import Message from "./Message";
 import PickerInterface from "./PickerInterface";
 import WebCamComp from "./WebCamComp";

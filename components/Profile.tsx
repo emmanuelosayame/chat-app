@@ -56,10 +56,11 @@ const Profile = ({
   // console.log(photoPrev);
 
   useEffect(() => {
+    userData?.photoURL && setPhotoURL(userData?.photoURL);
     userData?.name && setName(userData?.name);
     userData?.userName &&
       setUserName({ exists: undefined, value: userData?.userName });
-    userData?.photoURL && setPhotoURL(userData?.photoURL);
+    userData?.about && setAbout(userData?.about);
   }, [userData]);
 
   const photoChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -229,14 +230,13 @@ const Profile = ({
         render: () => (
           <Box
             borderRadius={20}
-            bgColor="white"
-            p="1"
-            border="1px solid whitesmoke"
-          >
-            <Text textAlign="center" fontWeight={600}>
+            bgColor='white'
+            p='1'
+            border='1px solid whitesmoke'>
+            <Text textAlign='center' fontWeight={600}>
               username not set
             </Text>
-            <Text textAlign="center" fontWeight={600} fontSize="15">
+            <Text textAlign='center' fontWeight={600} fontSize='15'>
               setup username to get started
             </Text>
           </Box>
@@ -246,16 +246,16 @@ const Profile = ({
 
   return (
     <Flex
-      flexDirection="column"
-      align="center"
+      flexDirection='column'
+      align='center'
       display={profileOpen ? "flex" : ["none", "none", "none", "flex"]}
       ml={[0, 0, 0, 10]}
       w={["full", "full", "full", "60%", "65%"]}
-      bgColor="whitesmoke"
-      my="5"
-      borderRadius={10}
-    >
-      <Flex justify="space-between" w="full">
+      h='full'
+      bgColor='whitesmoke'
+      my={["5", "5", "auto"]}
+      borderRadius={10}>
+      <Flex justify='space-between' w='full'>
         {/* <Button
           aria-label="close-setting-page"
           // icon={<ChevronLeftIcon width={40} />}
@@ -272,171 +272,179 @@ const Profile = ({
         </Button> */}
         <IconButton
           display={userNameSet ? ["flex", "flex", "flex", "none"] : "none"}
-          aria-label="close-setting-page"
+          aria-label='close-setting-page'
           icon={<ChevronLeftIcon width={40} />}
-          variant="ghost"
-          // bgColor="white"
-          m="2"
-          size="sm"
-          color="blue.300"
-          borderRadius="15px"
+          variant='ghost'
+          m='2'
+          size='sm'
+          color='blue.300'
+          borderRadius='15px'
           onClick={() => setProfileOpen(false)}
         />
         <Button
-          aria-label="close-setting-page"
+          aria-label='close-setting-page'
           // icon={<ChevronLeftIcon width={40} />}
-          variant="ghost"
+          variant='ghost'
           // onClick={profileOnClose}
           // bgColor="white"
           // alignSelf="end"
-          m="2"
-          size="sm"
-          color="blue.300"
-          borderRadius="15px"
+          m='2'
+          size='sm'
+          color='blue.300'
+          borderRadius='15px'
           onClick={() => {
             handleProfileChanges();
             userNameSet && setProfileOpen(false);
-          }}
-        >
+          }}>
           Save
         </Button>
       </Flex>
-      <Flex mx="auto" mt={userNameSet ? "unset" : 5}>
+
+      <Flex mx='auto' mt={userNameSet ? "unset" : 3}>
         {photoPrev.URL && photoPrev.URL !== "null" ? (
           <Box
-            borderRadius="50%"
-            w="90px"
-            h="90px"
-            overflow="hidden"
-            border="1px solid #3c3c432d"
-          >
+            borderRadius='50%'
+            w='90px'
+            h='90px'
+            overflow='hidden'
+            border='1px solid #3c3c432d'>
             <Image
-              alt="userProfileImg"
-              referrerPolicy="no-referrer"
+              alt='userProfileImg'
+              referrerPolicy='no-referrer'
               loader={() => `${photoPrev.URL}?w=${90}&q=${75}`}
               src={photoPrev.URL.toString()}
-              width="100%"
-              height="100%"
+              width='100%'
+              height='100%'
             />
           </Box>
         ) : (
-          <Avatar size="xl" mr="2" />
+          <Avatar size='xl' />
         )}
       </Flex>
       <Button
-        variant="link"
-        fontSize="15px"
-        m="2"
-        display="block"
-        onClick={() => uploadRef?.current?.click()}
-      >
+        variant='link'
+        fontSize='15px'
+        m='2'
+        display='block'
+        onClick={() => uploadRef?.current?.click()}>
         {userData?.photoURL ? "Change Profile" : "Add"} Photo
       </Button>
       <Input
         ref={uploadRef}
         hidden
         multiple={false}
-        type="file"
-        accept="image/*"
+        type='file'
+        accept='image/*'
         onChange={photoChange}
       />
-      <Box my="5" color="#3c3c4399">
+      <Box
+        my='1'
+        //  color='#3c3c4399'
+      >
         <Box>
-          <Text textAlign="center" fontSize="18px" color="#3c3c434c	">
+          <Text textAlign='center' fontSize='18px' color='#3c3c434c	'>
             name
           </Text>
           <Input
-            mx="5"
-            w="90%"
-            variant="flushed"
-            aria-label="name"
+            mx='5'
+            w='90%'
+            variant='flushed'
+            aria-label='name'
             value={name}
-            fontSize="22px"
+            fontSize='20px'
             onChange={(e) => setName(e.target.value)}
           />
         </Box>
         <Box>
-          <Text textAlign="center" fontSize="18px" color="#3c3c434c	">
+          <Text textAlign='center' fontSize='18px' color='#3c3c434c	'>
             username
           </Text>
           <Flex>
             <Input
-              mx="5"
-              w="90%"
-              variant="flushed"
-              aria-label="userName"
+              mx='5'
+              w='90%'
+              variant='flushed'
+              aria-label='userName'
               defaultValue={userData?.userName}
               onChange={(e) => {
                 handleUserName(e.target.value);
               }}
-              fontSize="22px"
+              fontSize='20px'
               isInvalid={userName?.exists}
               focusBorderColor={userName?.exists ? "#ff9500ff" : "gray"}
-              pos="relative"
+              pos='relative'
             />
             <Box>
               {error ? (
                 <Text
                   fontSize={15}
-                  color="#8e8e93ff"
+                  color='#8e8e93ff'
                   borderRadius={8}
-                  bgColor="#ffffffff"
-                  p="1"
-                  h="fit-content"
-                  m="1"
-                  w="fit-content"
-                  pos="absolute"
-                >
+                  bgColor='#ffffffff'
+                  // p='1'
+                  h='fit-content'
+                  m='1'
+                  w='fit-content'
+                  pos='absolute'>
                   unable to connect
                 </Text>
               ) : userName?.exists === true ? (
                 <Text
                   fontSize={17}
-                  color="#ff9500ff"
+                  color='#ff9500ff'
                   borderRadius={8}
-                  bgColor="#ffffffff"
-                  px="1"
-                  h="fit-content"
-                  w="fit-content"
-                  pos="absolute"
-                >
+                  bgColor='#ffffffff'
+                  px='1'
+                  h='fit-content'
+                  w='fit-content'
+                  pos='absolute'>
                   taken
                 </Text>
               ) : userNameWarning ? (
                 <Text
                   fontSize={14}
-                  color="#8e8e93ff"
+                  color='#8e8e93ff'
                   borderRadius={16}
-                  bgColor="#ffffffff"
-                  px="2"
-                  py="1"
-                  h="fit-content"
-                  m="1"
-                  pos="absolute"
-                >
+                  bgColor='#ffffffff'
+                  px='2'
+                  py='1'
+                  h='fit-content'
+                  m='1'
+                  pos='absolute'>
                   {userNameWarning}
                 </Text>
               ) : (
                 userName?.exists === false && (
-                  <CheckCircleIcon width={30} color="green" />
+                  <CheckCircleIcon width={30} color='green' />
                 )
               )}
             </Box>
           </Flex>
         </Box>
-        <Box mt="10">
-          <Text textAlign="center" fontSize="18px" color="#3c3c434c	">
+        <Box mt='2'>
+          <Text textAlign='center' fontSize='18px' color='#3c3c434c	'>
             about
           </Text>
           <Textarea
-            mx="5"
-            w="90%"
-            variant="flushed"
-            aria-label="about"
+            mx='5'
+            w='90%'
+            sx={{
+              "&::-webkit-scrollbar": {
+                width: "4px",
+                backgroundColor: "transparent",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                borderRadius: "4px",
+                backgroundColor: "gray",
+              },
+            }}
+            // rows={1}
+            variant='flushed'
+            aria-label='about'
             value={about}
-            fontSize="22px"
+            fontSize='19px'
             onChange={(e) => setAbout(e.target.value)}
-            resize="none"
+            resize='none'
           />
         </Box>
       </Box>

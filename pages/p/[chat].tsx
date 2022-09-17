@@ -37,27 +37,19 @@ import {
   useCollectionData,
   useDocumentData,
 } from "react-firebase-hooks/firestore";
-import { MicWaveIcon, SendIcon, StickerIcon } from "../../comps/Icons";
+import { MicWaveIcon, SendIcon, StickerIcon } from "../../components/Svgs";
 import { auth, db, rdb } from "../../firebase";
 import ReactTimeAgo from "react-time-ago";
-import {
-  ArrowUpIcon,
-  CameraIcon,
-  ClockIcon,
-  CloudDownloadIcon,
-  CloudIcon,
-  MicrophoneIcon,
-} from "@heroicons/react/outline";
-import { Database, ref, DataSnapshot } from "firebase/database";
-import { useListVals, useObjectVal } from "react-firebase-hooks/database";
+import { ArrowUpIcon } from "@heroicons/react/outline";
+import { ref, DataSnapshot } from "firebase/database";
+import { useObjectVal } from "react-firebase-hooks/database";
 import Image from "next/image";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import PickerInterface from "../../comps/PickerInterface";
-import StickerComp from "../../comps/StickerComp";
-import prettyBytes from "pretty-bytes";
+import PickerInterface from "../../components/PickerInterface";
+import StickerComp from "../../components/StickerComp";
 
-import Message from "../../comps/Message";
-import WebCamComp from "../../comps/WebCamComp";
+import Message from "../../components/Message";
+import WebCamComp from "../../components/WebCamComp";
 import { UploadTask } from "firebase/storage";
 // import TimeAgo from "timeago-react";
 
@@ -132,93 +124,88 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
   return (
     <>
       <Flex
-        flexDirection="column"
-        w="full"
-        h="full"
-        bgColor="#ffffffff"
-        justify="space-between"
+        flexDirection='column'
+        w='full'
+        h='full'
+        bgColor='#ffffffff'
+        justify='space-between'
         position={["fixed", "fixed", "unset"]}
         // key={router.query.chatId?.toString()}
       >
         <Flex
-          pos="absolute"
-          w="full"
-          py="1"
-          maxH="10"
-          bgColor="whiteAlpha.500"
-          backdropFilter="auto"
-          backdropBlur="md"
-          justify="space-between"
-          align="center"
-          zIndex={1000}
-        >
-          <Flex mr="-14">
+          pos='absolute'
+          w='full'
+          py='1'
+          maxH='10'
+          bgColor='whiteAlpha.500'
+          backdropFilter='auto'
+          backdropBlur='md'
+          justify='space-between'
+          align='center'
+          zIndex={1000}>
+          <Flex mr='-14'>
             <IconButton
               display={["block", "block", "none"]}
-              aria-label="back-btn"
-              size="md"
+              aria-label='back-btn'
+              size='md'
               icon={<ChevronLeftIcon width={40} height={50} />}
-              mr="-4"
+              mr='-4'
               // mb="2"
               onClick={routeToChats}
               _hover={{ bgColor: "transparent" }}
               _active={{ bgColor: "transparent" }}
-              bgColor="transparent"
-              color="blue.500"
-              variant="ghost"
+              bgColor='transparent'
+              color='blue.500'
+              variant='ghost'
               // alignSelf="center"
             />
             <Flex
-              alignSelf="center"
-              w="60px"
+              alignSelf='center'
+              w='60px'
               fontWeight={600}
-              mx="2"
-              justifyContent="start"
-              align="center"
-            >
+              mx='2'
+              justifyContent='start'
+              align='center'>
               {!showStatus ? (
                 <Text
-                  textAlign="center"
-                  w="fit-content"
-                  color="whiteAlpha.900"
-                  bgColor="#5ac8faff"
-                  px="1"
-                  h="auto"
-                  py="0.5"
+                  textAlign='center'
+                  w='fit-content'
+                  color='whiteAlpha.900'
+                  bgColor='#5ac8faff'
+                  px='1'
+                  h='auto'
+                  py='0.5'
                   borderRadius={9}
                   fontSize={10}
-                  opacity={0.15}
-                >
+                  opacity={0.15}>
                   ~
                 </Text>
               ) : recStatus?.online && showStatus ? (
                 <Text
-                  textAlign="center"
-                  bgColor="#5ac8faff"
+                  textAlign='center'
+                  bgColor='#5ac8faff'
                   rounded={10}
-                  w="fit-content"
-                  px="1"
+                  w='fit-content'
+                  px='1'
                   py={0.5}
                   fontSize={["12", "12", "15"]}
-                  color="#f5f5f5"
-                >
+                  color='#f5f5f5'>
                   online
                 </Text>
               ) : (
                 <Text
-                  textAlign="center"
-                  w="fit-content"
-                  color="whiteAlpha.900"
-                  bgColor="#5ac8faff"
-                  px="1"
-                  h="auto"
-                  py="0.5"
+                  textAlign='center'
+                  w='fit-content'
+                  color='whiteAlpha.900'
+                  bgColor='#5ac8faff'
+                  px='1'
+                  h='auto'
+                  py='0.5'
                   borderRadius={9}
-                  fontSize={13}
-                >
+                  fontSize={13}>
                   <ReactTimeAgo
                     date={lastSeen}
-                    timeStyle="twitter-minute-now"
+                    timeStyle='twitter-minute-now'
                   />
                 </Text>
                 // <TimeAgo datetime={lastSeen} />
@@ -226,47 +213,44 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
             </Flex>
           </Flex>
 
-          <Box display="flex" flexDir="column" justifyContent="center">
+          <Box display='flex' flexDir='column' justifyContent='center'>
             <Text
-              mx="auto"
+              mx='auto'
               fontWeight={700}
               fontSize={[15, 15, 16]}
-              lineHeight="1.2"
-              color="#000000da"
-            >
+              lineHeight='1.2'
+              color='#000000da'>
               {router.query.name && router.query.name}
             </Text>
             <Text
-              mx="auto"
+              mx='auto'
               fontWeight={600}
               fontSize={[12, 12, 14]}
-              lineHeight="1"
-              color="#3c3c4399"
-            >
+              lineHeight='1'
+              color='#3c3c4399'>
               {router.query.name && router.query.userName}
             </Text>
           </Box>
           <Box>
             {!!router.query.photoURL && router.query.photoURL !== "null" ? (
               <Box
-                borderRadius="50%"
-                h="35px"
-                w="35px"
-                overflow="hidden"
-                border="1px solid #3c3c432d"
-                mx="2"
-              >
+                borderRadius='50%'
+                h='35px'
+                w='35px'
+                overflow='hidden'
+                border='1px solid #3c3c432d'
+                mx='2'>
                 <Image
-                  alt="recProfile"
-                  referrerPolicy="no-referrer"
+                  alt='recProfile'
+                  referrerPolicy='no-referrer'
                   loader={() => `${router.query.photoURL}?w=${60}&q=${75}`}
                   src={router.query.photoURL.toString()}
-                  width="100%"
-                  height="100%"
+                  width='100%'
+                  height='100%'
                 />
               </Box>
             ) : (
-              <Avatar size="sm" mx="2" />
+              <Avatar size='sm' mx='2' />
             )}
           </Box>
         </Flex>
@@ -282,13 +266,12 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
               backgroundColor: "transparent",
             },
           }}
-          scrollBehavior="smooth"
-          flexDirection="column"
-          overflowX="auto"
+          scrollBehavior='smooth'
+          flexDirection='column'
+          overflowX='auto'
           px={["3", "4", "6"]}
-          h="full"
-          pt="14"
-        >
+          h='full'
+          pt='14'>
           {!!messages &&
             messages?.docs.map((message: DocumentData) => (
               <Message
@@ -302,7 +285,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
 
         {/* {webCam &&  />} */}
         <Divider />
-        <Flex py="1" align="center" bgColor="#f2f2f7ff">
+        <Flex py='1' align='center' bgColor='#f2f2f7ff'>
           <PickerInterface
             isOpen={pickerIsOpen}
             onOpen={pickerOnOpen}
@@ -319,55 +302,53 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
             direction={["column", "column", "column", "column"]}
           />
           <Flex
-            w="full"
+            w='full'
             borderRadius={20}
-            borderWidth="1px"
-            bgColor="#ffffffff"
-            borderColor="#74748014"
-            mr="3"
-            position="relative"
-            align="center"
-            h="fit-content"
-          >
+            borderWidth='1px'
+            bgColor='#ffffffff'
+            borderColor='#74748014'
+            mr='3'
+            position='relative'
+            align='center'
+            h='fit-content'>
             {stickerIsOpen ? (
               <Box
-                alignSelf="center"
-                my="1"
-                mx="1.5"
-                rounded="full"
-                aria-label="send"
-                color="#007affff"
-                fontSize="1.1em"
-              >
+                alignSelf='center'
+                my='1'
+                mx='1.5'
+                rounded='full'
+                aria-label='send'
+                color='#007affff'
+                fontSize='1.1em'>
                 <StickerIcon />
               </Box>
             ) : (
               <IconButton
-                alignSelf="end"
-                my="1"
-                mx="1.5"
+                alignSelf='end'
+                my='1'
+                mx='1.5'
                 isRound
-                aria-label="send"
-                color="#007affff"
-                fontSize="1.1em"
-                size="xs"
+                aria-label='send'
+                color='#007affff'
+                fontSize='1.1em'
+                size='xs'
                 icon={<StickerIcon />}
                 onClick={stickerOnOpen}
               />
             )}
             <Textarea
               as={ReactTextareaAutosize}
-              w="full"
+              w='full'
               maxRows={7}
-              placeholder="Message"
+              placeholder='Message'
               _placeholder={{
                 fontSize: 20,
                 h: "full",
               }}
-              variant="unstyled"
-              size="sm"
+              variant='unstyled'
+              size='sm'
               rows={1}
-              resize="none"
+              resize='none'
               sx={{
                 "&::-webkit-scrollbar": {
                   width: "4px",
@@ -378,37 +359,37 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
                   backgroundColor: "transparent",
                 },
               }}
-              p="1.5"
+              p='1.5'
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              fontSize="100%"
-              h="full"
+              fontSize='100%'
+              h='full'
             />
 
             {newMessage.length > 0 ? (
               <IconButton
                 isRound
-                alignSelf="end"
-                aria-label="send"
-                bgColor="#007affff"
-                fontSize="1.2em"
-                size="xs"
-                icon={<ArrowUpIcon width={20} color="white" />}
+                alignSelf='end'
+                aria-label='send'
+                bgColor='#007affff'
+                fontSize='1.2em'
+                size='xs'
+                icon={<ArrowUpIcon width={20} color='white' />}
                 onClick={sendMessage}
-                m="1"
+                m='1'
               />
             ) : (
               <IconButton
-                alignSelf="end"
+                alignSelf='end'
                 isRound
-                aria-label="send"
-                bgColor="#74748014"
-                fontSize="1.2em"
-                size="xs"
+                aria-label='send'
+                bgColor='#74748014'
+                fontSize='1.2em'
+                size='xs'
                 // icon={<MicrophoneIcon width={25} color="#007affff" />}
-                icon={<MicWaveIcon color="#007affff" />}
+                icon={<MicWaveIcon color='#007affff' />}
                 // onClick={sendMessage}
-                m="1"
+                m='1'
               />
             )}
           </Flex>
