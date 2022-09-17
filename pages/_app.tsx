@@ -52,7 +52,16 @@ export default MyApp;
 
 export const Loading = () => {
   return (
-    <Flex h='100vh' w='full' align='center' justify='center'>
+    <Flex
+      position='fixed'
+      top={0}
+      right={0}
+      left={0}
+      bottom={0}
+      h='100vh'
+      w='100vw'
+      align='center'
+      justify='center'>
       <SpinnerDotted color='#007affff' />
     </Flex>
   );
