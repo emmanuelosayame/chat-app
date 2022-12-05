@@ -1,211 +1,241 @@
-import { Box, Flex, Link, Progress, Text } from "@chakra-ui/react";
-import { ClockIcon, CloudDownloadIcon } from "@heroicons/react/outline";
-import { DocumentData } from "firebase/firestore";
+import { ClockIcon, CloudArrowDownIcon } from "@heroicons/react/24/outline";
+import { limitText } from "@lib/helpers";
+import { Timestamp } from "firebase/firestore";
 import Image from "next/image";
 import prettyBytes from "pretty-bytes";
+import { ReactNode } from "react";
 import { SpinnerRound } from "spinners-react";
 import { auth } from "../firebase";
+
+interface MessageContent {
+  type: string;
+  sender: string;
+  text: string;
+  stickerURL: string;
+  photoURL: string;
+  mediaURL: string;
+  documentName: string;
+  documentType: string;
+  documentSize: number;
+  timeSent: Timestamp;
+}
+
+interface MessageComponent {
+  content: MessageContent;
+  time: any;
+
+  senderStyle: boolean;
+  children?: ReactNode;
+}
 
 const Message = ({
   content,
   docUploadProgress,
 }: {
-  content: DocumentData;
+  content: MessageContent;
   docUploadProgress?: number | undefined;
 }) => {
   const user = auth.currentUser;
   const time =
     !!content.timeSent &&
     content.timeSent?.toDate().toLocaleTimeString("en", { timeStyle: "short" });
-  const messageStyle = (userVal: string, recVal: string) => {
-    if (!content.sender) return userVal;
-    if (content.sender === user?.uid) {
-      return userVal;
-    } else return recVal;
+
+  const senderStyle = !!(!content.sender || content.sender === user?.uid);
+
+  const messageProps = {
+    content,
+    time,
+    senderStyle,
+  };
+
+  const renderMessage: { [key: string]: ReactNode } = {
+    text: <Text {...messageProps} />,
+    document: <Document {...messageProps} />,
+    video: <Video {...messageProps} />,
+    image: <Picture {...messageProps} />,
+    sticker: <Sticker {...messageProps} />,
   };
 
   return (
+    // <>
+
+    //     <div
+    //       className={`${sender ? "self-end" : "self-start"} m-1 max-w-[100px]`}
+    //       flexDirection='column'
+    //       alignSelf={messageStyle("end", "start")}
+    //       bgColor={messageStyle("#5ac8faff", "#78788028")}
+    //       h='auto'
+    //       borderRadius={12}
+    //       m='1'
+    //       maxW='280px'>
+    //       {content.type === "image" ? (
+    //         <Box
+    //           alignSelf={messageStyle("end", "start")}
+    //           mx='1'
+    //           mt='1'
+    //           mb='1'
+    //           w={content.photoURL || content.mediaURL ? "270px" : "fit-content"}
+    //           display='block'>
+    //           {content.status === "saved" ? (
+    //             <>
+    //               {(content.photoURL || content.mediaURL) && (
+
+    //               )}
+    //             </>
+    //           ) : (
+    //             <SpinnerRound color='#7676801e' />
+    //           )}
+    //         </Box>
+    //       ) : content.type === "video" ? (
+    //         <Box maxW='280px' p='1'>
+    //           {content.status === "saved" ? (
+    //             <video
+    //               controls
+    //               src={content.mediaURL}
+    //               style={{ borderRadius: 10 }}
+    //             />
+    //           ) : (
+    //             <SpinnerRound
+    //               color='#7676801e'
+    //               // onClick={() => upload?.resume()}
+    //             />
+    //           )}
+    //         </Box>
+    //       )
+    //       {content.type !== "text" && content.type && (
+    //         <Box
+    //           h='auto'
+    //           alignSelf='end'
+    //           mx={1.5}
+    //           pb={1}
+    //           // float="right"
+    //           w='fit-content'
+    //           fontSize={11}
+    //           fontWeight={500}
+    //           color={messageStyle("gray.50", "gray")}
+    //           // p
+    //           // mb="0"
+    //           // display="inline"
+    //         >
+    //           {content.timeSent ? time : <ClockIcon width={10} />}
+    //         </Box>
+    //       )}
+    //     </div>
+    //   )}
+    // </>
+    <div
+      className={`${senderStyle ? "self-end" : "self-start"} ${
+        !senderStyle ? "bg-neutral-300" : "bg-blue-300"
+      }  m-1 rounded-xl `}>
+      {renderMessage[content.type]}
+    </div>
+  );
+};
+
+const TimeComponent = ({
+  time,
+  timeSent,
+}: {
+  time: any;
+  timeSent: Timestamp;
+}) => {
+  return (
     <>
-      {content.type === "sticker" ? (
-        <Box alignSelf={messageStyle("end", "start")} maxWidth="100px" m="1">
-          <Image
-            referrerPolicy="no-referrer"
-            alt="stickerImg"
-            loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
-            src={content.stickerURL}
-            width="100px"
-            height="100px"
-            style={{
-              // zIndex: -1,
-              backgroundColor: "#000000ff",
-              borderRadius: 20,
-            }}
-          />
-          <Box
-            // mt="0.5"
-            p="1"
-            rounded="lg"
-            w="fit-content"
-            mx="auto"
-            alignSelf="end"
-            fontSize={9}
-            fontWeight={500}
-            bgColor={messageStyle("#5ac8faff", "#78788028")}
-            color={messageStyle("gray.50", "gray")}
-          >
-            {content.timeSent ? (
-              time
-            ) : (
-              <Box>
-                <ClockIcon width={10} />
-              </Box>
-            )}
-          </Box>
-        </Box>
+      {timeSent ? (
+        <p className='text-[10px] text-end h-fit'>{time}</p>
       ) : (
-        <Flex
-          flexDirection="column"
-          alignSelf={messageStyle("end", "start")}
-          bgColor={messageStyle("#5ac8faff", "#78788028")}
-          h="auto"
-          borderRadius={12}
-          m="1"
-          maxW="280px"
-        >
-          {content.type === "image" ? (
-            <Box
-              alignSelf={messageStyle("end", "start")}
-              mx="1"
-              mt="1"
-              mb="1"
-              w={content.photoURL || content.mediaURL ? "270px" : "fit-content"}
-              display="block"
-            >
-              {content.status === "saved" ? (
-                <>
-                  {(content.photoURL || content.mediaURL) && (
-                    <Image
-                      referrerPolicy="no-referrer"
-                      alt="captureImg"
-                      loader={() => `${content.photoURL || content.mediaURL}`}
-                      src={content.photoURL || content.mediaURL}
-                      width="100%"
-                      height="100%"
-                      layout="responsive"
-                      style={{
-                        // zIndex: -1,
-                        backgroundColor: "#000000ff",
-                        borderRadius: 10,
-                        // maxWidth: "350px",
-                      }}
-                    />
-                  )}
-                </>
-              ) : (
-                <SpinnerRound color="#7676801e" />
-              )}
-            </Box>
-          ) : content.type === "video" ? (
-            <Box maxW="280px" p="1">
-              {content.status === "saved" ? (
-                <video
-                  controls
-                  src={content.mediaURL}
-                  style={{ borderRadius: 10 }}
-                />
-              ) : (
-                <SpinnerRound
-                  color="#7676801e"
-                  // onClick={() => upload?.resume()}
-                />
-              )}
-            </Box>
-          ) : content.type === "document" ? (
-            <Flex
-              flexDirection="column"
-              align="center"
-              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-              m={1.5}
-              maxW="280px"
-            >
-              <Text fontSize={[14, 15, 16]} fontWeight={600}>
-                {content.documentName.slice(0, 15)}
-              </Text>
-              <Text fontSize={13}>{content.documentType}</Text>
-              <Text fontSize={13}>{prettyBytes(content.documentSize)}</Text>
-              {content.status === "uploading" ? (
-                <Box w="50px" opacity={0.5} my="1">
-                  <Progress
-                    hasStripe
-                    rounded="full"
-                    value={docUploadProgress}
-                    size="xs"
-                    colorScheme="gray"
-                  />
-                </Box>
-              ) : (
-                <Link
-                  href={content.documentURL}
-                  _hover={{ bgColor: "transparent", opacity: 0.5 }}
-                >
-                  <CloudDownloadIcon width={30} />
-                </Link>
-              )}
-            </Flex>
-          ) : (
-            <Box
-              fontSize={[14, 15, 16]}
-              fontWeight={600}
-              color={messageStyle("#f2f2f7ff", "#3c3c4399")}
-              maxW="280px"
-              flexDirection="column"
-              mx="2"
-              my="0.25rem"
-              // minW="70px"
-              lineHeight={1}
-              // display="inline-block"
-              py="0.5"
-            >
-              {content.text}
-              <Box
-                h="auto"
-                // alignSelf="end"
-                ml={1.5}
-                pt={1.5}
-                float="right"
-                w="fit-content"
-                fontSize={10}
-                fontWeight={500}
-                color={messageStyle("gray.50", "gray")}
-                // p
-                // mb="0"
-                // display="inline"
-              >
-                {content.timeSent ? time : <ClockIcon style={{}} width={10} />}
-              </Box>
-            </Box>
-          )}
-          {content.type !== "text" && content.type && (
-            <Box
-              h="auto"
-              alignSelf="end"
-              mx={1.5}
-              pb={1}
-              // float="right"
-              w="fit-content"
-              fontSize={11}
-              fontWeight={500}
-              color={messageStyle("gray.50", "gray")}
-              // p
-              // mb="0"
-              // display="inline"
-            >
-              {content.timeSent ? time : <ClockIcon width={10} />}
-            </Box>
-          )}
-        </Flex>
+        <ClockIcon width={10} />
       )}
     </>
+  );
+};
+
+const Text = ({ content, time, senderStyle }: MessageComponent) => {
+  return (
+    <div
+      className={`${
+        senderStyle ? "text-[#f2f2f7ff]" : "text-[#3c3c4399]"
+      } flex ${
+        content.text.length > 20 && "flex-col"
+      } text-sm px-2 max-w-xs space-x-2`}>
+      <p className='py-1'>{content.text}</p>
+      <div className={" flex items-end justify-end"}>
+        <TimeComponent time={time} timeSent={content.timeSent} />
+      </div>
+    </div>
+  );
+};
+
+const Picture = ({ content, time, senderStyle }: MessageComponent) => {
+  return (
+    <div
+      className={`${
+        senderStyle ? "text-[#f2f2f7ff]" : "text-[#3c3c4399]"
+      } text-sm px-1 pt-1 max-w-md`}>
+      <Image
+        referrerPolicy='no-referrer'
+        alt='capture-img'
+        loader={() => `${content.photoURL || content.mediaURL}`}
+        src={content.photoURL || content.mediaURL}
+        className='w-52 h-52 rounded-xl bg-black'
+        width={1000}
+        height={1000}
+      />
+      <div className={"px-2 mt-1"}>
+        <TimeComponent time={time} timeSent={content.timeSent} />
+      </div>
+    </div>
+  );
+};
+
+const Video = ({ content, time, senderStyle }: MessageComponent) => {
+  return (
+    <div
+      className={`${
+        senderStyle ? "text-[#f2f2f7ff]" : "text-[#3c3c4399]"
+      } text-sm px-1 pt-1 max-w-md`}>
+      <video controls src={content.mediaURL} style={{ borderRadius: 10 }} />
+      <div className={"px-2 mt-1"}>
+        <TimeComponent time={time} timeSent={content.timeSent} />
+      </div>
+    </div>
+  );
+};
+
+const Document = ({ content, time, senderStyle }: MessageComponent) => {
+  return (
+    <div
+      className={`${
+        senderStyle ? "text-[#f2f2f7ff]" : "text-[#3c3c4399]"
+      } text-sm p-2 max-w-xs space-x-2`}>
+      <p className='text-[14px]'>{limitText(content.documentName, 15)}</p>
+      <p>{content.documentType}</p>
+      <p className='text-[13px] text-neutral-400'>
+        {prettyBytes(content.documentSize)}
+      </p>
+    </div>
+  );
+};
+
+const Sticker = ({ content, time, senderStyle }: MessageComponent) => {
+  return (
+    <div
+      className={`${
+        senderStyle ? "text-[#f2f2f7ff]" : "text-[#3c3c4399]"
+      } text-sm px-1 pt-1 max-w-xs space-x-2`}>
+      <Image
+        referrerPolicy='no-referrer'
+        alt='stickerImg'
+        loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
+        src={content.stickerURL}
+        className='w-full h-full rounded-xl bg-black'
+        width={100}
+        height={100}
+      />
+      <div className={" flex items-end justify-end px-2 mt-1"}>
+        <TimeComponent time={time} timeSent={content.timeSent} />
+      </div>
+    </div>
   );
 };
 

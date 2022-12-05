@@ -9,8 +9,8 @@ import {
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@heroicons/react/outline";
-import { ChevronLeftIcon } from "@heroicons/react/solid";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { ref, remove, set, update } from "firebase/database";
 import {
   collection,
@@ -313,8 +313,9 @@ const Profile = ({
               referrerPolicy='no-referrer'
               loader={() => `${photoPrev.URL}?w=${90}&q=${75}`}
               src={photoPrev.URL.toString()}
-              width='100%'
-              height='100%'
+              className='w-full h-full'
+              width={100}
+              height={100}
             />
           </Box>
         ) : (

@@ -10,11 +10,11 @@ import {
   useBoolean,
 } from "@chakra-ui/react";
 import {
-  ArrowNarrowRightIcon,
+  ArrowLongRightIcon,
   CameraIcon,
   VideoCameraIcon,
-} from "@heroicons/react/outline";
-import { ArrowsExpandIcon } from "@heroicons/react/solid";
+} from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon } from "@heroicons/react/24/solid";
 import { User } from "firebase/auth";
 import {
   addDoc,
@@ -119,23 +119,23 @@ const WebCamCompLg = ({
     <>
       <IconButton
         isRound
-        aria-label="sticker"
-        color="blue.400"
-        bgColor="transparent"
-        size="sm"
+        aria-label='sticker'
+        color='blue.400'
+        bgColor='transparent'
+        size='sm'
         icon={<CameraIcon width={30} />}
-        mx="0.5"
+        mx='0.5'
         onClick={setWebCam.on}
       />
       {webCam && (
         <>
-          <Show above="md">
+          <Show above='md'>
             <Flex
-              w="auto"
-              h="auto"
-              bgColor="#ffffff6f"
-              backdropFilter="auto"
-              backdropBlur="lg"
+              w='auto'
+              h='auto'
+              bgColor='#ffffff6f'
+              backdropFilter='auto'
+              backdropBlur='lg'
               position={expandPhoto ? "fixed" : "absolute"}
               bottom={0}
               right={0}
@@ -143,10 +143,9 @@ const WebCamCompLg = ({
               top={expandPhoto ? 0 : top}
               zIndex={expandPhoto ? 1000 : 100}
               flexDirection={direction}
-              justify="center"
-              align="center"
-              mx="auto"
-            >
+              justify='center'
+              align='center'
+              mx='auto'>
               {vid && mode === "video" ? (
                 <AspectRatio>
                   <video />
@@ -158,77 +157,77 @@ const WebCamCompLg = ({
                       bottom={0}
                       right={0}
                       left={0}
-                      w="fit-content"
-                      bgColor="#fff"
-                      h="full"
-                      mx="auto"
+                      w='fit-content'
+                      bgColor='#fff'
+                      h='full'
+                      mx='auto'
                       borderRadius={10}
-                      p="1"
-                      position="relative"
-                    >
+                      p='1'
+                      position='relative'>
                       <Image
-                        alt="captureImg"
+                        alt='captureImg'
                         src={imgSrc.data}
-                        width="1200px"
-                        height="720px"
+                        width={1200}
+                        height={720}
                         loader={() => imgSrc.data}
                         style={{ borderRadius: 15 }}
                       />
                       <Button
-                        size="xs"
-                        rounded="lg"
+                        size='xs'
+                        rounded='lg'
                         onClick={() => setExpandPhoto.off()}
-                        mx="auto"
-                        position="absolute"
+                        mx='auto'
+                        position='absolute'
                         left={0}
                         right={0}
                         top={5}
-                        w="fit-content"
-                        bgColor="#ffffff67"
-                      >
+                        w='fit-content'
+                        bgColor='#ffffff67'>
                         back
                       </Button>
                     </Box>
                   ) : (
-                    <Box position="relative" mx="1">
+                    <Box position='relative' mx='1'>
                       <Image
-                        alt="captureImg"
+                        alt='captureImg'
                         src={imgSrc.data}
-                        width="1280px"
-                        height="720px"
+                        width={1280}
+                        height={720}
                         loader={() => imgSrc.data}
                         style={{ borderRadius: 15 }}
                       />
 
                       <IconButton
-                        position="absolute"
-                        w="fit-content"
+                        position='absolute'
+                        w='fit-content'
                         bottom={4}
                         right={0}
                         left={2}
                         // mx="auto"
-                        aria-label="expand-photo"
-                        icon={<ArrowsExpandIcon color="#007affff" width={20} />}
+                        aria-label='expand-photo'
+                        icon={
+                          <ArrowUpOnSquareIcon color='#007affff' width={20} />
+                        }
                         onClick={setExpandPhoto.on}
-                        variant="ghost"
-                        size="sm"
+                        variant='ghost'
+                        size='sm'
                         isRound
                       />
                       <IconButton
-                        aria-label="send"
-                        position="absolute"
+                        aria-label='send'
+                        position='absolute'
                         bottom={0}
-                        top="50%"
+                        top='50%'
                         right={4}
                         // left={0}
-                        w="fit-content"
+                        w='fit-content'
                         isDisabled={!imgSrc}
-                        rounded="2xl"
-                        size="lg"
+                        rounded='2xl'
+                        size='lg'
                         // backdropBlur="3xl"
                         // backdropFilter="auto"
-                        bgColor="#ffffff75"
-                        icon={<ArrowNarrowRightIcon color="#ffff" width={40} />}
+                        bgColor='#ffffff75'
+                        icon={<ArrowLongRightIcon color='#ffff' width={40} />}
                         onClick={sendMedia}
                       />
                     </Box>
@@ -236,14 +235,13 @@ const WebCamCompLg = ({
                 </>
               ) : (
                 <Box
-                  position="relative"
+                  position='relative'
                   borderRadius={10}
-                  m="1"
-                  overflow="hidden"
-                >
+                  m='1'
+                  overflow='hidden'>
                   <Webcam
                     audio={false}
-                    screenshotFormat="image/webp"
+                    screenshotFormat='image/webp'
                     videoConstraints={videoConstraints}
                     ref={webCamRef}
                     // style={{}}
@@ -253,27 +251,24 @@ const WebCamCompLg = ({
               {!expandPhoto && (
                 <Box
                   // bgColor="whitesmoke"
-                  mx="2"
-                  my="2"
-                  py="1"
-                  px="2"
+                  mx='2'
+                  my='2'
+                  py='1'
+                  px='2'
                   borderRadius={10}
-                  h="fit-content"
-                  w="auto"
-                >
+                  h='fit-content'
+                  w='auto'>
                   <Stack
-                    h="fit-content"
-                    mx="auto"
+                    h='fit-content'
+                    mx='auto'
                     direction={["row", "row", "row", "row"]}
-                    w="fit-content"
-                  >
+                    w='fit-content'>
                     <Button
-                      rounded="2xl"
+                      rounded='2xl'
                       onClick={() => {
                         setWebCam.off();
                         setImgSrc(null);
-                      }}
-                    >
+                      }}>
                       back
                     </Button>
 
@@ -281,34 +276,31 @@ const WebCamCompLg = ({
                       <>
                         {vid ? (
                           <Button
-                            size="lg"
-                            rounded="2xl"
-                            onClick={() => setVid(null)}
-                          >
+                            size='lg'
+                            rounded='2xl'
+                            onClick={() => setVid(null)}>
                             retake
                           </Button>
                         ) : (
                           <Box
-                            aria-label="start-recording"
-                            bgColor="#0000006e"
-                            rounded="full"
-                            p="2"
-                            m="0"
-                            cursor="pointer"
-                          >
+                            aria-label='start-recording'
+                            bgColor='#0000006e'
+                            rounded='full'
+                            p='2'
+                            m='0'
+                            cursor='pointer'>
                             <Box
-                              w="40px"
-                              h="40px"
-                              bgColor="#ff4242"
-                              rounded="full"
+                              w='40px'
+                              h='40px'
+                              bgColor='#ff4242'
+                              rounded='full'
                             />
                           </Box>
                         )}
                         <Button
                           // size="sm"
-                          rounded="2xl"
-                          onClick={() => setMode("photo")}
-                        >
+                          rounded='2xl'
+                          onClick={() => setMode("photo")}>
                           photo
                         </Button>
                       </>
@@ -316,39 +308,36 @@ const WebCamCompLg = ({
                       <>
                         {imgSrc ? (
                           <Button
-                            size="lg"
-                            rounded="2xl"
-                            onClick={() => setImgSrc(null)}
-                          >
+                            size='lg'
+                            rounded='2xl'
+                            onClick={() => setImgSrc(null)}>
                             retake
                           </Button>
                         ) : (
                           <Box
-                            aria-label="capture"
+                            aria-label='capture'
                             onClick={capture}
                             // icon={<CameraIcon color="#007affff" width={40} />}
-                            bgColor="#00000084"
-                            rounded="full"
-                            p="2"
-                            m="0"
-                            cursor="pointer"
-                          >
+                            bgColor='#00000084'
+                            rounded='full'
+                            p='2'
+                            m='0'
+                            cursor='pointer'>
                             <Box
-                              w="40px"
-                              h="40px"
-                              bgColor="#ffffff"
-                              rounded="full"
+                              w='40px'
+                              h='40px'
+                              bgColor='#ffffff'
+                              rounded='full'
                             />
                           </Box>
                         )}
                         <Button
                           // size="sm"
-                          rounded="2xl"
+                          rounded='2xl'
                           onClick={() => {
                             setMode("video");
                             setImgSrc(null);
-                          }}
-                        >
+                          }}>
                           Video
                         </Button>
                       </>
@@ -359,13 +348,13 @@ const WebCamCompLg = ({
             </Flex>
           </Show>
 
-          <Show below="md">
+          <Show below='md'>
             <Flex
-              w="auto"
-              h="full"
-              bgColor="#ffffff6f"
-              backdropFilter="auto"
-              backdropBlur="lg"
+              w='auto'
+              h='full'
+              bgColor='#ffffff6f'
+              backdropFilter='auto'
+              backdropBlur='lg'
               position={expandPhoto ? "fixed" : "absolute"}
               bottom={0}
               right={0}
@@ -373,10 +362,9 @@ const WebCamCompLg = ({
               top={expandPhoto ? 0 : top}
               zIndex={expandPhoto ? 1000 : 100}
               flexDirection={direction}
-              justify="center"
-              align="center"
-              mx="auto"
-            >
+              justify='center'
+              align='center'
+              mx='auto'>
               {vid && mode === "video" ? (
                 <AspectRatio>
                   <video />
@@ -388,75 +376,75 @@ const WebCamCompLg = ({
                       bottom={0}
                       right={0}
                       left={0}
-                      w="fit-content"
-                      h="fit-content"
-                      mx="auto"
+                      w='fit-content'
+                      h='fit-content'
+                      mx='auto'
                       borderRadius={10}
-                      p="2"
-                      position="relative"
-                    >
+                      p='2'
+                      position='relative'>
                       <Image
-                        alt="captureImg"
+                        alt='captureImg'
                         src={imgSrc.data}
-                        height="720px"
-                        width="720px"
+                        height={720}
+                        width={720}
                         loader={() => imgSrc.data}
                         style={{ borderRadius: 10 }}
                       />
                       <Button
-                        size="xs"
-                        rounded="lg"
+                        size='xs'
+                        rounded='lg'
                         onClick={() => setExpandPhoto.off()}
-                        mx="auto"
-                        position="absolute"
+                        mx='auto'
+                        position='absolute'
                         left={0}
                         right={0}
                         top={5}
-                        w="fit-content"
-                        bgColor="#ffffff67"
-                      >
+                        w='fit-content'
+                        bgColor='#ffffff67'>
                         back
                       </Button>
                     </Box>
                   ) : (
-                    <Box position="relative" mx="1">
+                    <Box position='relative' mx='1'>
                       <Image
-                        alt="captureImg"
+                        alt='captureImg'
                         src={imgSrc.data}
-                        width="720px"
-                        height="720px"
+                        width={720}
+                        height={720}
                         loader={() => imgSrc.data}
                         style={{ borderRadius: 10 }}
                       />
                       <IconButton
-                        position="absolute"
-                        w="fit-content"
+                        position='absolute'
+                        w='fit-content'
                         bottom={4}
                         right={0}
                         left={2}
                         // mx="auto"
-                        aria-label="expand-photo"
-                        icon={<ArrowsExpandIcon color="#007affff" width={20} />}
+                        aria-label='expand-photo'
+                        icon={
+                          <ArrowUpOnSquareIcon color='#007affff' width={20} />
+                        }
                         onClick={setExpandPhoto.on}
-                        variant="ghost"
-                        size="sm"
+                        variant='ghost'
+                        size='sm'
                         isRound
                       />
                       <IconButton
-                        aria-label="send"
-                        position="absolute"
+                        aria-label='send'
+                        position='absolute'
                         bottom={0}
-                        top="50%"
+                        top='50%'
                         right={4}
                         // left={0}
-                        w="fit-content"
+                        w='fit-content'
                         isDisabled={!imgSrc}
-                        rounded="2xl"
-                        size="lg"
+                        rounded='2xl'
+                        size='lg'
                         // backdropBlur="3xl"
                         // backdropFilter="auto"
-                        bgColor="#ffffff75"
-                        icon={<ArrowNarrowRightIcon color="#ffff" width={40} />}
+                        bgColor='#ffffff75'
+                        icon={<ArrowLongRightIcon color='#ffff' width={40} />}
                         onClick={sendMedia}
                       />
                     </Box>
@@ -464,14 +452,13 @@ const WebCamCompLg = ({
                 </>
               ) : (
                 <Box
-                  position="relative"
+                  position='relative'
                   borderRadius={10}
-                  m="1"
-                  overflow="hidden"
-                >
+                  m='1'
+                  overflow='hidden'>
                   <Webcam
                     audio={false}
-                    screenshotFormat="image/webp"
+                    screenshotFormat='image/webp'
                     videoConstraints={videoConstraintsSm}
                     ref={webCamRefSm}
                     // style={{}}
@@ -481,27 +468,24 @@ const WebCamCompLg = ({
               {!expandPhoto && (
                 <Box
                   // bgColor="whitesmoke"
-                  mx="2"
-                  my="2"
-                  py="1"
-                  px="2"
+                  mx='2'
+                  my='2'
+                  py='1'
+                  px='2'
                   borderRadius={10}
-                  h="fit-content"
-                  w="auto"
-                >
+                  h='fit-content'
+                  w='auto'>
                   <Stack
-                    h="fit-content"
-                    mx="auto"
+                    h='fit-content'
+                    mx='auto'
                     direction={["row", "row", "row", "column"]}
-                    w="fit-content"
-                  >
+                    w='fit-content'>
                     <Button
-                      rounded="2xl"
+                      rounded='2xl'
                       onClick={() => {
                         setWebCam.off();
                         setImgSrc(null);
-                      }}
-                    >
+                      }}>
                       back
                     </Button>
 
@@ -509,34 +493,31 @@ const WebCamCompLg = ({
                       <>
                         {vid ? (
                           <Button
-                            size="lg"
-                            rounded="2xl"
-                            onClick={() => setVid(null)}
-                          >
+                            size='lg'
+                            rounded='2xl'
+                            onClick={() => setVid(null)}>
                             retake
                           </Button>
                         ) : (
                           <Box
-                            aria-label="start-recording"
-                            bgColor="#0000006e"
-                            rounded="full"
-                            p="2"
-                            m="0"
-                            cursor="pointer"
-                          >
+                            aria-label='start-recording'
+                            bgColor='#0000006e'
+                            rounded='full'
+                            p='2'
+                            m='0'
+                            cursor='pointer'>
                             <Box
-                              w="40px"
-                              h="40px"
-                              bgColor="#ff4242"
-                              rounded="full"
+                              w='40px'
+                              h='40px'
+                              bgColor='#ff4242'
+                              rounded='full'
                             />
                           </Box>
                         )}
                         <Button
                           // size="sm"
-                          rounded="2xl"
-                          onClick={() => setMode("photo")}
-                        >
+                          rounded='2xl'
+                          onClick={() => setMode("photo")}>
                           photo
                         </Button>
                       </>
@@ -544,39 +525,36 @@ const WebCamCompLg = ({
                       <>
                         {imgSrc ? (
                           <Button
-                            size="lg"
-                            rounded="2xl"
-                            onClick={() => setImgSrc(null)}
-                          >
+                            size='lg'
+                            rounded='2xl'
+                            onClick={() => setImgSrc(null)}>
                             retake
                           </Button>
                         ) : (
                           <Box
-                            aria-label="capture"
+                            aria-label='capture'
                             onClick={captureSm}
                             // icon={<CameraIcon color="#007affff" width={40} />}
-                            bgColor="#00000084"
-                            rounded="full"
-                            p="2"
-                            m="0"
-                            cursor="pointer"
-                          >
+                            bgColor='#00000084'
+                            rounded='full'
+                            p='2'
+                            m='0'
+                            cursor='pointer'>
                             <Box
-                              w="40px"
-                              h="40px"
-                              bgColor="#ffffff"
-                              rounded="full"
+                              w='40px'
+                              h='40px'
+                              bgColor='#ffffff'
+                              rounded='full'
                             />
                           </Box>
                         )}
                         <Button
                           // size="sm"
-                          rounded="2xl"
+                          rounded='2xl'
                           onClick={() => {
                             setMode("video");
                             setImgSrc(null);
-                          }}
-                        >
+                          }}>
                           Video
                         </Button>
                       </>

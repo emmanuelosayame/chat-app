@@ -1,24 +1,45 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { ReactNode } from "react";
+import { useStore } from "../store";
+import Settings from "./Settings";
 
-const Header = ({ children }: { children: ReactNode; setSelectChat: any }) => {
+const Header = ({
+  userData,
+  editChats,
+}: {
+  children?: ReactNode;
+  editChats: () => void;
+  userData: any;
+}) => {
+  const toggleNCM = useStore((state) => state.toggleNCM);
   return (
-    <Flex
-      justify="space-between"
-      h="10"
-      position="absolute"
-      w="full"
-      left={0}
-      top={0}
-      bgColor="#f2f2f783"
-      backdropFilter="auto"
-      backdropBlur="md"
-      zIndex={1000}
-      p="2"
-      align="center"
-    >
-      {children}
-    </Flex>
+    <div
+      className='flex justify-between h-10 top-0 left-0 bg-[#f2f2f783] w-full backdrop-blur-md z-30
+     p-2 absolute items-center'>
+      <Settings
+        userData={userData}
+        isOpen={false}
+        onOpen={() => {}}
+        onClose={() => {}}
+        userNameSet={false}
+        setUserNameSet={() => {}}
+      />
+      <h2 className='text-base'>wagwan</h2>
+      <div className='flex items-center space-x-1'>
+        <button
+          aria-label='create-chat-button'
+          className='text-blue-400'
+          onClick={toggleNCM}>
+          <PencilSquareIcon width={22} />
+        </button>
+
+        <button
+          onClick={editChats}
+          className='text-sm md:text-base text-blue-400'>
+          Edit
+        </button>
+      </div>
+    </div>
   );
 };
 

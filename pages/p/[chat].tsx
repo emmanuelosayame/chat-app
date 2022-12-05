@@ -1,72 +1,45 @@
 import {
-  Avatar,
   Box,
   Divider,
   Flex,
   IconButton,
-  Link,
-  Progress,
-  SlideFade,
   Text,
   Textarea,
   useBoolean,
   useDisclosure,
 } from "@chakra-ui/react";
-import {
-  ArrowCircleUpIcon,
-  ArrowNarrowUpIcon,
-  ChevronLeftIcon,
-} from "@heroicons/react/solid";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import {
   addDoc,
   collection,
-  doc,
   DocumentData,
   limit,
   orderBy,
   query,
   serverTimestamp,
-  startAt,
-  Timestamp,
 } from "firebase/firestore";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import {
-  useCollection,
-  useCollectionData,
-  useDocumentData,
-} from "react-firebase-hooks/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
 import { MicWaveIcon, SendIcon, StickerIcon } from "../../components/Svgs";
 import { auth, db, rdb } from "../../firebase";
 import ReactTimeAgo from "react-time-ago";
-import { ArrowUpIcon } from "@heroicons/react/outline";
+import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { ref, DataSnapshot } from "firebase/database";
 import { useObjectVal } from "react-firebase-hooks/database";
-import Image from "next/image";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import PickerInterface from "../../components/PickerInterface";
 import StickerComp from "../../components/StickerComp";
-
+import Avatar from "@components/radix/Avatar";
 import Message from "../../components/Message";
 import WebCamComp from "../../components/WebCamComp";
-import { UploadTask } from "firebase/storage";
 // import TimeAgo from "timeago-react";
 
-const Chats: NextPage = ({ showStatus, userData }: any) => {
+const ChatPage: NextPage = ({ showStatus, userData }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
-  const chatId = router.query.chatId;
-  const {
-    isOpen: pickerIsOpen,
-    onOpen: pickerOnOpen,
-    onClose: pickerOnClose,
-  } = useDisclosure();
-  const {
-    isOpen: stickerIsOpen,
-    onOpen: stickerOnOpen,
-    onClose: stickerOnClose,
-  } = useDisclosure();
+  const chatId = router.query.chatId?.toString();
 
   const keepBottomRef = useRef<any>();
   const messagesRef = collection(db, "chatGroup", `${chatId}`, "messages");
@@ -77,7 +50,7 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
     limit(20)
   );
   const [messages] = useCollection(messagesQuery);
-  const [newMessage, setNewMessage] = useState<string>("");
+
   const [recStatus] = useObjectVal<{
     lastSeen: number;
     online: DataSnapshot;
@@ -104,6 +77,102 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
     }
   }, [router.pathname, messages]);
 
+  const routeToChats = () => {
+    router.push("/");
+  };
+
+  // console.log(router?.query?.photoURL);
+
+  return (
+    <>
+      <div className='w-full h-full bg-[#ffffffff] fixed inset-x-0 md:relative flex flex-col justify-between'>
+        <div
+          className='flex absolute bg-white bg-opacity-50 w-full py-1 backdrop-blur-md justify-between max-h-12
+         items-center z-20'>
+          <div className=''>
+            <button
+              aria-label='back-btn'
+              className='text-blue-500 md:hidden'
+              onClick={routeToChats}>
+              <ChevronLeftIcon width={40} height={50} />
+            </button>
+            <div className='flex w-16 items-center mx-2'>
+              {!showStatus ? (
+                <p className='w-fit px-1 h-auto py-05 rounded-sm text-base text-gray-900 text-center'>
+                  ~
+                </p>
+              ) : recStatus?.online && showStatus ? (
+                <p className='text-center bg-[#5ac8faff] w-fit px-1 py-0.5 text-sm md:text-base text-[#f5f5f5]'>
+                  online
+                </p>
+              ) : (
+                <p className='w-fit text-center px-1 rounded-md py-0.5 bg-[#5ac8faff] text-gray-900 text-sm'>
+                  <ReactTimeAgo
+                    date={lastSeen}
+                    timeStyle='twitter-minute-now'
+                  />
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className='flex flex-col text-center justify-center'>
+            <p className=' text-base text-[#000000da]'>
+              {router.query.name && router.query.name}
+            </p>
+            <p className='text-[12px] text-[#3c3c4399] md:text-sm'>
+              {router.query.name && router.query.userName}
+            </p>
+          </div>
+
+          <div>
+            <Avatar
+              className='w-9 h-9 rounded-full mx-3'
+              // src={router?.query?.photoURL?.toString()}
+            />
+          </div>
+        </div>
+
+        <div className='overflow-y-auto scroll-smooth flex flex-col px-2 md:flex-6 h-full pt-16'>
+          {!!messages &&
+            messages?.docs.map((message: DocumentData) => (
+              <Message
+                key={message.id}
+                content={message.data()}
+                docUploadProgress={docUploadProgress}
+              />
+            ))}
+          <div ref={keepBottomRef} />
+        </div>
+
+        <div className='divider border-neutral-200' />
+
+        <InputArea />
+      </div>
+    </>
+  );
+};
+
+export const InputArea = ({
+  messagesRef,
+  user,
+  setDocUploadProgress,
+  chatId,
+  userData,
+}: any) => {
+  const {
+    isOpen: pickerIsOpen,
+    onOpen: pickerOnOpen,
+    onClose: pickerOnClose,
+  } = useDisclosure();
+  const {
+    isOpen: stickerIsOpen,
+    onOpen: stickerOnOpen,
+    onClose: stickerOnClose,
+  } = useDisclosure();
+
+  const [newMessage, setNewMessage] = useState<string>("");
+
   const sendMessage = () => {
     if (!(newMessage.length === 0)) {
       addDoc(messagesRef, {
@@ -117,295 +186,128 @@ const Chats: NextPage = ({ showStatus, userData }: any) => {
     }
   };
 
-  const routeToChats = () => {
-    router.push("/");
-  };
-
   return (
-    <>
-      <Flex
-        flexDirection='column'
+    <Flex
+      w='full'
+      borderRadius={20}
+      borderWidth='1px'
+      bgColor='#ffffffff'
+      borderColor='#74748014'
+      mr='3'
+      position='relative'
+      align='center'
+      h='fit-content'>
+      {stickerIsOpen ? (
+        <Box
+          alignSelf='center'
+          my='1'
+          mx='1.5'
+          rounded='full'
+          aria-label='send'
+          color='#007affff'
+          fontSize='1.1em'>
+          <StickerIcon />
+        </Box>
+      ) : (
+        <IconButton
+          alignSelf='end'
+          my='1'
+          mx='1.5'
+          isRound
+          aria-label='send'
+          color='#007affff'
+          fontSize='1.1em'
+          size='xs'
+          icon={<StickerIcon />}
+          onClick={stickerOnOpen}
+        />
+      )}
+      <Textarea
+        as={ReactTextareaAutosize}
         w='full'
+        maxRows={7}
+        placeholder='Message'
+        _placeholder={{
+          fontSize: 20,
+          h: "full",
+        }}
+        variant='unstyled'
+        size='sm'
+        rows={1}
+        resize='none'
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: "4px",
+            backgroundColor: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            borderRadius: "4px",
+            backgroundColor: "transparent",
+          },
+        }}
+        p='1.5'
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        fontSize='100%'
         h='full'
-        bgColor='#ffffffff'
-        justify='space-between'
-        position={["fixed", "fixed", "unset"]}
-        // key={router.query.chatId?.toString()}
-      >
-        <Flex
-          pos='absolute'
-          w='full'
-          py='1'
-          maxH='10'
-          bgColor='whiteAlpha.500'
-          backdropFilter='auto'
-          backdropBlur='md'
-          justify='space-between'
-          align='center'
-          zIndex={1000}>
-          <Flex mr='-14'>
-            <IconButton
-              display={["block", "block", "none"]}
-              aria-label='back-btn'
-              size='md'
-              icon={<ChevronLeftIcon width={40} height={50} />}
-              mr='-4'
-              // mb="2"
-              onClick={routeToChats}
-              _hover={{ bgColor: "transparent" }}
-              _active={{ bgColor: "transparent" }}
-              bgColor='transparent'
-              color='blue.500'
-              variant='ghost'
-              // alignSelf="center"
-            />
-            <Flex
-              alignSelf='center'
-              w='60px'
-              fontWeight={600}
-              mx='2'
-              justifyContent='start'
-              align='center'>
-              {!showStatus ? (
-                <Text
-                  textAlign='center'
-                  w='fit-content'
-                  color='whiteAlpha.900'
-                  bgColor='#5ac8faff'
-                  px='1'
-                  h='auto'
-                  py='0.5'
-                  borderRadius={9}
-                  fontSize={10}
-                  opacity={0.15}>
-                  ~
-                </Text>
-              ) : recStatus?.online && showStatus ? (
-                <Text
-                  textAlign='center'
-                  bgColor='#5ac8faff'
-                  rounded={10}
-                  w='fit-content'
-                  px='1'
-                  py={0.5}
-                  fontSize={["12", "12", "15"]}
-                  color='#f5f5f5'>
-                  online
-                </Text>
-              ) : (
-                <Text
-                  textAlign='center'
-                  w='fit-content'
-                  color='whiteAlpha.900'
-                  bgColor='#5ac8faff'
-                  px='1'
-                  h='auto'
-                  py='0.5'
-                  borderRadius={9}
-                  fontSize={13}>
-                  <ReactTimeAgo
-                    date={lastSeen}
-                    timeStyle='twitter-minute-now'
-                  />
-                </Text>
-                // <TimeAgo datetime={lastSeen} />
-              )}
-            </Flex>
-          </Flex>
+      />
 
-          <Box display='flex' flexDir='column' justifyContent='center'>
-            <Text
-              mx='auto'
-              fontWeight={700}
-              fontSize={[15, 15, 16]}
-              lineHeight='1.2'
-              color='#000000da'>
-              {router.query.name && router.query.name}
-            </Text>
-            <Text
-              mx='auto'
-              fontWeight={600}
-              fontSize={[12, 12, 14]}
-              lineHeight='1'
-              color='#3c3c4399'>
-              {router.query.name && router.query.userName}
-            </Text>
-          </Box>
-          <Box>
-            {!!router.query.photoURL && router.query.photoURL !== "null" ? (
-              <Box
-                borderRadius='50%'
-                h='35px'
-                w='35px'
-                overflow='hidden'
-                border='1px solid #3c3c432d'
-                mx='2'>
-                <Image
-                  alt='recProfile'
-                  referrerPolicy='no-referrer'
-                  loader={() => `${router.query.photoURL}?w=${60}&q=${75}`}
-                  src={router.query.photoURL.toString()}
-                  width='100%'
-                  height='100%'
-                />
-              </Box>
-            ) : (
-              <Avatar size='sm' mx='2' />
-            )}
-          </Box>
-        </Flex>
-        {/* <Divider/> */}
-        <Flex
-          sx={{
-            "&::-webkit-scrollbar": {
-              width: "4px",
-              backgroundColor: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              borderRadius: "4px",
-              backgroundColor: "transparent",
-            },
-          }}
-          scrollBehavior='smooth'
-          flexDirection='column'
-          overflowX='auto'
-          px={["3", "4", "6"]}
-          h='full'
-          pt='14'>
-          {!!messages &&
-            messages?.docs.map((message: DocumentData) => (
-              <Message
-                key={message.id}
-                content={message.data()}
-                docUploadProgress={docUploadProgress}
-              />
-            ))}
-          <div ref={keepBottomRef} />
-        </Flex>
-
-        {/* {webCam &&  />} */}
-        <Divider />
-        <Flex py='1' align='center' bgColor='#f2f2f7ff'>
-          <PickerInterface
-            isOpen={pickerIsOpen}
-            onOpen={pickerOnOpen}
-            onClose={pickerOnClose}
-            // chatId={chatId}
-            colRef={messagesRef}
-            user={user}
-            setProgress={setDocUploadProgress}
-          />
-          <WebCamComp
+      {newMessage.length > 0 ? (
+        <IconButton
+          isRound
+          alignSelf='end'
+          aria-label='send'
+          bgColor='#007affff'
+          fontSize='1.2em'
+          size='xs'
+          icon={<ArrowUpIcon width={20} color='white' />}
+          onClick={sendMessage}
+          m='1'
+        />
+      ) : (
+        <IconButton
+          alignSelf='end'
+          isRound
+          aria-label='send'
+          bgColor='#74748014'
+          fontSize='1.2em'
+          size='xs'
+          // icon={<MicrophoneIcon width={25} color="#007affff" />}
+          icon={<MicWaveIcon color='#007affff' />}
+          // onClick={sendMessage}
+          m='1'
+        />
+      )}
+      <div className='flex py-1 items-center bg-[#f2f2f7ff]'>
+        <PickerInterface
+          isOpen={pickerIsOpen}
+          onOpen={pickerOnOpen}
+          onClose={pickerOnClose}
+          // chatId={chatId}
+          colRef={messagesRef}
+          user={user}
+          setProgress={setDocUploadProgress}
+        />
+        {/* <WebCamComp
             colRef={messagesRef}
             user={user}
             top={9}
             direction={["column", "column", "column", "column"]}
-          />
-          <Flex
-            w='full'
-            borderRadius={20}
-            borderWidth='1px'
-            bgColor='#ffffffff'
-            borderColor='#74748014'
-            mr='3'
-            position='relative'
-            align='center'
-            h='fit-content'>
-            {stickerIsOpen ? (
-              <Box
-                alignSelf='center'
-                my='1'
-                mx='1.5'
-                rounded='full'
-                aria-label='send'
-                color='#007affff'
-                fontSize='1.1em'>
-                <StickerIcon />
-              </Box>
-            ) : (
-              <IconButton
-                alignSelf='end'
-                my='1'
-                mx='1.5'
-                isRound
-                aria-label='send'
-                color='#007affff'
-                fontSize='1.1em'
-                size='xs'
-                icon={<StickerIcon />}
-                onClick={stickerOnOpen}
-              />
-            )}
-            <Textarea
-              as={ReactTextareaAutosize}
-              w='full'
-              maxRows={7}
-              placeholder='Message'
-              _placeholder={{
-                fontSize: 20,
-                h: "full",
-              }}
-              variant='unstyled'
-              size='sm'
-              rows={1}
-              resize='none'
-              sx={{
-                "&::-webkit-scrollbar": {
-                  width: "4px",
-                  backgroundColor: "transparent",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  borderRadius: "4px",
-                  backgroundColor: "transparent",
-                },
-              }}
-              p='1.5'
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              fontSize='100%'
-              h='full'
-            />
-
-            {newMessage.length > 0 ? (
-              <IconButton
-                isRound
-                alignSelf='end'
-                aria-label='send'
-                bgColor='#007affff'
-                fontSize='1.2em'
-                size='xs'
-                icon={<ArrowUpIcon width={20} color='white' />}
-                onClick={sendMessage}
-                m='1'
-              />
-            ) : (
-              <IconButton
-                alignSelf='end'
-                isRound
-                aria-label='send'
-                bgColor='#74748014'
-                fontSize='1.2em'
-                size='xs'
-                // icon={<MicrophoneIcon width={25} color="#007affff" />}
-                icon={<MicWaveIcon color='#007affff' />}
-                // onClick={sendMessage}
-                m='1'
-              />
-            )}
-          </Flex>
-        </Flex>
-        {stickerIsOpen && (
-          // <SlideFade in={stickerIsOpen}>
-          <StickerComp
-            onClose={stickerOnClose}
-            chatId={chatId}
-            userData={userData}
-            // stickerOnClose={stickerOnClose}
-          />
-          // </SlideFade>
-        )}
-      </Flex>
-    </>
+          /> */}
+      </div>
+      {stickerIsOpen && (
+        // <SlideFade in={stickerIsOpen}>
+        <StickerComp
+          onClose={stickerOnClose}
+          chatId={chatId}
+          userData={userData}
+          // stickerOnClose={stickerOnClose}
+        />
+        // </SlideFade>
+      )}
+      {/* {webCam &&  />} */}
+    </Flex>
   );
 };
-export default Chats;
+
+export default ChatPage;

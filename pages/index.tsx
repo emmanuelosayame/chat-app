@@ -1,26 +1,10 @@
-import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
-import { CogIcon } from "@heroicons/react/outline";
-import { NextPage } from "next";
-import { auth } from "../firebase";
-
-const Home: NextPage = ({ userData }: any) => {
-  // console.log(userData)
+const Home = ({ userData }: any) => {
   return (
-    <Box
-      bgColor='whiteAlpha.500'
-      backdropFilter='auto'
-      backdropBlur='md'
-      w='full'
-      h='full'>
-      <Flex h='8' justify='space-between'>
-        <Text>...</Text>
-      </Flex>
-      <Flex w='full' align='center' h='full'>
-        <Text fontSize={35} fontWeight={600} mx='auto'>
-          😃 such empty 😃!
-        </Text>
-      </Flex>
-    </Box>
+    <div className='w-full h-screen bg-white bg-opacity-50 backdrop-blur-md'>
+      <div className='flex items-center w-full h-full'>
+        <p className='text-2xl font-semibold mx-auto'>😃 such empty 😃!</p>
+      </div>
+    </div>
   );
 };
 

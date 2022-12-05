@@ -28,7 +28,7 @@ import FileResizer from "react-image-file-resizer";
 import { auth, db, storage } from "../firebase";
 import { useLiveQuery } from "dexie-react-hooks";
 import { odb } from "./OfflineDB";
-import { StarIcon } from "@heroicons/react/solid";
+import { StarIcon } from "@heroicons/react/24/solid";
 
 const StickerComp = ({
   onClose,
@@ -183,76 +183,71 @@ const StickerComp = ({
   return (
     <>
       <Flex
-        flexDirection="column"
-        position="relative"
+        flexDirection='column'
+        position='relative'
         ref={ref}
-        w="full"
-        minH="250px"
+        w='full'
+        minH='250px'
         // py="1"
         // px="2"
-        bgColor="#f2f2f7ff"
-      >
+        bgColor='#f2f2f7ff'>
         <Box
           overflowY={uploadPage ? "unset" : "auto"}
-          w="full"
-          h="full"
-          bgColor="#ffffff"
-          rounded="md"
-          px="2"
-          py="2"
-        >
+          w='full'
+          h='full'
+          bgColor='#ffffff'
+          rounded='md'
+          px='2'
+          py='2'>
           {uploadPage ? (
             <>
-              <Flex justify="space-between">
+              <Flex justify='space-between'>
                 <Button
-                  aria-label="cancel"
+                  aria-label='cancel'
                   // variant="ghost"
-                  rounded="lg"
-                  size="xs"
+                  rounded='lg'
+                  size='xs'
                   fontSize={15}
-                  color="#8e8e93ff"
+                  color='#8e8e93ff'
                   onClick={() => {
                     setUploadPage.off();
                     setStickerFile(null);
                     preview && URL.revokeObjectURL(preview);
-                  }}
-                >
+                  }}>
                   Cancel
                 </Button>
                 <Button
-                  aria-label="cancel"
-                  rounded="lg"
-                  size="xs"
+                  aria-label='cancel'
+                  rounded='lg'
+                  size='xs'
                   fontSize={15}
                   isDisabled={
                     selectSticker?.value && stickerFile ? false : true
                   }
-                  onClick={uploadSticker}
-                >
+                  onClick={uploadSticker}>
                   Upload
                 </Button>
               </Flex>
 
-              <Flex justify="space-between" align="center" h="full" mx="auto">
+              <Flex justify='space-between' align='center' h='full' mx='auto'>
                 {!selectSticker?.state ? (
                   <Button
-                    size="md"
+                    size='md'
                     onClick={() =>
                       setSelectSticker({ state: true, value: null })
                     }
-                    mx="auto"
-                    rounded="2xl"
-                    color="#3c3c4399"
-                  >
+                    mx='auto'
+                    rounded='2xl'
+                    color='#3c3c4399'>
                     {selectSticker?.value || "tag"}
                   </Button>
                 ) : (
                   <Flex
-                    flexDirection="column"
-                    maxH="200px"
-                    overflowY="auto"
-                    mb="10"
-                    mx="auto"
+                    flexDirection='column'
+                    maxH='200px'
+                    overflowY='auto'
+                    mb='10'
+                    mx='auto'
                     sx={{
                       "&::-webkit-scrollbar": {
                         width: "4px",
@@ -262,86 +257,77 @@ const StickerComp = ({
                         borderRadius: "4px",
                         backgroundColor: "transparent",
                       },
-                    }}
-                  >
+                    }}>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Comrade" })
-                      }
-                    >
+                      }>
                       Comrade
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Pawpaw" })
-                      }
-                    >
+                      }>
                       Pawpaw
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Akii" })
-                      }
-                    >
+                      }>
                       Akii
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Funny" })
-                      }
-                    >
+                      }>
                       Funny
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Happy" })
-                      }
-                    >
+                      }>
                       Happy
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Sad" })
-                      }
-                    >
+                      }>
                       Sad
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Random" })
-                      }
-                    >
+                      }>
                       Random
                     </Button>
                     <Button
-                      p="2"
-                      size="xs"
-                      variant="ghost"
+                      p='2'
+                      size='xs'
+                      variant='ghost'
                       onClick={() =>
                         setSelectSticker({ state: false, value: "Others" })
-                      }
-                    >
+                      }>
                       Others
                     </Button>
                   </Flex>
@@ -349,21 +335,21 @@ const StickerComp = ({
                 {stickerFile && preview ? (
                   <Flex
                     borderRadius={15}
-                    w="100px"
-                    h="100px"
-                    overflow="hidden"
-                    border="1px solid #3c3c432d"
-                    mx="auto"
-                    align="center"
-                    justify="center"
-                  >
+                    w='100px'
+                    h='100px'
+                    overflow='hidden'
+                    border='1px solid #3c3c432d'
+                    mx='auto'
+                    align='center'
+                    justify='center'>
                     <Image
-                      alt="sticker"
-                      referrerPolicy="no-referrer"
+                      alt='sticker'
+                      referrerPolicy='no-referrer'
                       loader={() => `${preview}?w=${60}&q=${75}`}
                       src={preview}
-                      width="100%"
-                      height="100%"
+                      className='w-full h-full'
+                      width={100}
+                      height={100}
                     />
                   </Flex>
                 ) : (
@@ -372,29 +358,27 @@ const StickerComp = ({
                       ref={uploadRef}
                       hidden
                       multiple={false}
-                      type="file"
-                      accept="image/*"
+                      type='file'
+                      accept='image/*'
                       onChange={pickSticker}
                     />
                     <Button
-                      size="xs"
-                      mx="auto"
-                      variant="link"
-                      onClick={() => uploadRef.current?.click()}
-                    >
+                      size='xs'
+                      mx='auto'
+                      variant='link'
+                      onClick={() => uploadRef.current?.click()}>
                       Select Sticker
                     </Button>
                   </>
                 )}
               </Flex>
               <Box
-                position="absolute"
+                position='absolute'
                 bottom={0}
-                w="full"
+                w='full'
                 fontSize={13}
-                color="#3c3c4399"
-                textAlign="center"
-              >
+                color='#3c3c4399'
+                textAlign='center'>
                 <Text lineHeight={0.6}>
                   stickers uploaded would be available to the public
                 </Text>
@@ -403,108 +387,102 @@ const StickerComp = ({
             </>
           ) : storePage ? (
             <>
-              <Flex justify="space-between">
+              <Flex justify='space-between'>
                 <Button
-                  aria-label="cancel"
-                  rounded="lg"
-                  size="xs"
+                  aria-label='cancel'
+                  rounded='lg'
+                  size='xs'
                   fontSize={15}
-                  onClick={setStorePage.off}
-                >
+                  onClick={setStorePage.off}>
                   Cancel
                 </Button>
                 <Button
-                  aria-label="cancel"
-                  rounded="lg"
-                  size="xs"
+                  aria-label='cancel'
+                  rounded='lg'
+                  size='xs'
                   fontSize={15}
                   onClick={() => {
                     setStorePage.off();
-                  }}
-                >
+                  }}>
                   Done
                 </Button>
               </Flex>
 
               <Grid
-                w="full"
-                h="fit-content"
-                gridTemplateColumns="repeat(auto-fill,minmax(80px,1fr))"
+                w='full'
+                h='fit-content'
+                gridTemplateColumns='repeat(auto-fill,minmax(80px,1fr))'
                 rowGap={3}
                 columnGap={2}
-                gridAutoRows="80px"
-                mt={3}
-              >
+                gridAutoRows='80px'
+                mt={3}>
                 {stickersStore &&
                   stickersStore?.map((sticker: DocumentData) => (
                     <GridItem
                       rounded={["10", "10", "13"]}
-                      overflow="hidden"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      bgColor="#000000ff"
+                      overflow='hidden'
+                      display='flex'
+                      justifyContent='center'
+                      alignItems='center'
+                      bgColor='#000000ff'
                       key={sticker.id}
-                      position="relative"
+                      position='relative'
                       cursor={alreadyAdded(sticker.id) ? "unset" : "pointer"}
-                      filter="auto"
+                      filter='auto'
                       blur={alreadyAdded(sticker.id) ? "0.04rem" : "unset"}
                       brightness={alreadyAdded(sticker.id) ? "40%" : "unset"}
-                      role="group"
+                      role='group'
                       onClick={() =>
                         addSticker(
                           sticker.id,
                           sticker.data().tag,
                           sticker.data().stickerURL
                         )
-                      }
-                    >
+                      }>
                       {sticker.data().stickerURL && (
                         <Image
-                          alt="sticker"
-                          referrerPolicy="no-referrer"
+                          alt='sticker'
+                          referrerPolicy='no-referrer'
                           loader={() =>
                             `${sticker.data().stickerURL}?w=${60}&q=${75}`
                           }
                           src={sticker.data().stickerURL}
-                          width="100%"
-                          height="100%"
+                          className='w-full h-full'
+                          width={100}
+                          height={100}
                         />
                       )}
 
                       <Flex
-                        display="none"
-                        position="absolute"
-                        align="center"
-                        w="full"
-                        h="full"
-                        bgColor="#00000090"
-                        _groupHover={{ display: "flex" }}
-                      >
+                        display='none'
+                        position='absolute'
+                        align='center'
+                        w='full'
+                        h='full'
+                        bgColor='#00000090'
+                        _groupHover={{ display: "flex" }}>
                         {alreadyAdded(sticker.id) ? (
                           <Text
                             opacity={0.8}
                             fontSize={15}
-                            color="white"
-                            mx="auto"
-                          >
+                            color='white'
+                            mx='auto'>
                             Added
                           </Text>
                         ) : (
                           <Text
                             opacity={0.2}
                             fontSize={15}
-                            color="white"
-                            mx="auto"
-                          >
+                            color='white'
+                            mx='auto'>
                             Add sticker
                           </Text>
                         )}
                       </Flex>
 
                       {sticker.data()?.star && (
-                        <Box position="absolute" right={1} top={1}>
-                          <StarIcon width={15} color="#ffcc00b2" />
+                        <Box position='absolute' right={1} top={1}>
+                          <StarIcon width={15} color='#ffcc00b2' />
                         </Box>
                       )}
                     </GridItem>
@@ -513,59 +491,57 @@ const StickerComp = ({
             </>
           ) : (
             <>
-              <Text fontSize="15" fontWeight={500} m="1" color="#3c3c43b0">
+              <Text fontSize='15' fontWeight={500} m='1' color='#3c3c43b0'>
                 My Stickers
               </Text>
               <Grid
-                w="full"
-                h="fit-content"
-                gridTemplateColumns="repeat(auto-fill,minmax(80px,1fr))"
+                w='full'
+                h='fit-content'
+                gridTemplateColumns='repeat(auto-fill,minmax(80px,1fr))'
                 rowGap={3}
                 columnGap={2}
-                gridAutoRows="80px"
-              >
+                gridAutoRows='80px'>
                 {myStickers &&
                   myStickers?.map((sticker) => (
                     <GridItem
-                      rounded="17"
-                      overflow="hidden"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      bgColor="#000000ff"
+                      rounded='17'
+                      overflow='hidden'
+                      display='flex'
+                      justifyContent='center'
+                      alignItems='center'
+                      bgColor='#000000ff'
                       key={sticker.id}
-                      cursor="pointer"
+                      cursor='pointer'
                       onClick={() =>
                         sendSticker(sticker.id, sticker.stickerURL)
-                      }
-                    >
+                      }>
                       <Image
-                        alt="sticker"
-                        referrerPolicy="no-referrer"
+                        alt='sticker'
+                        referrerPolicy='no-referrer'
                         loader={() => `${sticker.stickerURL}?w=${60}&q=${75}`}
                         src={sticker.stickerURL}
-                        width="100%"
-                        height="100%"
+                        className='w-full h-full'
+                        width={100}
+                        height={100}
                       />
                     </GridItem>
                   ))}
               </Grid>
 
-              <Box position="absolute" bottom={0} w="full">
-                <Text mx="auto" w="fit-content" fontSize={12} color="#3c3c434c">
+              <Box position='absolute' bottom={0} w='full'>
+                <Text mx='auto' w='fit-content' fontSize={12} color='#3c3c434c'>
                   unless cache and browser data is cleared, stickers remain
                   offline.
                 </Text>
-                <Box mx="auto" w="fit-content">
-                  <Button size="xs" variant="link" onClick={setUploadPage.on}>
+                <Box mx='auto' w='fit-content'>
+                  <Button size='xs' variant='link' onClick={setUploadPage.on}>
                     Upload
                   </Button>
                   <Button
-                    size="xs"
-                    mx="1"
-                    variant="ghost"
-                    onClick={setStorePage.on}
-                  >
+                    size='xs'
+                    mx='1'
+                    variant='ghost'
+                    onClick={setStorePage.on}>
                     Store
                   </Button>
                 </Box>

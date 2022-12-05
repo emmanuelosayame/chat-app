@@ -4,21 +4,28 @@ import { ChakraProvider, Flex } from "@chakra-ui/react";
 import { auth, db, rdb } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "../components/Login";
-import { SpinnerDotted } from "spinners-react";
 import App from "../components/App";
 import { useEffect, useState } from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import theme from "../theme";
 import Head from "next/head";
-// import { useRouter } from "next/router";
+import { Loading } from "../components/Loading";
+import font from "@next/font/local";
+
+const poppins = font({
+  src: [
+    {
+      path: "../public/fonts/Poppins-Regular.ttf",
+      style: "normal",
+      weight: "500",
+    },
+  ],
+  variable: "--font-poppins",
+});
 
 function MyApp({ Component, pageProps, router }: AppProps) {
   const [user, loading] = useAuthState(auth);
-
-  // user?.getIdTokenResult().then((t) => console.log(t.claims.admin));
-
-  // console.log(auth.currentUser);
 
   useEffect(() => {
     TimeAgo.addDefaultLocale(en);
@@ -38,31 +45,18 @@ function MyApp({ Component, pageProps, router }: AppProps) {
       </Head>
 
       <ChakraProvider theme={theme}>
-        {!user ? (
-          <Login />
-        ) : (
-          <App router={router} Component={Component} pageProps={pageProps} />
-        )}
+        <main className={` ${poppins.variable} font-poppins`}>
+          {!user ? (
+            <Login />
+          ) : (
+            <App>
+              <Component {...pageProps} />
+            </App>
+          )}
+        </main>
       </ChakraProvider>
     </>
   );
 }
 
 export default MyApp;
-
-export const Loading = () => {
-  return (
-    <Flex
-      position='fixed'
-      top={0}
-      right={0}
-      left={0}
-      bottom={0}
-      h='100vh'
-      w='100vw'
-      align='center'
-      justify='center'>
-      <SpinnerDotted color='#007affff' />
-    </Flex>
-  );
-};

@@ -1,4 +1,3 @@
-import { Box, Button, Flex, Stack, Text, useToast } from "@chakra-ui/react";
 import { NextPage } from "next";
 import {
   signInWithPopup,
@@ -16,13 +15,10 @@ import { GoogleLogoIcon } from "./Svgs";
 
 const Login: NextPage = () => {
   const router = useRouter();
-  useEffect(() => {
-    router.push("/");
-  }, []);
+  // useEffect(() => {
+  //   router.push("/");
+  // }, []);
 
-  // const [token,setToken] = useState<string | undefined>("")
-  // const toast = useToast();
-  // const [signedUser, setSignedUser] = useState<any | null>(null);
   const provider = new GoogleAuthProvider();
 
   const signIn = (e: React.MouseEvent<HTMLElement>) => {
@@ -130,46 +126,25 @@ const Login: NextPage = () => {
 
   return (
     <>
-      <Flex
-        alignItems='center'
-        h='100vh'
-        position='fixed'
-        right='0'
-        left='0'
-        top='0'
-        bottom='0'
-        justify='center'
-        bgColor='#f2f2f7ff'>
-        <Stack>
-          <Button
-            size='lg'
-            py={8}
-            fontSize={21}
-            bgColor='blue.400'
-            boxShadow='lg'
-            color='white'
-            rounded='2xl'
-            _active={{ bgColor: "transparent" }}
+      <div className='flex items-center fixed inset-0 h-full justify-center bg-[#f2f2f7ff]'>
+        <div className='flex flex-col space-y-3'>
+          <button
+            className='px-5 py-3 text-2xl inline-flex items-center text-white rounded-3xl bg-blue-300
+            hover:bg-blue-200 drop-shadow-md
+             active:blue-300'
             onClick={signIn}>
-            <GoogleLogoIcon boxSize={10} />
-            <Text mx={2}>Login</Text>
-          </Button>
+            <GoogleLogoIcon className='w-12 h-12' />
+            <p className='mx-2'>Login</p>
+          </button>
 
-          <Button
-            size='md'
-            py={4}
-            fontSize={23}
-            bgColor='gray'
-            boxShadow='lg'
-            color='white'
-            rounded='2xl'
-            _active={{ bgColor: "transparent" }}
+          <button
+            className='py-3 px-8 bg-gray-500 hover:bg-gray-600 drop-shadow-md rounded-2xl text-white text-xl'
             onClick={signInAnm}>
             {/* <GoogleLogoIcon boxSize={10} /> */}
-            <Text mx={2}>Guest</Text>
-          </Button>
-        </Stack>
-      </Flex>
+            <p className='mx-2'>Guest</p>
+          </button>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { Flex, IconButton, Textarea, useDisclosure } from "@chakra-ui/react";
-import { ArrowUpIcon } from "@heroicons/react/outline";
-import { ChevronLeftIcon } from "@heroicons/react/solid";
+import { ArrowUpIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import {
   addDoc,
   collection,
@@ -21,7 +21,7 @@ const Bucket = ({ setBucket }: any) => {
   const user = auth.currentUser;
   const bucketListRef = collection(db, "Users", `${user?.uid}`, "bucket");
   const bucketListQuery = query(bucketListRef, orderBy("timeSent", "asc"));
-  const [bucketList] = useCollectionData(bucketListQuery);
+  const [bucketList] = useCollectionData<any>(bucketListQuery);
 
   const [bucketMessage, setBucketMessage] = useState<string>("");
   const [docUploadProgress, setDocUploadProgress] = useState<
@@ -42,17 +42,16 @@ const Bucket = ({ setBucket }: any) => {
 
   return (
     <Flex
-      position="relative"
-      w="full"
-      flexDirection="column"
+      position='relative'
+      w='full'
+      flexDirection='column'
       // justify="space-between"
-      h="full"
-    >
+      h='full'>
       <Flex
         // h="full"
         py={16}
-        flexDirection="column"
-        overflowY="auto"
+        flexDirection='column'
+        overflowY='auto'
         sx={{
           "&::-webkit-scrollbar": {
             width: "4px",
@@ -62,27 +61,25 @@ const Bucket = ({ setBucket }: any) => {
             borderRadius: "4px",
             backgroundColor: "transparent",
           },
-        }}
-      >
+        }}>
         <Flex
-          w="full"
-          position="absolute"
+          w='full'
+          position='absolute'
           left={0}
           top={0}
-          bgColor="#f2f2f783"
-          backdropFilter="auto"
-          backdropBlur="md"
+          bgColor='#f2f2f783'
+          backdropFilter='auto'
+          backdropBlur='md'
           zIndex={500}
-          px="2"
-          align="center"
-        >
+          px='2'
+          align='center'>
           <IconButton
-            aria-label="close-setting-page"
+            aria-label='close-setting-page'
             onClick={() => {
               setBucket(false);
             }}
-            icon={<ChevronLeftIcon color="#007affff" width={40} />}
-            variant="ghost"
+            icon={<ChevronLeftIcon color='#007affff' width={40} />}
+            variant='ghost'
           />
         </Flex>
         {bucketList?.map((list) => (
@@ -91,13 +88,12 @@ const Bucket = ({ setBucket }: any) => {
       </Flex>
 
       <Flex
-        py="1"
+        py='1'
         // position="fixed"
         bottom={0}
         right={0}
         left={0}
-        bgColor="white"
-      >
+        bgColor='white'>
         <PickerInterface
           isOpen={isOpen}
           onOpen={onOpen}
@@ -113,28 +109,27 @@ const Bucket = ({ setBucket }: any) => {
           direction={["column", "column", "column", "row"]}
         />
         <Flex
-          w="full"
+          w='full'
           borderRadius={20}
-          borderWidth="2px"
-          borderColor="#3c3c4349"
-          mr="3"
-          position="relative"
-          overflow="hidden"
-        >
+          borderWidth='2px'
+          borderColor='#3c3c4349'
+          mr='3'
+          position='relative'
+          overflow='hidden'>
           <Textarea
             as={ReactTextareaAutosize}
-            w="full"
+            w='full'
             maxRows={7}
-            placeholder="Message"
+            placeholder='Message'
             _placeholder={{
               fontSize: 20,
               pl: 2,
             }}
-            variant="unstyled"
-            bgColor="white"
-            size="sm"
+            variant='unstyled'
+            bgColor='white'
+            size='sm'
             rows={1}
-            resize="none"
+            resize='none'
             sx={{
               "&::-webkit-scrollbar": {
                 width: "4px",
@@ -145,36 +140,36 @@ const Bucket = ({ setBucket }: any) => {
                 backgroundColor: "transparent",
               },
             }}
-            p="1.5"
+            p='1.5'
             value={bucketMessage}
             onChange={(e) => setBucketMessage(e.target.value)}
-            fontSize="100%"
+            fontSize='100%'
           />
 
           {bucketMessage.length > 0 ? (
             <IconButton
               isRound
-              alignSelf="end"
-              aria-label="send"
-              bgColor="#007affff"
-              fontSize="1.2em"
-              size="xs"
-              icon={<ArrowUpIcon width={20} color="white" />}
+              alignSelf='end'
+              aria-label='send'
+              bgColor='#007affff'
+              fontSize='1.2em'
+              size='xs'
+              icon={<ArrowUpIcon width={20} color='white' />}
               onClick={handleSendMessage}
-              m="1"
+              m='1'
             />
           ) : (
             <IconButton
-              alignSelf="end"
+              alignSelf='end'
               isRound
-              aria-label="send"
-              bgColor="#78788033"
-              fontSize="1.2em"
-              size="xs"
+              aria-label='send'
+              bgColor='#78788033'
+              fontSize='1.2em'
+              size='xs'
               // icon={<MicrophoneIcon width={25} color="#007affff" />}
-              icon={<MicWaveIcon color="#007affff" />}
+              icon={<MicWaveIcon color='#007affff' />}
               // onClick={sendMessage}
-              m="1"
+              m='1'
             />
           )}
         </Flex>

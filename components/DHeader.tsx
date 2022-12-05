@@ -1,11 +1,11 @@
 import { Avatar, Box, Button, Flex, Text } from "@chakra-ui/react";
-import { BadgeCheckIcon, ChevronUpIcon } from "@heroicons/react/solid";
+import { CheckBadgeIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 
 const DHeader = ({ userData, accountOnClose, onClose, userNameSet }: any) => {
   return (
     <>
-      <Flex h='auto'>
+      <div className='h-auto'>
         {!!userData?.photoURL && userData?.photoURL !== "null" ? (
           <Box
             rounded='full'
@@ -19,9 +19,9 @@ const DHeader = ({ userData, accountOnClose, onClose, userNameSet }: any) => {
               referrerPolicy='no-referrer'
               loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
               src={userData?.photoURL}
-              width='100%'
-              height='100%'
-              layout='responsive'
+              className='w-full h-full'
+              width={100}
+              height={100}
             />
           </Box>
         ) : (
@@ -44,11 +44,11 @@ const DHeader = ({ userData, accountOnClose, onClose, userNameSet }: any) => {
               <Text opacity={0}>name</Text>
             )}
             {userData?.verified && (
-              <BadgeCheckIcon fill='#007affff' width={20} />
+              <CheckBadgeIcon fill='#007affff' width={20} />
             )}
           </Box>
         </Box>
-      </Flex>
+      </div>
 
       <Button
         display={userNameSet ? "block" : "none"}

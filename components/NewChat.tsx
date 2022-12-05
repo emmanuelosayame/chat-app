@@ -47,6 +47,7 @@ import {
 import Fuse from "fuse.js";
 import { debounce } from "lodash";
 import Image from "next/image";
+import { useStore } from "../store";
 
 const NewChatComp = ({
   newSearch,
@@ -56,10 +57,10 @@ const NewChatComp = ({
   text,
   icon,
   color,
+  onClose,
 }: any) => {
   const router = useRouter();
   const user = auth.currentUser;
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
   const usersRef = ref(rdb, `Users`);
   const [usersList, setUsersList] = useState<
@@ -79,9 +80,9 @@ const NewChatComp = ({
     (ids: { recId: string } | undefined) => ids?.recId
   );
   // console.log(noChatUsersList);
-  useEffect(() => {
-    setChatUsersList([]);
-  }, [isOpen]);
+  // useEffect(() => {
+  //   setChatUsersList([]);
+  // }, [isOpen]);
 
   const searchUser = debounce(async (e: any) => {
     const input = e.target.value.toLowerCase();
@@ -137,92 +138,74 @@ const NewChatComp = ({
     );
   };
 
+  const isOpen = useStore((state) => state.newChatModal.open);
+
   return (
     <>
-      <Button
-        aria-label="create-chat-button"
-        variant="ghost"
-        bgColor="transparent"
-        _active={{ bgColor: "transparent" }}
-        _hover={{ bgColor: "transparent" }}
-        size="sm"
-        mr={-3}
-        leftIcon={icon}
-        iconSpacing={0}
-        onClick={onOpen}
-        color={color}
-      >
-        {text}
-      </Button>
       <Modal
+        isOpen={isOpen}
         onClose={onClose}
         initialFocusRef={inputRef}
-        isOpen={isOpen}
-        scrollBehavior="inside"
-        motionPreset="slideInBottom"
-        size={["xs", "sm"]}
-      >
+        scrollBehavior='inside'
+        motionPreset='slideInBottom'
+        size={["xs", "sm"]}>
         <ModalOverlay />
         <ModalContent
           borderRadius={13}
-          boxShadow="2xl"
-          border="2px solid #74748039"
-          px="4"
-          bgColor="#f2f2f7ff"
-          w="full"
-        >
+          boxShadow='2xl'
+          border='2px solid #74748039'
+          px='4'
+          bgColor='#f2f2f7ff'
+          w='full'>
           <ModalHeader
-            textAlign="center"
-            fontSize="15"
-            color="#3c3c4399"
+            textAlign='center'
+            fontSize='15'
+            color='#3c3c4399'
             fontWeight={600}
-            p="2"
-            w="full"
-          >
+            p='2'
+            w='full'>
             Start Chat
           </ModalHeader>
           {/* <ModalCloseButton size="sm" color="blue.400" /> */}
 
-          <ModalBody p={2} w="full">
+          <ModalBody p={2} w='full'>
             <InputGroup
               onClick={() => !newSearch && setNewSearch(true)}
-              onFocus={() => setNewSearch(true)}
-            >
+              onFocus={() => setNewSearch(true)}>
               <InputLeftElement>
-              <SearchIcon mb="1" />
+                <SearchIcon mb='1' />
               </InputLeftElement>
               <Input
-                size="sm"
-                variant="filled"
-                type="text"
-                borderRadius="7"
-                placeholder="Search friends"
-                bgColor="#74748014"
+                size='sm'
+                variant='filled'
+                type='text'
+                borderRadius='7'
+                placeholder='Search friends'
+                bgColor='#74748014'
                 _placeholder={{ color: "#3c3c434c" }}
-                focusBorderColor="transparent"
+                focusBorderColor='transparent'
                 _hover={{ bgColor: "white" }}
                 _focus={{ bgColor: "#74748014" }}
                 onChange={searchUser}
-                fontSize="100%"
+                fontSize='100%'
               />
             </InputGroup>
             <Box>
-              <Flex p="2" fontWeight={600}>
-                <Avatar size="sm" mr="5" />
+              <Flex p='2' fontWeight={600}>
+                <Avatar size='sm' mr='5' />
                 New Group
-                <Text fontWeight={500} fontSize="13" ml="5" color="#ddddddcf">
+                <Text fontWeight={500} fontSize='13' ml='5' color='#ddddddcf'>
                   coming soon
                 </Text>
               </Flex>
-              <Divider mb="2" w="90%" />
+              <Divider mb='2' w='90%' />
 
               <Box
-                borderRadius="15px"
-                overflowY="auto"
-                transitionDelay="1s ease-in-out"
-              >
+                borderRadius='15px'
+                overflowY='auto'
+                transitionDelay='1s ease-in-out'>
                 {chatUsersList.length > 0 && (
-                  <Text fontSize={13} color="#3c3c434c" m="1">
+                  <Text fontSize={13} color='#3c3c434c' m='1'>
                     My Chats
                   </Text>
                 )}
@@ -248,36 +231,35 @@ const NewChatComp = ({
                         }}
                         key={user.item.recId}
                         _hover={{ bgColor: "whitesmoke" }}
-                        cursor="pointer"
+                        cursor='pointer'
                         // justify="center"
-                        h="auto"
+                        h='auto'
                         borderRadius={10}
-                        align="center"
-                      >
+                        align='center'>
                         {user.item.photoURL ? (
                           <Flex
-                            borderRadius="50%"
-                            w="40px"
-                            h="40px"
-                            overflow="hidden"
-                            mx="3"
-                          >
+                            borderRadius='50%'
+                            w='40px'
+                            h='40px'
+                            overflow='hidden'
+                            mx='3'>
                             <Image
-                              alt="recProfileImg"
-                              referrerPolicy="no-referrer"
+                              alt='recProfileImg'
+                              referrerPolicy='no-referrer'
                               loader={() =>
                                 `${user.item.photoURL}?w=${40}&q=${75}`
                               }
                               src={user.item.photoURL}
-                              width="100%"
-                              height="100%"
+                              className='w-full h-full'
+                              width={100}
+                              height={100}
                             />
                           </Flex>
                         ) : (
-                          <Avatar size="sm" mx="2" />
+                          <Avatar size='sm' mx='2' />
                         )}
                         <Box>
-                          <Text fontSize={20} fontWeight="600">
+                          <Text fontSize={20} fontWeight='600'>
                             {user.item.name}
                           </Text>
                           <Text fontSize={13}>{user.item.userName}</Text>
@@ -288,7 +270,7 @@ const NewChatComp = ({
                   ))}
 
                 {noChatUsersList && noChatUsersList.length > 0 && (
-                  <Text fontSize={13} color="#3c3c434c" m="1">
+                  <Text fontSize={13} color='#3c3c434c' m='1'>
                     All
                   </Text>
                 )}
@@ -300,31 +282,30 @@ const NewChatComp = ({
                     }}
                     key={user.uid}
                     _hover={{ bgColor: "whitesmoke" }}
-                    cursor="pointer"
+                    cursor='pointer'
                     // justify="center"
                   >
                     {user?.photoURL ? (
                       <Flex
-                        borderRadius="50%"
-                        w="40px"
-                        h="40px"
-                        overflow="hidden"
-                        mx="2"
-                      >
+                        borderRadius='50%'
+                        w='40px'
+                        h='40px'
+                        overflow='hidden'
+                        mx='2'>
                         <Image
-                          alt="recProfileImg"
-                          referrerPolicy="no-referrer"
+                          alt='recProfileImg'
+                          referrerPolicy='no-referrer'
                           loader={() => `${user?.photoURL}?w=${40}&q=${75}`}
                           src={user?.photoURL}
-                          width="100%"
-                          height="100%"
+                          className='w-full h-full'
+                          width={100}
                         />
                       </Flex>
                     ) : (
-                      <Avatar alignSelf="center" size="sm" />
+                      <Avatar alignSelf='center' size='sm' />
                     )}
                     <Box>
-                      <Text fontSize={20} fontWeight="600">
+                      <Text fontSize={20} fontWeight='600'>
                         {user.name}
                       </Text>
                       <Text fontSize={13}>{user.userName}</Text>

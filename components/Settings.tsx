@@ -14,17 +14,12 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import {
-  ArchiveIcon,
+  ArchiveBoxIcon,
   KeyIcon,
   MoonIcon,
   UserIcon,
-} from "@heroicons/react/outline";
-import {
-  BadgeCheckIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from "@heroicons/react/solid";
-
+} from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -127,7 +122,7 @@ const Settings = ({
                 borderRadius={12}
                 p='1.5'
                 border='1px solid #dfb200c3'>
-                <ArchiveIcon color='black' width={20} />
+                <ArchiveBoxIcon color='black' width={20} />
               </Box>
               My Bucket
             </Flex>
@@ -284,8 +279,9 @@ const Settings = ({
               referrerPolicy='no-referrer'
               loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
               src={userData?.photoURL}
-              width='100%'
-              height='100%'
+              className='w-full h-full'
+              width={100}
+              height={100}
             />
           </Box>
         ) : (
