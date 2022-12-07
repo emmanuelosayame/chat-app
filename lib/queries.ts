@@ -9,7 +9,7 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "./firebase";
 import { UserData } from "../types";
 
 interface ChatData {

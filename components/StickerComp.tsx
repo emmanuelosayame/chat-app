@@ -25,9 +25,8 @@ import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import FileResizer from "react-image-file-resizer";
-import { auth, db, storage } from "../firebase";
+import { auth, db, storage } from "../lib/firebase";
 import { useLiveQuery } from "dexie-react-hooks";
-import { odb } from "./OfflineDB";
 import { StarIcon } from "@heroicons/react/24/solid";
 
 const StickerComp = ({
@@ -80,10 +79,9 @@ const StickerComp = ({
     }
   };
 
-  const myStickers = useLiveQuery(() => odb.stickers.toArray());
-
+  const myStickers = undefined;
   const alreadyAdded = (ssid: string) => {
-    if (myStickers) return !!myStickers.find((msid) => msid.id === ssid);
+    if (myStickers) return false;
   };
 
   useEffect(() => {
@@ -97,15 +95,15 @@ const StickerComp = ({
 
   // console.log(stickersStore?.map((d) => d.data()));
 
-  useEffect(() => {
-    if (myStickers && myStickers?.length < 1) {
-      (async () => {
-        // const userData = await getDoc(doc(db, "Users", `${user?.uid}`));
-        if (userData?.stickers)
-          await odb.stickers.bulkAdd(userData.data()?.stickers);
-      })();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (myStickers && myStickers?.length < 1) {
+  //     (async () => {
+  //       // const userData = await getDoc(doc(db, "Users", `${user?.uid}`));
+  //       if (userData?.stickers)
+  //         await odb.stickers.bulkAdd(userData.data()?.stickers);
+  //     })();
+  //   }
+  // }, []);
 
   const uploadSticker = async () => {
     if (stickerFile && stickerFile) {
@@ -136,12 +134,12 @@ const StickerComp = ({
                 stickerURL: URL,
               }),
             });
-            await odb.stickers.add({
-              id: (await fsid).id,
-              tag: selectSticker?.value ? selectSticker?.value : "others",
-              date: new Date(),
-              stickerURL: URL,
-            });
+            // await odb.stickers.add({
+            //   id: (await fsid).id,
+            //   tag: selectSticker?.value ? selectSticker?.value : "others",
+            //   date: new Date(),
+            //   stickerURL: URL,
+            // });
           })
         )
         .catch(async () => deleteDoc(await fsid));
@@ -152,12 +150,12 @@ const StickerComp = ({
 
   const addSticker = async (id: string, tag: string, stickerURL: string) => {
     if (!alreadyAdded(id)) {
-      await odb.stickers.add({
-        id: id,
-        tag: tag,
-        date: new Date(),
-        stickerURL: stickerURL,
-      });
+      // await odb.stickers.add({
+      //   id: id,
+      //   tag: tag,
+      //   date: new Date(),
+      //   stickerURL: stickerURL,
+      // });
       updateDoc(doc(db, "Users", `${user?.uid}`), {
         stickers: arrayUnion({
           id: id,
@@ -494,7 +492,7 @@ const StickerComp = ({
               <Text fontSize='15' fontWeight={500} m='1' color='#3c3c43b0'>
                 My Stickers
               </Text>
-              <Grid
+              {/* <Grid
                 w='full'
                 h='fit-content'
                 gridTemplateColumns='repeat(auto-fill,minmax(80px,1fr))'
@@ -526,7 +524,7 @@ const StickerComp = ({
                       />
                     </GridItem>
                   ))}
-              </Grid>
+              </Grid> */}
 
               <Box position='absolute' bottom={0} w='full'>
                 <Text mx='auto' w='fit-content' fontSize={12} color='#3c3c434c'>

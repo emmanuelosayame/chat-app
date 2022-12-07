@@ -1,12 +1,8 @@
+import * as Dialog from "@radix-ui/react-dialog/dist";
 import {
-  Avatar,
   Box,
   Button,
   Divider,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerHeader,
   Flex,
   Stack,
   Switch,
@@ -15,341 +11,189 @@ import {
 } from "@chakra-ui/react";
 import {
   ArchiveBoxIcon,
+  ChevronDownIcon,
   KeyIcon,
   MoonIcon,
   UserIcon,
-} from "@heroicons/react/24/outline";
-import { ChevronRightIcon } from "@heroicons/react/24/solid";
+} from "@heroicons/react/24/solid";
+import { ChevronRightIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { ReactNode, useEffect, useState } from "react";
+import { auth } from "../lib/firebase";
+import { useStore } from "../store";
 import Bucket from "./Bucket";
-import DHeader from "./DHeader";
 import Profile from "./Profile";
+import Avatar from "./radix/Avatar";
+import { UserData } from "../types";
 
-const Settings = ({
-  userData,
-  isOpen,
-  onClose,
-  onOpen,
-  userNameSet,
-  setUserNameSet,
-}: any) => {
-  const user = auth.currentUser;
-  const router = useRouter();
-  const [bucket, setBucket] = useState<boolean>(false);
+const Settings = () => {
+  const userdata = useStore((state) => state.userdata);
+  const [isOpen, page] = useStore((state) => state.settingsModal);
+  const toggleSM = useStore((state) => state.toggleSM);
 
-  // const [profileLg, setProfileLg] = useState<boolean>(true);
-  const [profileOpen, setProfileOpen] = useState<boolean>(false);
-  const {
-    isOpen: accountIsOpen,
-    onOpen: accountOnOpen,
-    onClose: accountOnClose,
-  } = useDisclosure();
-
-  useEffect(() => {
-    if (!userNameSet) {
-      accountOnOpen();
-      setProfileOpen(true);
-    }
-  }, [userNameSet]);
-
-  const logout = () => {
-    router.push("/");
-    router.reload();
-    // terminate(db);
-    // clearIndexedDbPersistence(db);
-    auth.signOut();
-  };
-
-  const SettingsMenu = () => {
-    return (
-      <Stack mx='0' w='full'>
-        <Flex
-          borderRadius={15}
-          flexDir='column'
-          mt='5'
-          mb='3'
-          p='1'
-          bgColor='#74748014'>
-          <Button
-            onClick={() => {
-              accountOnOpen();
-              // profileIsOpen && profileOnClose();
-            }}
-            borderRadius={12}
-            justifyContent='space-between'
-            variant='ghost'
-            bgColor='transparent'
-            _active={{ bgColor: "transparent" }}
-            _hover={{ bgColor: "transparent" }}
-            mt='1'
-            px='1'
-            size='sm'
-            rightIcon={<ChevronRightIcon width={30} color='#3c3c434c' />}>
-            <Flex align='center'>
-              <Box
-                mx='3'
-                bgColor='#007bff89'
-                borderRadius={12}
-                border='1px solid #1068c545'
-                p='1.5'>
-                <KeyIcon color='black' width={20} />
-              </Box>
-              Account
-            </Flex>
-          </Button>
-          <Divider w='90%' m='1' alignSelf='end' />
-          <Button
-            onClick={() => {
-              setBucket(true);
-            }}
-            borderRadius={12}
-            justifyContent='space-between'
-            variant='ghost'
-            bgColor='transparent'
-            _active={{ bgColor: "transparent" }}
-            _hover={{ bgColor: "transparent" }}
-            mb='1'
-            px='1'
-            size='sm'
-            rightIcon={<ChevronRightIcon width={30} color='#3c3c434c' />}>
-            <Flex align='center'>
-              <Box
-                mx='3'
-                bgColor='#ffcc00ea'
-                borderRadius={12}
-                p='1.5'
-                border='1px solid #dfb200c3'>
-                <ArchiveBoxIcon color='black' width={20} />
-              </Box>
-              My Bucket
-            </Flex>
-          </Button>
-        </Flex>
-
-        <Flex
-          justifyContent='space-between'
-          borderRadius={10}
-          bgColor='#74748014'
-          p='1.5'>
-          <Flex px='1'>
-            <Flex fontWeight={600} align='center'>
-              <Box mx='2' bgColor='#c6c6c8ff' borderRadius={12} p='1.5'>
-                <MoonIcon color='black' fill='black' width={20} />
-              </Box>
-              Dark Mode
-            </Flex>
-          </Flex>
-          <Switch isDisabled alignSelf='center' size='lg' />
-        </Flex>
-        <Text textAlign='center' fontSize={16} color='#3c3c4399'>
-          coming soon
-        </Text>
-      </Stack>
-    );
-  };
-
-  const Account = () => {
-    return (
-      <Flex
-        flexDirection='column'
-        align='center'
-        bgColor='whitesmoke'
-        // my='5'
-        py={2}
-        borderRadius={10}
-        display={profileOpen ? ["none", "none", "none", "flex"] : "flex"}
-        w={["full", "full", "full", "40%", "35%"]}>
-        <Button
-          aria-label='close-setting-page'
-          display={userNameSet ? "block" : "none"}
-          variant='ghost'
-          bgColor='transparent'
-          _active={{ bgColor: "transparent" }}
-          _hover={{ bgColor: "transparent" }}
-          onClick={accountOnClose}
-          alignSelf='start'
-          m='2'
-          size='sm'
-          color='blue.300'
-          borderRadius='15px'>
-          Back
-        </Button>
-        <Stack w='full' px='8'>
-          <Button
-            display={["flex", "flex", "flex", "none"]}
-            w='full'
-            my='5'
-            bgColor='white'
-            p='2'
-            borderRadius={12}
-            onClick={() => setProfileOpen(true)}
-            justifyContent='space-between'
-            rightIcon={<ChevronRightIcon width={30} color='#3c3c434c' />}>
-            <Flex align='center' fontSize={[14, 15, 17]}>
-              <Box mx='2' bgColor='#007bff89' borderRadius={15} p='1.5'>
-                <UserIcon fill='black' width={20} />
-              </Box>
-              Edit Profile
-            </Flex>
-          </Button>
-
-          <Flex
-            display={["none", "none", "none", "flex"]}
-            w='full'
-            my='5'
-            bgColor='#ececece6'
-            py='1.5'
-            px='3'
-            borderRadius={12}
-            justifyContent='space-between'>
-            <Flex align='center' fontWeight={600}>
-              <Box mx='2' bgColor='#007bff89' borderRadius={15} p='1.5'>
-                <UserIcon fill='black' width={20} />
-              </Box>
-              Edit Profile
-            </Flex>
-          </Flex>
-        </Stack>
-        <Box px='8' h='full' w='full'>
-          <Flex
-            fontWeight={600}
-            fontSize={[14, 15, 17]}
-            p='2'
-            bgColor='white'
-            borderRadius={10}
-            my='2'>
-            <Text mx='2'>Email:</Text>
-            <Text>{user?.email}</Text>
-          </Flex>
-          <Text fontSize={12} textAlign='center' color='#3c3c434c'>
-            your email is private and not visible to other users
-          </Text>
-          <Flex
-            align='center'
-            fontWeight={600}
-            p='2'
-            bgColor='white'
-            borderRadius={10}
-            my='2'
-            fontSize={[14, 15, 17]}>
-            <Text mx='2'>Last SignedIn:</Text>
-            <Text>{user?.metadata.lastSignInTime}</Text>
-          </Flex>
-        </Box>
-        <Button
-          borderRadius='15px'
-          bgColor='white'
-          color='#007affff'
-          fontSize={18}
-          p='2'
-          m='3'
-          mx='auto'
-          size='sm'
-          onClick={logout}>
-          Logout
-        </Button>
-      </Flex>
-    );
+  const renderPage: { [key: string]: ReactNode } = {
+    account: <Account userdata={userdata} toggleSM={toggleSM} />,
+    home: <Home userdata={userdata} toggleSM={toggleSM} />,
+    profile: <Profile userdata={userdata} toggleSM={toggleSM} />,
   };
 
   return (
     <>
-      <Button
-        variant='ghost'
-        bgColor='transparent'
-        _active={{ bgColor: "transparent" }}
-        _hover={{ bgColor: "transparent" }}
-        p={1}
-        m={1}
-        rounded='full'
-        onClick={onOpen}>
-        {userData?.photoURL && userData?.photoURL !== "null" ? (
-          <Box
-            borderRadius='50%'
-            w='38px'
-            h='38px'
-            overflow='hidden'
-            border='1px solid #7a7a811f'
-            mx='1'>
-            <Image
-              alt='userProfileImg'
-              referrerPolicy='no-referrer'
-              loader={() => `${userData?.photoURL}?w=${60}&q=${75}`}
-              src={userData?.photoURL}
-              className='w-full h-full'
-              width={100}
-              height={100}
-            />
-          </Box>
-        ) : (
-          <Avatar size='sm' />
-        )}
-      </Button>
-      <Drawer
-        isOpen={isOpen}
-        placement='bottom'
-        onClose={onClose}
-        size='full'
-        closeOnOverlayClick={userNameSet ? true : false}>
-        {/* <DrawerOverlay /> */}
-        <DrawerContent
-          maxW='1440px'
-          border='2px solid white #2c2c2eff'
-          // pos='fixed'
-          borderTopRadius={bucket ? "unset" : 10}
-          w={bucket ? "full" : ["full", "99%"]}
-          h={bucket ? "full" : ["97.3%", "96.5%"]}
-          mx='auto'
-          bgColor='#ffffffff'>
-          {!bucket && (
-            <DrawerHeader
-              display={profileOpen ? ["none", "none", "none", "flex"] : "flex"}
-              justifyContent='space-between'
-              h='auto'
-              w='full'
-              pt={3}
-              px={5}>
-              <DHeader
-                userData={userData}
-                accountOnClose={accountOnClose}
-                onClose={onClose}
-                userNameSet={userNameSet}
-              />
-            </DrawerHeader>
-          )}
-          {bucket ? (
-            <Bucket setBucket={setBucket} />
-          ) : (
-            <DrawerBody
-              h='full'
-              py={0}
-              px={["4", "5", "unset", 20]}
-              display='flex'
-              flexWrap='wrap-reverse'
-              w='full'>
-              {accountIsOpen ? (
-                <Flex w='full'>
-                  <Account />
-                  <Profile
-                    profileOpen={profileOpen}
-                    setProfileOpen={setProfileOpen}
-                    userData={userData}
-                    userNameSet={userNameSet}
-                    setUserNameSet={setUserNameSet}
-                    onClose={onClose}
-                  />
-                </Flex>
-              ) : (
-                <SettingsMenu />
-              )}
-            </DrawerBody>
-          )}
-        </DrawerContent>
-      </Drawer>
+      <Dialog.Root open={isOpen} onOpenChange={toggleSM}>
+        <Dialog.Portal>
+          <Dialog.Overlay className=' bg-gray-800 opacity-60 z-40 inset-0 fixed' />
+          <div className='fixed inset-0 z-50 overflow-hidden'>
+            <div className='absolute inset-0 overflow-hidden'>
+              <div className='pointer-events-none fixed inset-x-0 bottom-0 flex w-full h-[95%]'>
+                <Dialog.Content className='pointer-events-auto relative w-screen'>
+                  <div className='flex h-full flex-col bg-white rounded-t-xl w-full p-4 shadow-xl'>
+                    {/* page */}
+                    {renderPage[page]}
+                  </div>
+                </Dialog.Content>
+              </div>
+            </div>
+          </div>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 };
+
+const Home = ({
+  userdata,
+  toggleSM,
+}: {
+  userdata?: UserData;
+  toggleSM: (state: boolean, page?: string) => void;
+}) => {
+  return (
+    <div className='p-1 w-full'>
+      <div className='flex'>
+        <>
+          {userdata?.photoURL && userdata?.photoURL !== "null" && (
+            <Avatar
+              className='w-10 h-10 rounded-full'
+              src={userdata?.photoURL}
+            />
+          )}
+        </>
+        <div className='ml-3'>
+          <h3 className='inline-flex items-center text-xl'>
+            {userdata?.name}
+            {userdata?.verified && (
+              <span className='ml-1'>
+                <CheckBadgeIcon width={18} color='#007affff' />
+              </span>
+            )}
+          </h3>
+          <p className='text-base'>{userdata?.userName}</p>
+        </div>
+        <div className='flex-1 flex justify-end'>
+          <button
+            className='text-white text-lg h-fit drop-shadow-sm rounded-xl md:rounded-xl bg-blue-400'
+            onClick={() => toggleSM(false)}>
+            <span className='hidden md:block w-16 p-0.5'>close</span>
+            <ChevronDownIcon width={30} className='text-white md:hidden' />
+          </button>
+        </div>
+      </div>
+      <div className='py-3 px-5 mt-10 bg-[#74748014] rounded-xl text-neutral-600'>
+        <button
+          className='inline-flex items-center w-full my-1.5 hover:opacity-50'
+          onClick={() => toggleSM(true, "account")}>
+          <KeyIcon
+            className='bg-blue-400 fill-white p-1 rounded-xl'
+            width={35}
+          />
+          <p className='flex-1 text-start mx-3 text-lg '>Account</p>
+          <ChevronRightIcon color='#3c3c434c' width={30} />
+        </button>
+        <div className='divider' />
+        <button
+          className='inline-flex items-center w-full my-1.5 hover:opacity-50'
+          onClick={() => toggleSM(true, "bucket")}>
+          <ArchiveBoxIcon
+            className='bg-amber-400 fill-white p-1 rounded-xl'
+            width={35}
+          />
+          <p className='flex-1 text-start mx-3 text-lg '> My Bucket</p>
+          <ChevronRightIcon color='#3c3c434c' width={30} />
+        </button>
+        <div className='divider' />
+        <button
+          className='inline-flex items-center w-full my-1.5 hover:opacity-50'
+          disabled>
+          <MoonIcon
+            className='bg-[#c6c6c8ff] fill-gray-500 p-1 rounded-xl'
+            width={35}
+          />
+          <p className='flex-1 text-start mx-3 text-lg '> Dark Mode</p>
+          <Switch isDisabled alignSelf='center' size='lg' />
+        </button>
+      </div>
+
+      <p className='text-center text-[#3c3c4399]'>coming soon</p>
+    </div>
+  );
+};
+
+const Account = ({
+  userdata,
+  toggleSM,
+}: {
+  userdata?: UserData;
+  toggleSM: (state: boolean, page?: string) => void;
+}) => {
+  const router = useRouter();
+  const user = auth.currentUser;
+
+  const logout = () => {
+    router.push("/");
+    router.reload();
+
+    auth.signOut();
+  };
+
+  return (
+    <div className='h-auto'>
+      <button className='text-blue-500' onClick={() => toggleSM(true, "home")}>
+        Back
+      </button>
+      <div className='flex flex-col h-full pt-5'>
+        <button
+          className='inline-flex bg-neutral-100 text-neutral-600 rounded-xl p-1 items-center
+           w-full my-1.5 hover:opacity-50'
+          onClick={() => toggleSM(true, "profile")}>
+          <UserIcon
+            className='bg-blue-400 fill-white p-1 rounded-xl'
+            width={35}
+          />
+          <p className='flex-1 text-start mx-3 text-base '> Edit Profile</p>
+          <ChevronRightIcon color='#3c3c434c' width={30} />
+        </button>
+
+        <div className='text-neutral-600 flex-1 mt-3'>
+          <h3 className='text-base mt-3 bg-neutral-100 rounded-xl p-2'>
+            Email: <span className='text-sm ml-2'>{user?.email}</span>
+          </h3>
+          <p className='text-[#3c3c434c] text-[13px] text-center'>
+            your email is private and not visible to other users
+          </p>
+          <h3 className='text-base mt-3 bg-neutral-100 rounded-xl p-2'>
+            Last SignedIn:{" "}
+            <span className='text-[13px]'>{user?.metadata.lastSignInTime}</span>
+          </h3>
+        </div>
+        <button
+          className='text-white bg-blue-400 py-1 px-2 rounded-lg'
+          onClick={logout}>
+          Logout
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export default Settings;

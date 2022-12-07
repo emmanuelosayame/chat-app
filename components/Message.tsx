@@ -5,7 +5,7 @@ import Image from "next/image";
 import prettyBytes from "pretty-bytes";
 import { ReactNode } from "react";
 import { SpinnerRound } from "spinners-react";
-import { auth } from "../firebase";
+import { auth } from "../lib/firebase";
 
 interface MessageContent {
   type: string;
@@ -144,7 +144,7 @@ const TimeComponent = ({
       {timeSent ? (
         <p className='text-[10px] text-end h-fit'>{time}</p>
       ) : (
-        <ClockIcon width={10} />
+        <ClockIcon width={11} className='mb-1 text-white' />
       )}
     </>
   );

@@ -28,7 +28,7 @@ import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { storage } from "../firebase";
+import { storage } from "../lib/firebase";
 
 const WebCamCompLg = ({
   colRef,

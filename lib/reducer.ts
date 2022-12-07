@@ -1,5 +1,10 @@
 import { Reducer, ReducerState } from "react";
-import { LocalState, ReducerActions } from "../types/reducer";
+import {
+  LocalState,
+  ProfileActions,
+  ProfileState,
+  ReducerActions,
+} from "../types/reducer";
 
 export const initialState: LocalState = {
   editChats: false,
@@ -20,6 +25,24 @@ export const reducer: Reducer<LocalState, ReducerActions> = (state, action) => {
         : [...state.selectedChats, action.payload];
       return { ...state, selectedChats };
     }
+    default:
+      return state;
+  }
+};
+
+export const profileReducer: Reducer<ProfileState, ProfileActions> = (
+  state,
+  action
+) => {
+  switch (action.type) {
+    case "name":
+      return { ...state, name: action.payload };
+    case "user-name":
+      return { ...state, userName: action.payload };
+    case "about":
+      return { ...state, about: action.payload };
+    case "photo":
+      return { ...state, photo: action.payload };
     default:
       return state;
   }

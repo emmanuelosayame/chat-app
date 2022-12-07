@@ -32,7 +32,7 @@ if (!apps.length) {
   // connectFirestoreEmulator(db, "localhost", 8080);
   // connectDatabaseEmulator(rdb, "localhost", 9000);
   // connectStorageEmulator(storage, "localhost", 9199);
-  enableMultiTabIndexedDbPersistence(db, rdb).catch((err) => {
+  enableMultiTabIndexedDbPersistence(db).catch((err) => {
     if (err.code == "failed-precondition") {
       console.log(
         "Multiple tabs open, persistence can only be enabled in one tab at a a time"

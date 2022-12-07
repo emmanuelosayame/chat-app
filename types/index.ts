@@ -1,6 +1,8 @@
 export interface UISlice {
   newChatModal: { open: boolean };
   toggleNCM: () => void;
+  settingsModal: [boolean, string];
+  toggleSM: (state: boolean, page?: string) => void;
   // toggleNCM: (state?: boolean) => void;
 }
 

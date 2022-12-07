@@ -35,7 +35,7 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { auth, db, rdb } from "../firebase";
+import { auth, db, rdb } from "../lib/firebase";
 import {
   endAt,
   onValue,
@@ -79,10 +79,6 @@ const NewChatComp = ({
   const recIds = mappedChats?.map(
     (ids: { recId: string } | undefined) => ids?.recId
   );
-  // console.log(noChatUsersList);
-  // useEffect(() => {
-  //   setChatUsersList([]);
-  // }, [isOpen]);
 
   const searchUser = debounce(async (e: any) => {
     const input = e.target.value.toLowerCase();
@@ -112,7 +108,6 @@ const NewChatComp = ({
       { onlyOnce: true }
     );
   }, 700);
-  // console.log(chatsData)
 
   const noChatUsersList = usersList?.filter(
     (list) => !recIds.includes(list.uid) && list.uid !== user?.uid

@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { auth, db } from "../firebase";
+import { auth, db } from "../lib/firebase";
 import { MicWaveIcon } from "./Svgs";
 import Message from "./Message";
 import PickerInterface from "./PickerInterface";
@@ -94,14 +94,14 @@ const Bucket = ({ setBucket }: any) => {
         right={0}
         left={0}
         bgColor='white'>
-        <PickerInterface
+        {/* <PickerInterface
           isOpen={isOpen}
           onOpen={onOpen}
           onClose={onClose}
           colRef={bucketListRef}
           user={user}
           setProgress={setDocUploadProgress}
-        />
+        /> */}
 
         <WebCamComp
           colRef={bucketListRef}

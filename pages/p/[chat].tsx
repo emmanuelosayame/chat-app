@@ -12,6 +12,7 @@ import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import {
   addDoc,
   collection,
+  CollectionReference,
   DocumentData,
   limit,
   orderBy,
@@ -23,7 +24,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { MicWaveIcon, SendIcon, StickerIcon } from "../../components/Svgs";
-import { auth, db, rdb } from "../../firebase";
+import { auth, db, rdb } from "@lib/firebase";
 import ReactTimeAgo from "react-time-ago";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { ref, DataSnapshot } from "firebase/database";
@@ -34,9 +35,10 @@ import StickerComp from "../../components/StickerComp";
 import Avatar from "@components/radix/Avatar";
 import Message from "../../components/Message";
 import WebCamComp from "../../components/WebCamComp";
+import { User } from "firebase/auth";
 // import TimeAgo from "timeago-react";
 
-const ChatPage: NextPage = ({ showStatus, userData }: any) => {
+const ChatPage: NextPage = () => {
   const router = useRouter();
   const user = auth.currentUser;
   const chatId = router.query.chatId?.toString();
@@ -85,7 +87,7 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
 
   return (
     <>
-      <div className='w-full h-full bg-[#ffffffff] fixed inset-x-0 md:relative flex flex-col justify-between'>
+      <div className='w-full h-screen bg-[#ffffffff] inset-x-0 relative flex flex-col justify-between'>
         <div
           className='flex absolute bg-white bg-opacity-50 w-full py-1 backdrop-blur-md justify-between max-h-12
          items-center z-20'>
@@ -96,7 +98,7 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
               onClick={routeToChats}>
               <ChevronLeftIcon width={40} height={50} />
             </button>
-            <div className='flex w-16 items-center mx-2'>
+            {/* <div className='flex w-16 items-center mx-2'>
               {!showStatus ? (
                 <p className='w-fit px-1 h-auto py-05 rounded-sm text-base text-gray-900 text-center'>
                   ~
@@ -113,7 +115,7 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
                   />
                 </p>
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className='flex flex-col text-center justify-center'>
@@ -133,7 +135,7 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
           </div>
         </div>
 
-        <div className='overflow-y-auto scroll-smooth flex flex-col px-2 md:flex-6 h-full pt-16'>
+        <div className='overflow-y-auto scroll-smooth h-full flex flex-col px-2 md:flex-6 pt-16 pb-16'>
           {!!messages &&
             messages?.docs.map((message: DocumentData) => (
               <Message
@@ -145,9 +147,7 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
           <div ref={keepBottomRef} />
         </div>
 
-        <div className='divider border-neutral-200' />
-
-        <InputArea />
+        <InputArea messagesRef={messagesRef} user={user} />
       </div>
     </>
   );
@@ -156,137 +156,79 @@ const ChatPage: NextPage = ({ showStatus, userData }: any) => {
 export const InputArea = ({
   messagesRef,
   user,
-  setDocUploadProgress,
-  chatId,
-  userData,
-}: any) => {
-  const {
-    isOpen: pickerIsOpen,
-    onOpen: pickerOnOpen,
-    onClose: pickerOnClose,
-  } = useDisclosure();
+}: {
+  messagesRef: CollectionReference<DocumentData>;
+  user?: User | null;
+}) => {
+  const [picker, setPicker] = useState(false);
+
+  const togglePicker = (state: boolean) => {
+    setPicker(state);
+  };
+
   const {
     isOpen: stickerIsOpen,
     onOpen: stickerOnOpen,
     onClose: stickerOnClose,
   } = useDisclosure();
 
-  const [newMessage, setNewMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
 
-  const sendMessage = () => {
-    if (!(newMessage.length === 0)) {
-      addDoc(messagesRef, {
-        text: newMessage,
-        sender: user?.uid,
-        timeSent: serverTimestamp(),
-        type: "text",
-      });
-      // keepBottom();
-      setNewMessage("");
-    }
+  const sendMessage = async () => {
+    if (message.length < 1) return;
+    addDoc(messagesRef, {
+      text: message,
+      sender: user?.uid,
+      timeSent: serverTimestamp(),
+      type: "text",
+    });
+    // keepBottom();
+    setMessage("");
   };
 
   return (
-    <Flex
-      w='full'
-      borderRadius={20}
-      borderWidth='1px'
-      bgColor='#ffffffff'
-      borderColor='#74748014'
-      mr='3'
-      position='relative'
-      align='center'
-      h='fit-content'>
-      {stickerIsOpen ? (
-        <Box
-          alignSelf='center'
-          my='1'
-          mx='1.5'
-          rounded='full'
-          aria-label='send'
-          color='#007affff'
-          fontSize='1.1em'>
-          <StickerIcon />
-        </Box>
-      ) : (
-        <IconButton
-          alignSelf='end'
-          my='1'
-          mx='1.5'
-          isRound
-          aria-label='send'
-          color='#007affff'
-          fontSize='1.1em'
-          size='xs'
-          icon={<StickerIcon />}
-          onClick={stickerOnOpen}
+    <div
+      className='absolute bottom-0 inset-x-0 pb-2 pt-1 px-2 items-end bg-white flex border-t
+     border-neutral-200'>
+      <div>
+        {stickerIsOpen ? (
+          <StickerIcon className='w-7 h-7 text-blue-400' />
+        ) : (
+          <button onClick={stickerOnOpen}>
+            <StickerIcon className='w-7 h-7 text-blue-400 drop-shadow-md' />
+          </button>
+        )}
+      </div>
+      <div className='relative h-full flex flex-col w-full'>
+        <ReactTextareaAutosize
+          className='w-full rounded-xl text-base ring-1 ring-neutral-200 bg-white mx-2 py-2 pl-4
+          pr-10 placeholder:pl-1 resize-none'
+          maxRows={7}
+          placeholder='Message'
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
-      )}
-      <Textarea
-        as={ReactTextareaAutosize}
-        w='full'
-        maxRows={7}
-        placeholder='Message'
-        _placeholder={{
-          fontSize: 20,
-          h: "full",
-        }}
-        variant='unstyled'
-        size='sm'
-        rows={1}
-        resize='none'
-        sx={{
-          "&::-webkit-scrollbar": {
-            width: "4px",
-            backgroundColor: "transparent",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            borderRadius: "4px",
-            backgroundColor: "transparent",
-          },
-        }}
-        p='1.5'
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        fontSize='100%'
-        h='full'
-      />
+        <div className='absolute right-0 inset-y-0 h-full pb-1.5 flex flex-col justify-end'>
+          {message.length > 0 ? (
+            <button
+              className='bg-amber-400 rounded-full p-1 drop-shadow-lg'
+              onClick={sendMessage}>
+              <ArrowUpIcon width={20} color='white' />
+            </button>
+          ) : (
+            <button className='bg-blue-400 rounded-full p-1 drop-shadow-lg'>
+              <MicWaveIcon className='w-5 text-white drop-shadow-lg' />
+            </button>
+          )}
+        </div>
+      </div>
 
-      {newMessage.length > 0 ? (
-        <IconButton
-          isRound
-          alignSelf='end'
-          aria-label='send'
-          bgColor='#007affff'
-          fontSize='1.2em'
-          size='xs'
-          icon={<ArrowUpIcon width={20} color='white' />}
-          onClick={sendMessage}
-          m='1'
-        />
-      ) : (
-        <IconButton
-          alignSelf='end'
-          isRound
-          aria-label='send'
-          bgColor='#74748014'
-          fontSize='1.2em'
-          size='xs'
-          // icon={<MicrophoneIcon width={25} color="#007affff" />}
-          icon={<MicWaveIcon color='#007affff' />}
-          // onClick={sendMessage}
-          m='1'
-        />
-      )}
-      <div className='flex py-1 items-center bg-[#f2f2f7ff]'>
+      <div className='flex py-1 items-center'>
         <PickerInterface
-          isOpen={pickerIsOpen}
-          onOpen={pickerOnOpen}
-          onClose={pickerOnClose}
-          // chatId={chatId}
+          isOpen={picker}
+          toggle={togglePicker}
           colRef={messagesRef}
           user={user}
-          setProgress={setDocUploadProgress}
         />
         {/* <WebCamComp
             colRef={messagesRef}
@@ -297,16 +239,17 @@ export const InputArea = ({
       </div>
       {stickerIsOpen && (
         // <SlideFade in={stickerIsOpen}>
-        <StickerComp
-          onClose={stickerOnClose}
-          chatId={chatId}
-          userData={userData}
-          // stickerOnClose={stickerOnClose}
-        />
+        // <StickerComp
+        //   onClose={stickerOnClose}
+        //   chatId={chatId}
+        //   userData={userData}
+        //   // stickerOnClose={stickerOnClose}
+        // />
         // </SlideFade>
+        <></>
       )}
       {/* {webCam &&  />} */}
-    </Flex>
+    </div>
   );
 };
 

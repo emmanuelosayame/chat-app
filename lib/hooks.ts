@@ -26,15 +26,17 @@ export const useFetchChats = (user: User | undefined | null) => {
   return chats;
 };
 
-export const fetchUserData = (user: User | undefined | null) => {
+export const useFetchUserData = (user: User | undefined | null) => {
   const setUserData = useStore((state) => state.setUserData);
 
   useEffect(() => {
     if (!user) return;
-    (async () => {
-      const data = await getDoc(userRef(user));
-      const withId = { id: data.id, ...data.data() };
-      data && setUserData(withId);
-    })();
+    const listener = onSnapshot(userRef(user), (snapshot) => {
+      const withId = { id: snapshot.id, ...snapshot.data() };
+      setUserData(withId);
+    });
+    return () => {
+      listener();
+    };
   }, [user]);
 };

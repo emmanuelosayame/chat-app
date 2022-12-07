@@ -1,4 +1,6 @@
-export const limitText = (sentence: string, limit: number) =>
+import FileResizer from "react-image-file-resizer";
+
+export const limitText = (sentence: string, limit: number = 20) =>
   sentence?.length > limit ? sentence.slice(0, limit) + "..." : sentence;
 
 export const dateLocale = (date: Date) => {
@@ -18,5 +20,22 @@ export const dateTimeLocale = (date: Date) => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+  });
+};
+
+export const resizeImage = (file: File) => {
+  return new Promise<any>((resolve) => {
+    FileResizer.imageFileResizer(
+      file,
+      150,
+      150,
+      "WEBP",
+      100,
+      0,
+      (uri) => {
+        resolve(uri);
+      },
+      "file"
+    );
   });
 };

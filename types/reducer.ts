@@ -10,3 +10,15 @@ export type LocalState = {
   selectedChats: string[];
   search: boolean;
 };
+
+export type ProfileState = {
+  name: string;
+  userName: string;
+  about: string;
+  photo: File | null;
+  photoURL?: string;
+};
+
+export type ProfileActions =
+  | { type: "photo"; payload: File }
+  | { type: "name" | "user-name" | "about"; payload: string };

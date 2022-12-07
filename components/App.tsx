@@ -2,12 +2,10 @@ import Header from "./Header";
 import NewChatComp from "./NewChat";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useEffect, useState } from "react";
-import { auth, db, rdb } from "../firebase";
+import { auth, db, rdb } from "../lib/firebase";
 import { doc, DocumentData, getDoc } from "firebase/firestore";
 import Chat from "./Chat";
 import { useRouter } from "next/router";
-import { useDocumentData, useCollection } from "react-firebase-hooks/firestore";
-
 import Fuse from "fuse.js";
 import { browserName } from "react-device-detect";
 import debounce from "lodash/debounce";
@@ -15,24 +13,22 @@ import { useStore } from "../store";
 import { useReducer } from "react";
 import { initialState, reducer } from "@lib/reducer";
 import { userRef } from "@lib/queries";
-import { fetchUserData, useFetchChats } from "@lib/hooks";
+import { useFetchUserData, useFetchChats } from "@lib/hooks";
 
 const App = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const user = auth.currentUser;
 
   const chats = useFetchChats(user);
-  fetchUserData(user);
+  useFetchUserData(user);
 
-  const userData = useStore((state) => state.userdata);
+  const userdata = useStore((state) => state.userdata);
   const [state, dispatch] = useReducer(reducer, initialState);
   const toggleNCM = useStore((state) => state.toggleNCM);
 
   useEffect(() => {
     router.pathname !== "/" && router.push("/");
   }, []);
-
-  console.log(userData);
 
   const responsiveLayout = !!router.query?.chat;
 
@@ -56,7 +52,7 @@ const App = ({ children }: { children: ReactNode }) => {
           } w-full md:w-2/5 lg:w-2/6 relative`}>
           <div className='w-full h-full overflow-y-auto'>
             <Header
-              userData={userData}
+              userdata={userdata}
               editChats={() =>
                 dispatch({
                   type: "edit-chats",
@@ -64,7 +60,7 @@ const App = ({ children }: { children: ReactNode }) => {
                 })
               }
             />
-            <div className='flex w-full px-2 relative h-auto pb-3 mt-12'>
+            <div className='flex w-full px-2 relative h-auto pb-3 mt-16'>
               <button
                 className='inline-flex items-center bg-neutral-100 md:bg-white w-full rounded-md p-1 cursor-text'
                 onClick={() => {

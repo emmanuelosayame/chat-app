@@ -12,6 +12,11 @@ const uiSlice: StateCreator<
     set((state) => {
       state.newChatModal.open = !state.newChatModal.open;
     }),
+  settingsModal: [false, "home"],
+  toggleSM: (newState, page) =>
+    set((state) => {
+      state.settingsModal = [newState, page ?? "home"];
+    }),
 });
 
 export default uiSlice;

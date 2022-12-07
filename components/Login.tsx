@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider,
   signInAnonymously,
 } from "firebase/auth";
-import { auth, db, rdb } from "../firebase";
+import { auth, db, rdb } from "../lib/firebase";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -15,9 +15,6 @@ import { GoogleLogoIcon } from "./Svgs";
 
 const Login: NextPage = () => {
   const router = useRouter();
-  // useEffect(() => {
-  //   router.push("/");
-  // }, []);
 
   const provider = new GoogleAuthProvider();
 
