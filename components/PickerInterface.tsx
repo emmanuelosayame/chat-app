@@ -1,20 +1,6 @@
-import {
-  Box,
-  Button,
-  Flex,
-  GridItem,
-  IconButton,
-  Input,
-  SlideFade,
-  Stack,
-  Text,
-  useDisclosure,
-  useOutsideClick,
-} from "@chakra-ui/react";
 import { Root, Portal, Overlay, Content } from "@radix-ui/react-dialog/dist";
 import {
   PlusIcon,
-  CameraIcon,
   PhotoIcon,
   DocumentIcon,
   // PaperClipIcon,
@@ -49,6 +35,7 @@ import {
 import { db, storage } from "../lib/firebase";
 import { pickerVs } from "@lib/validations";
 import { limitText } from "@lib/helpers";
+import ReactPlayer from "react-player/lazy";
 
 interface PickerProps {
   isOpen: boolean;
@@ -62,14 +49,19 @@ interface Values {
   medias?: File[];
 }
 interface Errors {
-  documents?: string;
-  medias?: string;
+  documents?: any;
+  medias?: any;
 }
 
 interface State {
   values: Values;
   errors: Errors;
 }
+
+type HandleChangeArgs = (
+  e: ChangeEvent<HTMLInputElement>,
+  type: "media" | "document"
+) => void;
 
 const PickerInterface = ({ isOpen, toggle, colRef, user }: PickerProps) => {
   const initialState: State = {
@@ -78,19 +70,32 @@ const PickerInterface = ({ isOpen, toggle, colRef, user }: PickerProps) => {
   };
   const [{ errors, values }, setState] = useState<State>(initialState);
 
-  const handleDocuments = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange: HandleChangeArgs = async (e, type) => {
     const files = Array.from(e.target.files || []);
-    try {
-      await pickerVs.validate({ documents: files });
-      setState({ values: { documents: files }, errors: {} });
-    } catch (err) {
-      setState({ errors: { documents: "err", medias: undefined }, values: {} });
+    if (type === "document") {
+      try {
+        await pickerVs.validate({ documents: files });
+        setState({ values: { documents: files }, errors: {} });
+      } catch (err) {
+        setState({
+          errors: { documents: "err", medias: undefined },
+          values: {},
+        });
+      }
+    } else if (type === "media") {
+      try {
+        await pickerVs.validate({ medias: files });
+        setState({ values: { medias: files }, errors: {} });
+      } catch (err) {
+        setState({
+          errors: { medias: err, documents: undefined },
+          values: {},
+        });
+      }
     }
   };
 
   // console.log(values, errors);
-
-  const handleMedia = (e: ChangeEvent<HTMLInputElement>) => {};
 
   const sendMedia = async () => {};
 
@@ -152,19 +157,23 @@ const PickerInterface = ({ isOpen, toggle, colRef, user }: PickerProps) => {
     ? "media"
     : "home";
 
+  const stateProps = {
+    errors,
+    values,
+  };
+
   const renderPage: { [key: string]: ReactNode } = {
-    home: (
-      <HomePage handleMedia={handleMedia} handleDocuments={handleDocuments} />
-    ),
+    home: <HomePage handleChange={handleChange} />,
     document: (
       <DocumentPage
         setState={setState}
-        errors={errors}
-        values={values}
         sendDocument={sendDocument}
+        {...stateProps}
       />
     ),
-    media: <MediaPage />,
+    media: (
+      <MediaPage sendMedia={sendMedia} setState={setState} {...stateProps} />
+    ),
   };
 
   return (
@@ -190,7 +199,7 @@ const PickerInterface = ({ isOpen, toggle, colRef, user }: PickerProps) => {
   );
 };
 
-const HomePage = ({ handleMedia, handleDocuments }: any) => {
+const HomePage = ({ handleChange }: { handleChange: HandleChangeArgs }) => {
   const documentRef = useRef<any>(null);
   const mediaRef = useRef<any>(null);
 
@@ -211,7 +220,9 @@ const HomePage = ({ handleMedia, handleDocuments }: any) => {
         multiple={true}
         type='file'
         accept='image/*,video/*'
-        onChange={(e: ChangeEvent<HTMLInputElement>) => handleMedia(e)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          handleChange(e, "media")
+        }
       />
 
       <button
@@ -227,87 +238,78 @@ const HomePage = ({ handleMedia, handleDocuments }: any) => {
         multiple={true}
         type='file'
         // accept="image/*"
-        onChange={(e: ChangeEvent<HTMLInputElement>) => handleDocuments(e)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          handleChange(e, "document")
+        }
       />
     </div>
   );
 };
 
-const MediaPage = () => {
+const MediaPage = ({
+  setState,
+  errors,
+  values,
+  sendMedia,
+}: {
+  documents?: File[];
+  setState: Dispatch<SetStateAction<State>>;
+  errors: Errors;
+  values: Values;
+  sendMedia: () => void;
+}) => {
   return (
-    <Box
-      // w="fit-content"
-      // rounded="lg"
-      m={1}
-      // overflow="hidden"
-      h='full'>
-      <Flex
-        w='full'
-        justify='space-between'
-        h='fit-content'
-        my='1'
-        bgColor='white'
-        boxShadow='lg'
-        rounded='xl'>
-        <Button
+    <div className='bg-white border-neutral-200 w-full md:w-96'>
+      <div className='flex w-full justify-between'>
+        <button
+          className='text-base text-blue-500 p-1'
           onClick={() => {
-            // setError(null);
-            // setMedia(null);
-            // URL.revokeObjectURL(media.URL);
-          }}
-          variant='ghost'
-          size='sm'
-          color='#007affff'
-          fontSize={14}
-          rounded='xl'>
+            setState({ errors: {}, values: {} });
+          }}>
           Cancel
-        </Button>
-        <Button
-          variant='ghost'
-          size='sm'
-          color='#007affff'
-          fontSize={14}
-          rounded='xl'
-          // onClick={sendMedia}
-          // isDisabled={error?.limit ? true : false}
-        >
+        </button>
+        {/* <p className='text-neutral-500'>{`${documents?.length} file${
+          documents?.length > 1 ? "s" : ""
+        }`}</p> */}
+        <button
+          className='text-base text-blue-500 p-1'
+          onClick={sendMedia}
+          disabled={errors?.documents ? true : false}>
           Send
-        </Button>
-      </Flex>
-      {/* <Box
-        mx='auto'
-        w='full'
-        rounded='lg'
-        overflow='hidden'
-        h='full'
-        boxShadow='2xl'>
-       
-        {media.file.type.slice(0, 5) === "image" ? (
-          <Image
-            alt='photo/video-prev'
-            src={media.URL}
-            loader={() => media.URL}
-            className='w-full h-full'
-            layout='responsive'
-            style={{ margin: "auto" }}
-            width={100}
-            height={100}
-          />
-        ) : (
-          media.file.type.slice(0, 5) === "video" && (
-            <video
-              autoPlay
-              controls
-              controlsList='nodownload noremoteplayback'
-              src={media.URL}
-              width='100%'
-              height='auto'
-              style={{ margin: "auto" }}
-            />
-          )
-        )}
-      </Box> */}
-    </Box>
+        </button>
+      </div>
+      <div className='mx-auto w-full'>
+        {values.medias?.map((media) => {
+          const src = URL.createObjectURL(media);
+          return (
+            <>
+              {media.type.slice(0, 5) === "image" ? (
+                <Image
+                  alt='photo/video-prev'
+                  src={src}
+                  className='w-full h-full'
+                  style={{ margin: "auto" }}
+                  width={100}
+                  height={100}
+                />
+              ) : (
+                media.type.slice(0, 5) === "video" && (
+                  <video
+                    autoPlay
+                    controls
+                    controlsList='nodownload noremoteplayback'
+                    width='100%'
+                    height='auto'>
+                    <source src={src} />
+                  </video>
+                  // <ReactPlayer url={URL.createObjectURL(media)} />
+                )
+              )}
+            </>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
@@ -346,6 +348,7 @@ const DocumentPage = ({
               Send
             </button>
           </div>
+          {/* yo */}
           <div className=''>
             {documents?.slice(0, 3).map((document) => (
               <div className='text-center text-neutral-800 my-1 p-1 rounded-xl'>

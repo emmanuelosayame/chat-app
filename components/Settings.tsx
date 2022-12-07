@@ -1,14 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog/dist";
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Stack,
-  Switch,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import * as Switch from "@radix-ui/react-switch/dist";
 import {
   ArchiveBoxIcon,
   ChevronDownIcon,
@@ -123,14 +114,25 @@ const Home = ({
         </button>
         <div className='divider' />
         <button
-          className='inline-flex items-center w-full my-1.5 hover:opacity-50'
+          className='inline-flex items-center w-full my-1.5 hover:opacity-50 disabled:hover:opacity-100'
           disabled>
           <MoonIcon
             className='bg-[#c6c6c8ff] fill-gray-500 p-1 rounded-xl'
             width={35}
           />
           <p className='flex-1 text-start mx-3 text-lg '> Dark Mode</p>
-          <Switch isDisabled alignSelf='center' size='lg' />
+          <Switch.Root
+            disabled
+            className=' group bg-white drop-shadow-sm relative focus:bg-opacity-75
+            data-checked:bg-neutral-500 data-unchecked:bg-gray-200 dark:data-unchecked:bg-gray-800
+            inline-flex h-[24px] w-[44px] flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-neutral-500 focus-visible:ring-opacity-75
+            '>
+            <Switch.Thumb
+              className=' data-checked:translate-x-5 data-unchecked:translate-x-0
+            pointer-events-none inline-block h-[20px] w-[20px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out
+            '
+            />
+          </Switch.Root>
         </button>
       </div>
 

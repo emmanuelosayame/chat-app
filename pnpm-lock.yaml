@@ -9,6 +9,7 @@ specifiers:
   '@next/font': ^13.0.5
   '@radix-ui/react-avatar': ^1.0.1
   '@radix-ui/react-dialog': ^1.0.2
+  '@radix-ui/react-switch': ^1.0.1
   '@radix-ui/react-toast': ^1.1.2
   '@swc/helpers': ^0.4.3
   '@types/lodash': ^4.14.182
@@ -43,6 +44,7 @@ specifiers:
   react-image-file-resizer: ^0.4.8
   react-intersection-observer: ^9.3.5
   react-media-recorder: ^1.6.6
+  react-player: ^2.11.0
   react-textarea-autosize: ^8.3.4
   react-time-ago: ^7.2.1
   react-timeago: ^7.1.0
@@ -63,6 +65,7 @@ dependencies:
   '@next/font': 13.0.5
   '@radix-ui/react-avatar': 1.0.1_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-dialog': 1.0.2_bb2bxwco6ptpubzwpazr52qf6i
+  '@radix-ui/react-switch': 1.0.1_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-toast': 1.1.2_biqbaboplfbrettd7655fr4n2y
   '@types/lodash': 4.14.182
   classnames: 2.3.2
@@ -88,6 +91,7 @@ dependencies:
   react-image-file-resizer: 0.4.8
   react-intersection-observer: 9.3.5_react@18.2.0
   react-media-recorder: 1.6.6
+  react-player: 2.11.0_react@18.2.0
   react-textarea-autosize: 8.3.4_3hx2ussxxho4jajbwrd6gq34qe
   react-time-ago: 7.2.1_6jxhcwa6e776bogvyohzxoo6pa
   react-timeago: 7.1.0_react@18.2.0
@@ -3178,6 +3182,24 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@radix-ui/react-switch/1.0.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-tTxGluMtwrc5ffgAiOSMrYIx0r3vSTcgM4Vl8rqfpXcHt6ryB9B0OlFKUOiDpKASXlhvzfHf4Y0AYKJdpzjL8w==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@babel/runtime': 7.18.9
+      '@radix-ui/primitive': 1.0.0
+      '@radix-ui/react-compose-refs': 1.0.0_react@18.2.0
+      '@radix-ui/react-context': 1.0.0_react@18.2.0
+      '@radix-ui/react-primitive': 1.0.1_biqbaboplfbrettd7655fr4n2y
+      '@radix-ui/react-use-controllable-state': 1.0.0_react@18.2.0
+      '@radix-ui/react-use-previous': 1.0.0_react@18.2.0
+      '@radix-ui/react-use-size': 1.0.0_react@18.2.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /@radix-ui/react-toast/1.1.2_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-Kpr4BBYoP0O5A1UeDBmao87UnCMNdAKGNioQH5JzEm6OYTUVGhuDRbOwoZxPwOZ6vsjJHeIpdUrwbiHEB65CCw==}
     peerDependencies:
@@ -3236,6 +3258,25 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
     dependencies:
       '@babel/runtime': 7.18.9
+      react: 18.2.0
+    dev: false
+
+  /@radix-ui/react-use-previous/1.0.0_react@18.2.0:
+    resolution: {integrity: sha512-RG2K8z/K7InnOKpq6YLDmT49HGjNmrK+fr82UCVKT2sW0GYfVnYp4wZWBooT/EYfQ5faA9uIjvsuMMhH61rheg==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@babel/runtime': 7.18.9
+      react: 18.2.0
+    dev: false
+
+  /@radix-ui/react-use-size/1.0.0_react@18.2.0:
+    resolution: {integrity: sha512-imZ3aYcoYCKhhgNpkNDh/aTiU05qw9hX+HHI1QDBTyIlcFjgeFlKKySNGMwTp7nYFLQg/j0VA2FmCY4WPDDHMg==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@babel/runtime': 7.18.9
+      '@radix-ui/react-use-layout-effect': 1.0.0_react@18.2.0
       react: 18.2.0
     dev: false
 
@@ -5270,6 +5311,10 @@ packages:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: false
 
+  /load-script/1.0.0:
+    resolution: {integrity: sha512-kPEjMFtZvwL9TaZo0uZ2ml+Ye9HUMmPwbYRJ324qF9tqMejwykJ5ggTyvzmrbBeapCAbk98BSbTeovHEEP1uCA==}
+    dev: false
+
   /loader-utils/2.0.2:
     resolution: {integrity: sha512-TM57VeHptv569d/GKh6TAYdzKblwDNiumOdkFnejjD0XwTH87K90w3O7AiJRqdQoXygvi1VQTJTLGhJl7WqA7A==}
     engines: {node: '>=8.9.0'}
@@ -5378,6 +5423,10 @@ packages:
       media-encoder-host-broker: 7.0.68
       media-encoder-host-worker: 9.0.68
       tslib: 2.4.0
+    dev: false
+
+  /memoize-one/5.2.1:
+    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
     dev: false
 
   /memoize-one/6.0.0:
@@ -6017,6 +6066,19 @@ packages:
     dependencies:
       extendable-media-recorder: 6.6.8
       extendable-media-recorder-wav-encoder: 7.0.74
+    dev: false
+
+  /react-player/2.11.0_react@18.2.0:
+    resolution: {integrity: sha512-fIrwpuXOBXdEg1FiyV9isKevZOaaIsAAtZy5fcjkQK9Nhmk1I2NXzY/hkPos8V0zb/ZX416LFy8gv7l/1k3a5w==}
+    peerDependencies:
+      react: '>=16.6.0'
+    dependencies:
+      deepmerge: 4.2.2
+      load-script: 1.0.0
+      memoize-one: 5.2.1
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-fast-compare: 3.2.0
     dev: false
 
   /react-remove-scroll-bar/2.3.3_3hx2ussxxho4jajbwrd6gq34qe:

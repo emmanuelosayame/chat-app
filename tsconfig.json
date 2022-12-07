@@ -6,7 +6,7 @@
         "./components/*"
       ],
       "@lib/*":["./lib/*"],
-       "@utils/*":["lib/*"],
+      //  "@utils/*":["lib/*"],
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -22,7 +22,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true
-  },firebase.ts
+  },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "firebase.ts"],
   "exclude": ["node_modules"]
 }

@@ -20,7 +20,7 @@ export const pickerVs = object().shape({
   medias: mixed<File[]>().test("size", "media too large", (values) => {
     if (!values) return true;
     for (const file of values) {
-      if (file.size > 100000000) return false;
+      if (file.size > 10000000000000) return false;
     }
     return true;
   }),
