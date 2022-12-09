@@ -282,7 +282,7 @@ const MediaPage = ({
         {values.medias?.map((media) => {
           const src = URL.createObjectURL(media);
           return (
-            <>
+            <div key={media.name}>
               {media.type.slice(0, 5) === "image" ? (
                 <Image
                   alt='photo/video-prev'
@@ -305,7 +305,7 @@ const MediaPage = ({
                   // <ReactPlayer url={URL.createObjectURL(media)} />
                 )
               )}
-            </>
+            </div>
           );
         })}
       </div>
@@ -351,7 +351,9 @@ const DocumentPage = ({
           {/* yo */}
           <div className=''>
             {documents?.slice(0, 3).map((document) => (
-              <div className='text-center text-neutral-800 my-1 p-1 rounded-xl'>
+              <div
+                key={document.name}
+                className='text-center text-neutral-800 my-1 p-1 rounded-xl'>
                 <h2 className='text-lg'>{limitText(document.name, 15)}</h2>
                 <p className='text-sm'>{document.type}</p>
                 <p className='text-base'>{prettyBytes(document.size)}</p>

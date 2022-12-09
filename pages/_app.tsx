@@ -1,6 +1,5 @@
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
-import { ChakraProvider, Flex } from "@chakra-ui/react";
 import { auth, db, rdb } from "../lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Login from "../components/Login";
@@ -8,7 +7,6 @@ import App from "../components/App";
 import { useEffect, useState } from "react";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
-import theme from "../theme";
 import Head from "next/head";
 import { Loading } from "../components/Loading";
 import font from "@next/font/local";
@@ -44,17 +42,15 @@ function MyApp({ Component, pageProps, router }: AppProps) {
         />
       </Head>
 
-      <ChakraProvider theme={theme}>
-        <main className={` ${poppins.variable} font-poppins`}>
-          {!user ? (
-            <Login />
-          ) : (
-            <App>
-              <Component {...pageProps} />
-            </App>
-          )}
-        </main>
-      </ChakraProvider>
+      <main className={` ${poppins.variable} font-poppins`}>
+        {!user ? (
+          <Login />
+        ) : (
+          <App>
+            <Component {...pageProps} />
+          </App>
+        )}
+      </main>
     </>
   );
 }

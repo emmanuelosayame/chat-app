@@ -1,13 +1,3 @@
-import {
-  Box,
-  Divider,
-  Flex,
-  IconButton,
-  Text,
-  Textarea,
-  useBoolean,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import {
   addDoc,
@@ -25,23 +15,25 @@ import { useEffect, useRef, useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { MicWaveIcon, SendIcon, StickerIcon } from "../../components/Svgs";
 import { auth, db, rdb } from "@lib/firebase";
-import ReactTimeAgo from "react-time-ago";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import { ref, DataSnapshot } from "firebase/database";
 import { useObjectVal } from "react-firebase-hooks/database";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import PickerInterface from "../../components/PickerInterface";
-import StickerComp from "../../components/StickerComp";
+import Stickers from "../../components/Stickers";
 import Avatar from "@components/radix/Avatar";
 import Message from "../../components/Message";
-import WebCamComp from "../../components/WebCamComp";
 import { User } from "firebase/auth";
+import { useStore } from "store";
+import { UserData } from "types";
 // import TimeAgo from "timeago-react";
 
 const ChatPage: NextPage = () => {
   const router = useRouter();
   const user = auth.currentUser;
   const chatId = router.query.chatId?.toString();
+
+  const userdata = useStore((state) => state.userdata);
 
   const keepBottomRef = useRef<any>();
   const messagesRef = collection(db, "chatGroup", `${chatId}`, "messages");
@@ -147,30 +139,39 @@ const ChatPage: NextPage = () => {
           <div ref={keepBottomRef} />
         </div>
 
-        <InputArea messagesRef={messagesRef} user={user} />
+        <InputArea
+          messagesRef={messagesRef}
+          user={user}
+          userdata={userdata}
+          chatId={chatId}
+        />
       </div>
     </>
   );
 };
 
+interface InputAreaProps {
+  messagesRef: CollectionReference<DocumentData>;
+  user?: User | null;
+  userdata?: UserData;
+  chatId?: string;
+}
+
 export const InputArea = ({
   messagesRef,
   user,
-}: {
-  messagesRef: CollectionReference<DocumentData>;
-  user?: User | null;
-}) => {
+  userdata,
+  chatId,
+}: InputAreaProps) => {
   const [picker, setPicker] = useState(false);
 
   const togglePicker = (state: boolean) => {
     setPicker(state);
   };
 
-  const {
-    isOpen: stickerIsOpen,
-    onOpen: stickerOnOpen,
-    onClose: stickerOnClose,
-  } = useDisclosure();
+  const [stickerOpen, setStickerOpen] = useState(false);
+
+  const toggleSticker = (state: boolean) => setStickerOpen(state);
 
   const [message, setMessage] = useState<string>("");
 
@@ -191,10 +192,10 @@ export const InputArea = ({
       className='absolute bottom-0 inset-x-0 pb-2 pt-1 px-2 items-end bg-white flex border-t
      border-neutral-200'>
       <div>
-        {stickerIsOpen ? (
+        {stickerOpen ? (
           <StickerIcon className='w-7 h-7 text-blue-400' />
         ) : (
-          <button onClick={stickerOnOpen}>
+          <button onClick={() => toggleSticker(true)}>
             <StickerIcon className='w-7 h-7 text-blue-400 drop-shadow-md' />
           </button>
         )}
@@ -237,17 +238,15 @@ export const InputArea = ({
             direction={["column", "column", "column", "column"]}
           /> */}
       </div>
-      {stickerIsOpen && (
-        // <SlideFade in={stickerIsOpen}>
-        // <StickerComp
-        //   onClose={stickerOnClose}
-        //   chatId={chatId}
-        //   userData={userData}
-        //   // stickerOnClose={stickerOnClose}
-        // />
-        // </SlideFade>
-        <></>
-      )}
+      <>
+        <Stickers
+          toggle={toggleSticker}
+          open={stickerOpen}
+          chatId={chatId}
+          userData={userdata}
+          // stickerOnClose={stickerOnClose}
+        />
+      </>
       {/* {webCam &&  />} */}
     </div>
   );

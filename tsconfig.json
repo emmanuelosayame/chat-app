@@ -23,6 +23,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "firebase.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "firebase.ts", "components/Stickerstsx", "components/Stickerstsx"],
   "exclude": ["node_modules"]
 }
