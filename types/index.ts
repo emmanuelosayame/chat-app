@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface UISlice {
   newChatModal: { open: boolean };
   toggleNCM: () => void;
@@ -9,6 +11,7 @@ export interface UISlice {
 export interface ChatData {
   id: string;
   recId: string;
+  timeStamp: Timestamp;
 }
 
 export interface UserData {

@@ -35,14 +35,7 @@ const App = ({ children }: { children: ReactNode }) => {
   return (
     <div className={`bg-[#000000] ${1 !== 1 && "pt-3"}`}>
       {/* new chat modal */}
-      <NewChatComp
-        newSearch={false}
-        setNewSearch={() => {}}
-        mappedChats={chats}
-        chatsData={[]}
-        color='#007affff'
-        onClose={toggleNCM}
-      />
+      <NewChatComp chats={chats} />
       {/* new chat modal */}
       <div
         className={`flex h-screen w-full max-w-screen-2xl bg-white md:bg-[#f2f2f7ff]`}>

@@ -1,7 +1,7 @@
-
+import { Root, Portal, Overlay, Content } from "@radix-ui/react-dialog/dist";
 import { addDoc, collection, serverTimestamp, where } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { auth, db, rdb } from "../lib/firebase";
 import {
   endAt,
@@ -12,48 +12,33 @@ import {
   startAt,
 } from "firebase/database";
 import Fuse from "fuse.js";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import Image from "next/image";
 import { useStore } from "../store";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ChatData } from "types";
+import Avatar from "./radix/Avatar";
 
-const NewChatComp = ({
-  newSearch,
-  setNewSearch,
-  chatsData,
-  mappedChats,
-  text,
-  icon,
-  color,
-  onClose,
-}: any) => {
+interface ChatList {
+  key: string;
+  name: string;
+  uid: string;
+  userName: string;
+  photoURL: string;
+}
+
+const NewChatComp = ({ chats }: { chats: ChatData[] }) => {
   const router = useRouter();
   const user = auth.currentUser;
-  const inputRef = useRef<HTMLInputElement>(null);
   const usersRef = ref(rdb, `Users`);
-  const [usersList, setUsersList] = useState<
-    | [
-        {
-          key: string;
-          name: string;
-          uid: string;
-          userName: string;
-          photoURL: string;
-        }
-      ]
-    | null
-  >(null);
-  const [chatUsersList, setChatUsersList] = useState<any>([]);
-  const recIds = mappedChats?.map(
-    (ids: { recId: string } | undefined) => ids?.recId
-  );
+  const [list, setList] = useState<ChatList[] | null>(null);
 
-  const searchUser = debounce(async (e: any) => {
+  // console.log(list);
+
+  const recIds = chats?.map((ids) => ids.recId);
+
+  const searchUser = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.toLowerCase();
-    if (!chatsData) return;
-    const fuse = new Fuse(chatsData, {
-      keys: ["name", "userName"],
-    });
-    setChatUsersList(fuse.search(`${input}`));
 
     const searchQuery = query(
       usersRef,
@@ -70,16 +55,21 @@ const NewChatComp = ({
           const val = data.val();
           list.push({ key, ...val });
         });
-        setUsersList(list);
+        setList(list);
       },
       { onlyOnce: true }
     );
-  }, 700);
+  }, 300);
 
-  const noChatUsersList = usersList?.filter(
-    (list) => !recIds.includes(list.uid) && list.uid !== user?.uid
+  const chatList = list?.filter(
+    (search) => recIds.includes(search.uid) && search.uid !== user?.uid
   );
-  // console.log(chatUsersList);
+
+  const noChatList = list?.filter(
+    (search) => !recIds.includes(search.uid) && search.uid !== user?.uid
+  );
+
+  // console.log(list);
 
   const handleNewChat = async (uid: any, name: any, userName: any) => {
     const newRef = await addDoc(collection(db, "chatGroup"), {
@@ -101,8 +91,94 @@ const NewChatComp = ({
   };
 
   const isOpen = useStore((state) => state.newChatModal.open);
+  const toggle = useStore((state) => state.toggleNCM);
 
-  return <>{isOpen && <>yoo/</>}</>;
+  return (
+    <Root open={isOpen} onOpenChange={toggle}>
+      <Portal>
+        <Overlay className='fixed bg-gray-800 opacity-60 z-30 inset-0 ' />
+        <Content
+          className='pointer-events-auto fixed z-40 md:-translate-x-1/2 w-96 
+          md:top-20 md:left-1/2 bg-white rounded-lg p-4 shadow-lg'>
+          <div className='relative'>
+            <MagnifyingGlassIcon
+              className='absolute top-1 left-2 text-blue-500'
+              width={23}
+            />
+            <input
+              autoFocus
+              placeholder='search user'
+              className='rounded-lg py-1 pl-9 pr-4 bg-neutral-100 w-full'
+              onChange={searchUser}
+            />
+            {/* no chat users */}
+            <div className='overflow-y-auto h-full max-h-[400px]'>
+              <div className='pt-5'>
+                <p className='font-semibold text-neutral-400 mb-1'>My chats</p>
+                {chatList?.map((chatUser) => (
+                  <div
+                    key={chatUser.uid}
+                    className='flex border-t border-neutral-100 p-0.5 items-center cursor-pointer 
+                    hover:opacity-70'
+                    onClick={() =>
+                      router.push(
+                        {
+                          pathname: "/p/[chat]",
+                          query: {
+                            // chatId: chatUser.chatId,
+                            // recId: chatUser.recId,
+                            name: chatUser.name,
+                            userName: chatUser.userName,
+                            photoURL: chatUser.photoURL,
+                          },
+                        },
+                        `/p/${chatUser.userName}`
+                      )
+                    }>
+                    <Avatar
+                      alt='profile'
+                      src={chatUser.photoURL}
+                      fallback={chatUser.name}
+                      className='w-10 h-10 rounded-full'
+                    />
+                    <div className='ml-3'>
+                      <p>{chatUser.name}</p>
+                      <p className='text-sm text-neutral-500'>
+                        {chatUser.userName}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {noChatList && noChatList.length > 1 && (
+                <>
+                  <p className='font-semibold text-neutral-400 mb-1'>All</p>
+                  {noChatList?.map((chatUser) => (
+                    <div
+                      key={chatUser.uid}
+                      className='flex border-t border-neutral-100 p-0.5 items-center'>
+                      <Avatar
+                        alt='profile'
+                        src={chatUser.photoURL}
+                        fallback={chatUser.name}
+                        className='w-10 h-10 rounded-full'
+                      />
+                      <div className='ml-3'>
+                        <p>{chatUser.name}</p>
+                        <p className='text-sm text-neutral-500'>
+                          {chatUser.userName}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        </Content>
+      </Portal>
+    </Root>
+  );
 };
 
 export default NewChatComp;
