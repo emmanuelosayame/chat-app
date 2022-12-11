@@ -81,14 +81,14 @@ const ChatPage: NextPage = () => {
     <>
       <div className='w-full h-screen bg-[#ffffffff] inset-x-0 relative flex flex-col justify-between'>
         <div
-          className='flex absolute bg-white bg-opacity-50 w-full py-1 backdrop-blur-md justify-between max-h-12
+          className='flex absolute bg-white bg-opacity-70 w-full py-1 backdrop-blur-lg justify-between max-h-12
          items-center z-20'>
           <div className=''>
             <button
               aria-label='back-btn'
-              className='text-blue-500 md:hidden'
+              className='text-blue-500 md:hidden stroke-blue-500'
               onClick={routeToChats}>
-              <ChevronLeftIcon width={40} height={50} />
+              <ChevronLeftIcon width={30} />
             </button>
             {/* <div className='flex w-16 items-center mx-2'>
               {!showStatus ? (
@@ -111,10 +111,10 @@ const ChatPage: NextPage = () => {
           </div>
 
           <div className='flex flex-col text-center justify-center'>
-            <p className=' text-base text-[#000000da]'>
+            <p className=' text-base leading-5 text-[#000000da]'>
               {router.query.name && router.query.name}
             </p>
-            <p className='text-[12px] text-[#3c3c4399] md:text-sm'>
+            <p className='text-[12px] leading-4 md:leading-4 text-[#3c3c4399] md:text-sm'>
               {router.query.name && router.query.userName}
             </p>
           </div>
@@ -188,66 +188,59 @@ export const InputArea = ({
   };
 
   return (
-    <div
-      className='absolute bottom-0 inset-x-0 pb-2 pt-1 px-2 items-end bg-white flex border-t
+    <div className=''>
+      <div
+        className=' pb-2 pt-1 px-2 items-end bg-white flex border-t
      border-neutral-200'>
-      <div>
-        {stickerOpen ? (
-          <StickerIcon className='w-7 h-7 text-blue-400' />
-        ) : (
-          <button onClick={() => toggleSticker(true)}>
-            <StickerIcon className='w-7 h-7 text-blue-400 drop-shadow-md' />
-          </button>
-        )}
-      </div>
-      <div className='relative h-full flex flex-col w-full'>
-        <ReactTextareaAutosize
-          className='w-full rounded-xl text-base ring-1 ring-neutral-200 bg-white mx-2 py-2 pl-4
-          pr-10 placeholder:pl-1 resize-none'
-          maxRows={7}
-          placeholder='Message'
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <div className='absolute right-0 inset-y-0 h-full pb-1.5 flex flex-col justify-end'>
-          {message.length > 0 ? (
-            <button
-              className='bg-amber-400 rounded-full p-1 drop-shadow-lg'
-              onClick={sendMessage}>
-              <ArrowUpIcon width={20} color='white' />
-            </button>
+        <div>
+          {stickerOpen ? (
+            <StickerIcon className='w-7 h-7 text-blue-400' />
           ) : (
-            <button className='bg-blue-400 rounded-full p-1 drop-shadow-lg'>
-              <MicWaveIcon className='w-5 text-white drop-shadow-lg' />
+            <button onClick={() => toggleSticker(true)}>
+              <StickerIcon className='w-7 h-7 text-blue-400 drop-shadow-md' />
             </button>
           )}
         </div>
-      </div>
+        <div className='relative h-full flex flex-col w-full'>
+          <ReactTextareaAutosize
+            className='w-full rounded-xl text-base ring-1 ring-neutral-200 bg-white mx-2 py-2 pl-4
+          pr-10 placeholder:pl-1 resize-none'
+            maxRows={7}
+            placeholder='Message'
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <div className='absolute right-0 inset-y-0 h-full pb-1.5 flex flex-col justify-end'>
+            {message.length > 0 ? (
+              <button
+                className='bg-amber-400 rounded-full p-1 drop-shadow-lg'
+                onClick={sendMessage}>
+                <ArrowUpIcon width={20} color='white' />
+              </button>
+            ) : (
+              <button className='bg-blue-400 rounded-full p-1 drop-shadow-lg'>
+                <MicWaveIcon className='w-5 text-white drop-shadow-lg' />
+              </button>
+            )}
+          </div>
+        </div>
 
-      <div className='flex py-1 items-center'>
         <PickerInterface
           isOpen={picker}
           toggle={togglePicker}
           colRef={messagesRef}
           user={user}
         />
-        {/* <WebCamComp
-            colRef={messagesRef}
-            user={user}
-            top={9}
-            direction={["column", "column", "column", "column"]}
-          /> */}
       </div>
       <>
         <Stickers
           toggle={toggleSticker}
           open={stickerOpen}
           chatId={chatId}
-          userData={userdata}
+          userdata={userdata}
           // stickerOnClose={stickerOnClose}
         />
       </>
-      {/* {webCam &&  />} */}
     </div>
   );
 };

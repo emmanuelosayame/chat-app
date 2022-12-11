@@ -33,8 +33,6 @@ const NewChatComp = ({ chats }: { chats: ChatData[] }) => {
   const usersRef = ref(rdb, `Users`);
   const [list, setList] = useState<ChatList[] | null>(null);
 
-  // console.log(list);
-
   const recIds = chats?.map((ids) => ids.recId);
 
   const searchUser = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
@@ -120,21 +118,24 @@ const NewChatComp = ({ chats }: { chats: ChatData[] }) => {
                     key={chatUser.uid}
                     className='flex border-t border-neutral-100 p-0.5 items-center cursor-pointer 
                     hover:opacity-70'
-                    onClick={() =>
+                    onClick={() => {
                       router.push(
                         {
                           pathname: "/p/[chat]",
                           query: {
-                            // chatId: chatUser.chatId,
-                            // recId: chatUser.recId,
+                            chatId: chats.find(
+                              (user) => user.recId === chatUser.uid
+                            )?.id,
+                            recId: chatUser.uid,
                             name: chatUser.name,
                             userName: chatUser.userName,
                             photoURL: chatUser.photoURL,
                           },
                         },
                         `/p/${chatUser.userName}`
-                      )
-                    }>
+                      );
+                      toggle();
+                    }}>
                     <Avatar
                       alt='profile'
                       src={chatUser.photoURL}

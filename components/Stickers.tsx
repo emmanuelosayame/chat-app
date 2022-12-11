@@ -1,11 +1,10 @@
-import { Root, Portal, Overlay, Content } from "@radix-ui/react-dialog/dist";
+import { Root, Content } from "@radix-ui/react-dialog/dist";
 import {
   addDoc,
   arrayUnion,
   collection,
-  deleteDoc,
+  CollectionReference,
   doc,
-  DocumentData,
   onSnapshot,
   serverTimestamp,
   updateDoc,
@@ -13,68 +12,66 @@ import {
 import { getDownloadURL, ref as sref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import FileResizer from "react-image-file-resizer";
 import { auth, db, storage } from "../lib/firebase";
-import { ClockIcon, StarIcon } from "@heroicons/react/24/outline";
+import {
+  ClockIcon,
+  StarIcon,
+  BuildingStorefrontIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import { User } from "firebase/auth";
+import { Sticker, UserData } from "types";
+import { stickerVs } from "@lib/validations";
+import { resizeImage } from "@lib/helpers";
+import * as RadixSelect from "@radix-ui/react-select/dist";
 
-const Stickers = ({
-  open,
-  toggle,
-  chatId,
-  userData,
-}: // stickerOnClose,
-{
+interface StickersInterface {
   open: boolean;
   toggle: (state: boolean) => void;
-  chatId: string | string[] | undefined;
-  userData: DocumentData | undefined;
-  // stickerOnClose: () => void;
-}) => {
+  chatId?: string;
+  userdata?: UserData;
+}
+
+interface UploadStickerProps {
+  setPage: (page: string) => void;
+  user?: User | null;
+  userdata?: UserData;
+}
+
+interface FileState {
+  file: File | null;
+  error?: string;
+}
+
+const Stickers = ({ open, toggle, chatId, userdata }: StickersInterface) => {
   const user = auth.currentUser;
-  const ref = useRef<any>();
-  const uploadRef = useRef<HTMLInputElement | null>(null);
-  const [stickerFile, setStickerFile] = useState<File | null>(null);
-  const [page, setPage] = useState("home");
-  const [stickersStore, setStickersStore] = useState<DocumentData | null>(null);
-  const [selectSticker, setSelectSticker] = useState<{
-    state: Boolean;
-    value: string | null;
-  }>();
 
-  const preview = stickerFile && URL.createObjectURL(stickerFile);
+  const [page, setPage] = useState("my-stickers");
+  const [store, setStore] = useState<Sticker[] | undefined>(undefined);
 
-  // console.log(userData)
-  const pickSticker = (e: ChangeEvent<HTMLInputElement>) => {
-    const img = e?.target.files?.[0];
-    if (img && img?.size < 500000) {
-      setStickerFile(img);
-    }
-  };
+  const stickers =
+    page === "my-stickers"
+      ? userdata?.stickers
+      : page === "recent"
+      ? userdata?.stickers
+      : undefined;
 
-  const myStickers = undefined;
-  const alreadyAdded = (ssid: string) => {
-    if (myStickers) return false;
-  };
-
-  const addSticker = async (id: string, tag: string, stickerURL: string) => {
-    if (!alreadyAdded(id)) {
-      // await odb.stickers.add({
-      //   id: id,
-      //   tag: tag,
-      //   date: new Date(),
-      //   stickerURL: stickerURL,
-      // });
-      updateDoc(doc(db, "Users", `${user?.uid}`), {
-        stickers: arrayUnion({
-          id: id,
-          tag: tag,
-          date: new Date(),
-          stickerURL: stickerURL,
-        }),
-      });
-    }
-  };
+  useEffect(() => {
+    if (page !== "store") return;
+    const listener = onSnapshot(
+      collection(db, "stickers") as CollectionReference<Omit<Sticker, "id">>,
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setStore(data);
+      }
+    );
+    return () => {
+      listener();
+    };
+  }, [page]);
 
   const sendSticker = (id: string, URL: string) => {
     addDoc(collection(db, "chatGroup", `${chatId}`, "messages"), {
@@ -87,359 +84,298 @@ const Stickers = ({
     // stickerOnClose();
   };
 
+  const alreadyAdded = (sid: string) =>
+    !!userdata?.stickers?.some((sticker) => sticker.id === sid);
+
+  const addToMyStickers = async (
+    id: string,
+    tag: string,
+    stickerURL: string
+  ) => {
+    updateDoc(doc(db, "Users", `${user?.uid}`), {
+      stickers: arrayUnion({
+        id: id,
+        tag: tag,
+        date: new Date(),
+        stickerURL: stickerURL,
+      }),
+    });
+  };
+
   return (
     <Root open={open} onOpenChange={toggle}>
-      <Portal>
-        <Overlay className='fixed bg-gray-800 opacity-60 z-40 inset-0 ' />
-        <div className='fixed inset-0 z-50 overflow-hidden'>
-          <div className='pointer-events-none fixed inset-x-2 md:right-auto w-full md:w-2/5 md:left-[50%] bottom-2 md:bottom-10 flex'>
-            <Content className='pointer-events-auto w-full bg-white rounded-xl p-3 shadow-xl'>
-              <div className='flex flex-col relative w-full rounded-xl bg-[#f2f2f7ff]'>
-                <div className='overflow-y-auto'>
-                  {page === "upload" ? (
-                    <UploadPage setPage={setPage} user={user} />
-                  ) : page == "store" ? (
-                    <StorePage setPage={setPage} user={user} />
-                  ) : (
-                    <div className='p-1'>
-                      <p className='text-base text-center text-blue-400'>
-                        My Stickers
-                      </p>
-                      <p className='mx-auto text-[12px] text-center text-[#3c3c434c]'>
-                        unless cache and browser data is cleared, stickers
-                        remain offline.
-                      </p>
-                      <div className='flex items-center space-x-1'>
-                        <button>
-                          <ClockIcon width={25} />
-                        </button>
-                        <button>
-                          <StarIcon width={25} />
-                        </button>
-                        <button onClick={() => setPage("store")}>Store</button>
-                      </div>
-
-                      <div>
-                        <div className='w-full flex justify-center'>
-                          <button
-                            className='px-2 py-0.5 text-base text-white rounded-xl drop-shadow-md bg-blue-300'
-                            onClick={() => setPage("upload")}>
-                            Upload
-                          </button>
+      <Content className='flex flex-col relative w-full bg-[#f2f2f7ff] h-64'>
+        <div className=''>
+          {page === "upload" ? (
+            <UploadPage setPage={setPage} user={user} userdata={userdata} />
+          ) : (
+            <div className='p-1'>
+              <p className='mx-auto text-[10px] md:text-[12px] text-center text-[#3c3c434c]'>
+                unless cache and browser data is cleared, stickers remain
+                offline.
+              </p>
+              <div className='flex items-center space-x-1'>
+                <button
+                  onClick={() => setPage("recent")}
+                  className={`${
+                    page === "recent" ? "text-blue-400" : "text-neutral-500"
+                  }`}>
+                  <ClockIcon width={25} />
+                </button>
+                <button
+                  onClick={() => setPage("my-stickers")}
+                  className={`${
+                    page === "my-stickers"
+                      ? "text-blue-400"
+                      : "text-neutral-500"
+                  }`}>
+                  <StarIcon width={25} />
+                </button>
+                <button
+                  onClick={() => setPage("store")}
+                  className={`${
+                    page === "store" ? "text-blue-400" : "text-neutral-500"
+                  }`}>
+                  <BuildingStorefrontIcon width={25} />
+                </button>
+              </div>
+              <div
+                className='grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 overflow-y-auto 
+              h-40 my-2'>
+                {page === "store" ? (
+                  <>
+                    {store?.map((sticker) => {
+                      const added = alreadyAdded(sticker.id);
+                      return (
+                        <div key={sticker.id} className='relative'>
+                          {added && (
+                            <div className='text-sm text-neutral-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+                              added
+                            </div>
+                          )}
+                          <Image
+                            alt='sticker'
+                            loader={() =>
+                              `${sticker.stickerURL}?w=${100}&q=${75}`
+                            }
+                            src={sticker.stickerURL}
+                            width={100}
+                            height={100}
+                            className={`rounded-md w-20 md:w-24 lg:w-28 bg-black  ${
+                              added
+                                ? "opacity-60"
+                                : "cursor-pointer hover:opacity-60"
+                            }`}
+                            onClick={() => {
+                              if (!added) {
+                                addToMyStickers(
+                                  sticker.id,
+                                  sticker.tag,
+                                  sticker.stickerURL
+                                );
+                              }
+                            }}
+                          />
                         </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {stickers?.map((sticker) => (
+                      <div key={sticker.id}>
+                        <Image
+                          key={sticker.id}
+                          alt='sticker'
+                          loader={() =>
+                            `${sticker.stickerURL}?w=${100}&q=${75}`
+                          }
+                          src={sticker.stickerURL}
+                          width={100}
+                          height={100}
+                          className='rounded-md w-20 md:w-24 lg:w-28 bg-black cursor-pointer hover:opacity-60'
+                          onClick={() =>
+                            sendSticker(sticker.id, sticker.stickerURL)
+                          }
+                        />
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </>
+                )}
+              </div>
+
+              <div>
+                <div className='w-full flex justify-center'>
+                  <button
+                    className='px-2 py-0.5 text-base text-white rounded-xl drop-shadow-md bg-blue-300'
+                    onClick={() => setPage("upload")}>
+                    Upload
+                  </button>
                 </div>
               </div>
-            </Content>
-          </div>
+            </div>
+          )}
         </div>
-      </Portal>
+      </Content>
     </Root>
   );
 };
 
-const UploadPage = ({
-  setPage,
-  user,
-}: {
-  setPage: (page: string) => void;
-  user?: User | null;
-}) => {
-  const [file, setFile] = useState<File | null>(null);
-  const preview = file ? URL.createObjectURL(file) : null;
+const UploadPage = ({ setPage, user, userdata }: UploadStickerProps) => {
+  const [state, setState] = useState<FileState>({
+    file: null,
+    error: undefined,
+  });
+  const [tag, setTag] = useState<string>();
 
-  const resizeImage = (file: File) => {
-    return new Promise<any>((resolve) => {
-      FileResizer.imageFileResizer(
-        file,
-        100,
-        100,
-        "WEBP",
-        100,
-        0,
-        (uri) => {
-          resolve(uri);
-        },
-        "file"
-      );
-    });
+  const preview = state.file ? URL.createObjectURL(state.file) : null;
+  const uploadRef = useRef<HTMLInputElement | null>(null);
+
+  const pickSticker = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e?.target?.files?.[0];
+    if (!file) return;
+    try {
+      await stickerVs.validate(file);
+      setState({ file });
+    } catch (err) {
+      setState({ error: "error", file: null });
+    }
   };
 
+  const selectList = [
+    { value: "funny", item: "Funny" },
+    { value: "happy", item: "Happy" },
+    { value: "sad", item: "Sad" },
+    { value: "comrade", item: "Comrade" },
+    { value: "random", item: "Random" },
+  ];
+
   const uploadSticker = async () => {
-    if (file && file) {
-      const stickerImg =
-        file.type === "image/webp" ? file : await resizeImage(file);
-      const fsid = addDoc(collection(db, "stickers"), {
+    const file = state.file;
+    if (!file) return;
+    const webpImage =
+      file.type === "image/webp" ? file : await resizeImage(file, 100, 100);
+    try {
+      const fsid = await addDoc(collection(db, "stickers"), {
         //  tag: selectSticker?.value,
         timeStamp: serverTimestamp(),
         //  star: userData?.admin ? true : false,
       });
-      uploadBytes(
+      const uploadResult = await uploadBytes(
         sref(storage, `stickers/${(await fsid).id}.webp`),
-        stickerImg,
-        { cacheControl: "public,max-age=365000000,immutable" }
-      )
-        .then((snap) =>
-          getDownloadURL(snap.ref).then(async (URL) => {
-            updateDoc(doc(db, "stickers", `${(await fsid).id}`), {
-              stickerURL: URL,
-            });
-            updateDoc(doc(db, "Users", `${user?.uid}`), {
-              stickers: arrayUnion({
-                id: (await fsid).id,
-                // tag: selectSticker?.value ? selectSticker?.value : "others",
-                date: new Date(),
-                stickerURL: URL,
-              }),
-            });
-            // await odb.stickers.add({
-            //   id: (await fsid).id,
-            //   tag: selectSticker?.value ? selectSticker?.value : "others",
-            //   date: new Date(),
-            //   stickerURL: URL,
-            // });
-          })
-        )
-        .catch(async () => deleteDoc(await fsid));
-      setFile(null);
+        webpImage,
+        {
+          cacheControl: "public,max-age=365000000,immutable",
+        }
+      );
+      const url = await getDownloadURL(uploadResult.ref);
+      await updateDoc(doc(db, "stickers", `${fsid.id}`), {
+        stickerURL: url,
+      });
+      await updateDoc(doc(db, "Users", `${user?.uid}`), {
+        stickers: arrayUnion({
+          id: fsid.id,
+          // tag: selectSticker?.value ? selectSticker?.value : "others",
+          date: new Date(),
+          stickerURL: url,
+        }),
+      });
+      setState({ file: null, error: undefined });
+    } catch (err) {
+      setState({ file: null, error: "upload failed" });
     }
   };
 
   return (
     <>
-      <div className='flex w-full justify-between text-blue-400'>
+      <div className='flex w-full justify-between text-blue-400 py-1 px-3'>
         <button
           aria-label='cancel'
           className=''
           onClick={() => {
-            setPage("home");
-            setFile(null);
+            setPage("recent");
+            setState({ file: null, error: undefined });
             preview && URL.revokeObjectURL(preview);
           }}>
           Cancel
         </button>
+        <p className='text-[12px] text-center text-neutral-400'>
+          stickers uploaded would be available to the public
+        </p>
         <button
           aria-label='cancel'
-          // disabled={selectSticker?.value && stickerFile ? false : true}
+          disabled={!state.file}
+          className='disabled:text-neutral-300'
           onClick={uploadSticker}>
           Upload
         </button>
       </div>
 
-      {/* <div className='flex justify-between items-center h-ull mx-auto'>
-        {!selectSticker?.state ? (
-          <button
-            onClick={() => setSelectSticker({ state: true, value: null })}>
-            {selectSticker?.value || "tag"}
-          </button>
-        ) : (
-          <div className='flex flex-col h-[200px] mx-auto overflow-y-auto'>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Comrade",
-                })
-              }>
-              Comrade
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Pawpaw",
-                })
-              }>
-              Pawpaw
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Akii",
-                })
-              }>
-              Akii
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Funny",
-                })
-              }>
-              Funny
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Happy",
-                })
-              }>
-              Happy
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() => setSelectSticker({ state: false, value: "Sad" })}>
-              Sad
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Random",
-                })
-              }>
-              Random
-            </Button>
-            <Button
-              p='2'
-              size='xs'
-              variant='ghost'
-              onClick={() =>
-                setSelectSticker({
-                  state: false,
-                  value: "Others",
-                })
-              }>
-              Others
-            </Button>
-          </div>
-        )}
-        {stickerFile && preview ? (
-          <Flex
-            borderRadius={15}
-            w='100px'
-            h='100px'
-            overflow='hidden'
-            border='1px solid #3c3c432d'
-            mx='auto'
-            align='center'
-            justify='center'>
+      <div className='overflow-y-auto p-2'>
+        <div className='flex justify-center'>
+          {!preview ? (
+            <div className='w-44 h-44 rounded-lg bg-neutral-400' />
+          ) : (
             <Image
-              alt='sticker'
-              referrerPolicy='no-referrer'
-              loader={() => `${preview}?w=${60}&q=${75}`}
+              alt='preview'
               src={preview}
-              className='w-full h-full'
               width={100}
               height={100}
+              className='w-44 h-44 rounded-lg bg-white'
             />
-          </Flex>
-        ) : (
-          <>
-            <Input
-              ref={uploadRef}
+          )}
+          <div className='ml-5 flex flex-col justify-center space-y-2'>
+            <RadixSelect.Root
+              // value={value}
+              // defaultValue={"tag"}
+              onValueChange={setTag}>
+              <RadixSelect.Trigger
+                className={`bg-neutral-400 text-white text-sm rounded-md outline-none py-0.5 px-2 flex justify-between items-center`}
+                aria-label='tag'>
+                <RadixSelect.Value
+                  placeholder='select tag'
+                  className='text-white text-sm'
+                />
+                <RadixSelect.Icon className='text-white ml-1 '>
+                  <ChevronDownIcon width={25} />
+                </RadixSelect.Icon>
+              </RadixSelect.Trigger>
+              {/* <RadixSelect.Portal> */}
+              <RadixSelect.Content
+                className={`shadow-lg bg-neutral-300 text-neutral-500 z-50 overflow-hidden rounded-lg`}>
+                <RadixSelect.Viewport className=''>
+                  {selectList.map((selectItem) => (
+                    <RadixSelect.Item
+                      key={selectItem.value}
+                      value={selectItem.value}
+                      className='py-1.5 px-5 hover:bg-blue-300 hover:text-white cursor-pointer text-base outline-none'>
+                      <RadixSelect.ItemText>
+                        {selectItem.item}
+                      </RadixSelect.ItemText>
+                      <RadixSelect.ItemIndicator />
+                    </RadixSelect.Item>
+                  ))}
+                </RadixSelect.Viewport>
+              </RadixSelect.Content>
+              {/* </RadixSelect.Portal> */}
+            </RadixSelect.Root>
+            <input
               hidden
-              multiple={false}
               type='file'
               accept='image/*'
               onChange={pickSticker}
+              ref={uploadRef}
             />
-            <Button
-              size='xs'
-              mx='auto'
-              variant='link'
-              onClick={() => uploadRef.current?.click()}>
-              Select Sticker
-            </Button>
-          </>
-        )}
-      </div> */}
-      <div className=''>
-        <p className='text-[12px] text-[#3c3c4399]'>
-          stickers uploaded would be available to the public
-        </p>
-      </div>
-    </>
-  );
-};
-
-const StorePage = ({
-  setPage,
-  user,
-}: {
-  setPage: (page: string) => void;
-  user?: User | null;
-}) => {
-  const store: any[] = [];
-  return (
-    <>
-      <div className='flex justify-between'>
-        <button
-          aria-label='cancel'
-          className=''
-          onClick={() => {
-            setPage("home");
-          }}>
-          Cancel
-        </button>
-        <button
-          aria-label='cancel'
-          // disabled={selectSticker?.value && stickerFile ? false : true}
-          onClick={() => {}}>
-          Upload
-        </button>
-      </div>
-
-      <div className='grid gap-4'>
-        {store &&
-          store?.map((sticker: any) => (
-            <div key={sticker.id} className=''>
-              {sticker.data().stickerURL && (
-                <Image
-                  alt='sticker'
-                  referrerPolicy='no-referrer'
-                  loader={() => `${sticker.data().stickerURL}?w=${60}&q=${75}`}
-                  src={sticker.data().stickerURL}
-                  className='w-full h-full'
-                  width={100}
-                  height={100}
-                />
-              )}
-
-              <div className='flex absolute w-full h-full bg-[#00000090]'>
-                {/* {alreadyAdded(sticker.id) ? (
-                  <Text opacity={0.8} fontSize={15} color='white' mx='auto'>
-                    Added
-                  </Text>
-                ) : (
-                  <Text opacity={0.2} fontSize={15} color='white' mx='auto'>
-                    Add sticker
-                  </Text>
-                )} */}
-              </div>
-
-              {sticker.data()?.star && (
-                <div className='absolute right-1 top-1'>
-                  <StarIcon width={15} color='#ffcc00b2' />
-                </div>
-              )}
-            </div>
-          ))}
+            <button
+              className='text-white rounded-lg text-base
+             px-2 py-0.5 bg-blue-400 drop-shadow-md'
+              onClick={() => {
+                uploadRef.current?.click();
+              }}>
+              pick image
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -23,14 +23,20 @@ export const dateTimeLocale = (date: Date) => {
   });
 };
 
-export const resizeImage = (file: File) => {
+export const resizeImage = (
+  file: File,
+  maxW: number = 150,
+  maxH: number = 150,
+  format: "WEBP" | "JPEG" = "WEBP",
+  quality: number = 100
+) => {
   return new Promise<any>((resolve) => {
     FileResizer.imageFileResizer(
       file,
-      150,
-      150,
-      "WEBP",
-      100,
+      maxW,
+      maxH,
+      format,
+      quality,
       0,
       (uri) => {
         resolve(uri);

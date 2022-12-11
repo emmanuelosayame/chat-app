@@ -18,11 +18,18 @@ export interface UserData {
   id: string;
   name?: string;
   about?: string;
-  stickers?: [];
+  stickers?: Sticker[];
   userName?: string;
   verified?: boolean;
   admin?: string;
   photoURL?: string;
+}
+
+export interface Sticker {
+  id: string;
+  tag: string;
+  stickerURL: string;
+  date: Timestamp;
 }
 
 export interface ApiSlice {
@@ -30,4 +37,6 @@ export interface ApiSlice {
   setChats: (chat: ChatData[]) => void;
   userdata?: UserData;
   setUserData: (userdata: UserData) => void;
+  // stickers: Sticker[];
+  // setStickers: (stickers: Sticker) => void;
 }

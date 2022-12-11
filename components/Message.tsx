@@ -228,11 +228,11 @@ const Sticker = ({ content, time, senderStyle }: MessageComponent) => {
         alt='stickerImg'
         loader={() => `${content.stickerURL}?w=${100}&q=${75}`}
         src={content.stickerURL}
-        className='w-full h-full rounded-xl bg-black'
+        className='w-28 h-28 rounded-xl bg-black'
         width={100}
         height={100}
       />
-      <div className={" flex items-end justify-end px-2 mt-1"}>
+      <div className={"flex items-end justify-end px-2 mt-1"}>
         <TimeComponent time={time} timeSent={content.timeSent} />
       </div>
     </div>

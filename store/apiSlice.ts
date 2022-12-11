@@ -17,6 +17,8 @@ const apiSlice: StateCreator<
     set((state) => {
       state.userdata = userdata;
     }),
+  stickers: [],
+  setStickers: (payload) => {},
 });
 
 export default apiSlice;

@@ -10,11 +10,11 @@
     "cypress": "cypress open"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.2",
     "@heroicons/react": "^2.0.13",
     "@next/font": "^13.0.5",
     "@radix-ui/react-avatar": "^1.0.1",
     "@radix-ui/react-dialog": "^1.0.2",
+    "@radix-ui/react-select": "^1.1.2",
     "@radix-ui/react-switch": "^1.0.1",
     "@radix-ui/react-toast": "^1.1.2",
     "@types/lodash": "^4.14.182",

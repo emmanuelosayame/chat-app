@@ -32,3 +32,13 @@ export const pickerVs = object().shape({
     return true;
   }),
 });
+
+export const stickerVs = mixed<File>().test(
+  "size",
+  "sticker too large",
+  (file) => {
+    if (!file) return true;
+    if (file.size > 10000000) return false;
+    return true;
+  }
+);
