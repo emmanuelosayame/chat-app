@@ -2,10 +2,7 @@ import { object, string, mixed } from "yup";
 
 export const profileVS = object().shape({
   name: string().min(2, "too short").max(30, "too long"),
-  userName: string()
-    .min(2, "too short")
-    .max(20, "too long")
-    .required("enter a username"),
+  userName: string().min(2, "too short").max(20, "too long"),
   about: string().max(100, "slow down"),
   photo: mixed<File>()
     .nullable()
@@ -20,7 +17,7 @@ export const pickerVs = object().shape({
   medias: mixed<File[]>().test("size", "media too large", (values) => {
     if (!values) return true;
     for (const file of values) {
-      if (file.size > 10000000000000) return false;
+      if (file.size > 1000000000) return false;
     }
     return true;
   }),

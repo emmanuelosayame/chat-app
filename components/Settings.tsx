@@ -8,7 +8,6 @@ import {
   UserIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { auth } from "../lib/firebase";
@@ -29,9 +28,11 @@ const Settings = () => {
     profile: <Profile userdata={userdata} toggleSM={toggleSM} />,
   };
 
+  const noUserName = userdata && !userdata.userName;
+
   return (
     <>
-      <Dialog.Root open={isOpen} onOpenChange={toggleSM}>
+      <Dialog.Root open={noUserName ? true : isOpen} onOpenChange={toggleSM}>
         <Dialog.Portal>
           <Dialog.Overlay className=' bg-gray-800 opacity-60 z-40 inset-0 fixed' />
           <div className='fixed inset-0 z-50 overflow-hidden'>
@@ -40,7 +41,7 @@ const Settings = () => {
                 <Dialog.Content className='pointer-events-auto relative w-screen'>
                   <div className='flex h-full flex-col bg-white rounded-t-xl w-full p-4 shadow-xl'>
                     {/* page */}
-                    {renderPage[page]}
+                    {renderPage[noUserName ? "profile" : page]}
                   </div>
                 </Dialog.Content>
               </div>
@@ -71,7 +72,7 @@ const Home = ({
           )}
         </>
         <div className='ml-3'>
-          <h3 className='inline-flex items-center text-xl'>
+          <h3 className='inline-flex items-center text-[17px] md:text-xl'>
             {userdata?.name}
             {userdata?.verified && (
               <span className='ml-1'>
@@ -79,7 +80,9 @@ const Home = ({
               </span>
             )}
           </h3>
-          <p className='text-base'>{userdata?.userName}</p>
+          <p className='text-[15px] md:text-base text-neutral-400'>
+            {userdata?.userName}
+          </p>
         </div>
         <div className='flex-1 flex justify-end'>
           <button
@@ -189,7 +192,7 @@ const Account = ({
           </h3>
         </div>
         <button
-          className='text-white bg-blue-400 py-1 px-2 rounded-lg'
+          className='text-white md:w-fit md:mx-auto bg-blue-400 py-1 px-2 rounded-lg'
           onClick={logout}>
           Logout
         </button>

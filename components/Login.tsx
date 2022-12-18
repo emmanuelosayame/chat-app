@@ -3,6 +3,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
+  User,
 } from "firebase/auth";
 import { auth, db, rdb } from "../lib/firebase";
 import { useEffect } from "react";
@@ -12,113 +13,93 @@ import { ref, set } from "firebase/database";
 import Image from "next/image";
 import logo from "../public/logo-sign-in.png";
 import { GoogleLogoIcon } from "./Svgs";
+import { useStore } from "store";
 
-const Login: NextPage = () => {
-  const router = useRouter();
+const Login = () => {
+  const nameRef = (user: User) =>
+    ref(
+      rdb,
+      `Users/${
+        user?.displayName
+          ? user?.displayName?.toLowerCase() + user?.uid
+          : "user"
+      }`
+    );
 
-  const provider = new GoogleAuthProvider();
-
-  const signIn = (e: React.MouseEvent<HTMLElement>) => {
+  const signInGoogle = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        const nameRef = ref(
-          rdb,
-          `Users/${
-            user?.displayName
-              ? user?.displayName?.toLowerCase() + user?.uid
-              : "user"
-          }`
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userdata = (await getDoc(doc(db, "Users", `${user.uid}`))).data();
+      if (!userdata?.name) {
+        await setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+            name: `${user?.displayName}`,
+          },
+          { merge: true }
         );
-        getDoc(doc(db, "Users", `${user.uid}`)).then((snapshot) => {
-          const userData = snapshot.data();
-          if (!userData?.name) {
-            setDoc(
-              doc(db, "Users", `${user?.uid}`),
-              {
-                name: `${user?.displayName}`,
-              },
-              { merge: true }
-            );
 
-            set(nameRef, {
-              uid: user?.uid,
-              name: user?.displayName,
-              photoURL: `${user?.photoURL && user?.photoURL}`,
-            });
-          }
-
-          if (!userData?.photoURL) {
-            setDoc(
-              doc(db, "Users", `${user?.uid}`),
-              {
-                photoURL: `${user?.photoURL && user?.photoURL}`,
-              },
-              { merge: true }
-            );
-          }
+        await set(nameRef(user), {
+          uid: user?.uid,
+          name: user?.displayName,
+          photoURL: `${user?.photoURL && user?.photoURL}`,
         });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData?.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
+      }
+      if (!userdata?.photoURL) {
+        setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+            photoURL: user?.photoURL && user?.photoURL,
+          },
+          { merge: true }
+        );
+      }
+    } catch (err: any) {
+      const errorCode = err.code;
+      const errorMessage = err.message;
+      const email = err.customData?.email;
+      const credential = GoogleAuthProvider.credentialFromError(err);
+    }
   };
 
-  const signInAnm = () => {
-    signInAnonymously(auth)
-      .then((result) => {
-        const user = result.user;
-        const nameRef = ref(
-          rdb,
-          `Users/${
-            user?.displayName
-              ? user?.displayName?.toLowerCase() + user?.uid
-              : "user"
-          }`
+  const signInUserName = async () => {
+    // const persistedUser = useStore((state) => state.user);
+    const result = await signInAnonymously(auth);
+    try {
+      const user = result.user;
+      const userdata = (await getDoc(doc(db, "Users", `${user.uid}`))).data();
+      if (!userdata?.name) {
+        await setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+            name: `${user?.displayName || "Someone Special"}`,
+            about: "Hi 😃, there.",
+          },
+          { merge: true }
         );
-        getDoc(doc(db, "Users", `${user.uid}`)).then((snapshot) => {
-          const userData = snapshot.data();
-          if (!userData?.name) {
-            setDoc(
-              doc(db, "Users", `${user?.uid}`),
-              {
-                name: `${user?.displayName || "Someone Special"}`,
-                about:
-                  "Hi 😃, welcome to my project. Really nice having you here. Hope you have fun chatting 😜 . This is still termed as a work in progress. Hit me up @biglevvi on any platform ",
-              },
-              { merge: true }
-            );
 
-            set(nameRef, {
-              uid: user?.uid,
-              name: user?.displayName || "Someone Special",
-              photoURL: `${user?.photoURL && user?.photoURL}`,
-            });
-          }
-
-          if (!userData?.photoURL) {
-            setDoc(
-              doc(db, "Users", `${user?.uid}`),
-              {
-                photoURL: `${user?.photoURL && user?.photoURL}`,
-              },
-              { merge: true }
-            );
-          }
+        set(nameRef(user), {
+          uid: user?.uid,
+          name: user?.displayName || "Someone Special",
+          photoURL: `${user?.photoURL && user?.photoURL}`,
         });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ...
-      });
+      }
+      if (!userdata?.photoURL) {
+        setDoc(
+          doc(db, "Users", `${user?.uid}`),
+          {
+            photoURL: `${user?.photoURL && user?.photoURL}`,
+          },
+          { merge: true }
+        );
+      }
+    } catch (err: any) {
+      const errorCode = err.code;
+      const errorMessage = err.message;
+    }
   };
 
   return (
@@ -126,19 +107,19 @@ const Login: NextPage = () => {
       <div className='flex items-center fixed inset-0 h-full justify-center bg-[#f2f2f7ff]'>
         <div className='flex flex-col space-y-3'>
           <button
-            className='px-5 py-3 text-2xl inline-flex items-center text-white rounded-3xl bg-blue-300
-            hover:bg-blue-200 drop-shadow-md
+            className='px-5 py-3 w-fit mx-auto text-2xl inline-flex items-center text-white rounded-full ring-2 ring-neutral-200 bg-blue-400
+            hover:bg-blue-300 drop-shadow-md
              active:blue-300'
-            onClick={signIn}>
-            <GoogleLogoIcon className='w-12 h-12' />
-            <p className='mx-2'>Login</p>
+            onClick={signInGoogle}>
+            <GoogleLogoIcon className='w-12 h-12 mx-auto' />
+            {/* <p className='mx-2'>Google</p> */}
           </button>
 
           <button
-            className='py-3 px-8 bg-gray-500 hover:bg-gray-600 drop-shadow-md rounded-2xl text-white text-xl'
-            onClick={signInAnm}>
+            className='py-2 px-3 ring-2 ring-neutral-200 bg-gray-500 hover:bg-gray-600 drop-shadow-md rounded-2xl text-white text-xl'
+            onClick={signInUserName}>
             {/* <GoogleLogoIcon boxSize={10} /> */}
-            <p className='mx-2'>Guest</p>
+            <p className='mx-2'>magic link</p>
           </button>
         </div>
       </div>

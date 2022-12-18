@@ -15,8 +15,8 @@ export type ProfileState = {
   name: string;
   userName: string;
   about: string;
-  photo: File | null;
-  photoURL?: string;
+  photo: { file: File | null; url?: string };
+  // photoURL?: string;
 };
 
 export type ProfileActions =

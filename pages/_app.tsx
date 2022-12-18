@@ -42,6 +42,14 @@ function MyApp({ Component, pageProps, router }: AppProps) {
         />
       </Head>
 
+      <style jsx global>
+        {`
+          html {
+            font-family: ${poppins.style.fontFamily};
+          }
+        `}
+      </style>
+
       <main className={` ${poppins.variable} font-poppins`}>
         {!user ? (
           <Login />

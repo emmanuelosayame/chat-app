@@ -40,3 +40,8 @@ export interface ApiSlice {
   // stickers: Sticker[];
   // setStickers: (stickers: Sticker) => void;
 }
+
+export interface UserSlice {
+  user: { uid: string } | null;
+  persistUser: (uid: string) => void;
+}
