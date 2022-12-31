@@ -32,7 +32,7 @@ const Settings = () => {
 
   return (
     <>
-      <Dialog.Root open={noUserName ? true : isOpen} onOpenChange={toggleSM}>
+      <Dialog.Root open={isOpen} onOpenChange={toggleSM}>
         <Dialog.Portal>
           <Dialog.Overlay className=' bg-gray-800 opacity-60 z-40 inset-0 fixed' />
           <div className='fixed inset-0 z-50 overflow-hidden'>
@@ -41,7 +41,7 @@ const Settings = () => {
                 <Dialog.Content className='pointer-events-auto relative w-screen'>
                   <div className='flex h-full flex-col bg-white rounded-t-xl w-full p-4 shadow-xl'>
                     {/* page */}
-                    {renderPage[noUserName ? "profile" : page]}
+                    {renderPage[page]}
                   </div>
                 </Dialog.Content>
               </div>

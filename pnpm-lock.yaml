@@ -49,6 +49,7 @@ specifiers:
   tailwindcss: ^3.2.4
   timeago-react: ^3.0.5
   typescript: 4.7.4
+  unique-names-generator: ^4.7.1
   yup: ^0.32.11
   zustand: ^4.1.4
 
@@ -90,6 +91,7 @@ dependencies:
   react-webcam: 7.0.1_biqbaboplfbrettd7655fr4n2y
   spinners-react: 1.0.7_v7vsrdtui4d36prbwvdnlb7tpq
   timeago-react: 3.0.5_react@18.2.0
+  unique-names-generator: 4.7.1
   yup: 0.32.11
   zustand: 4.1.4_immer@9.0.16+react@18.2.0
 
@@ -5823,6 +5825,11 @@ packages:
   /unicode-property-aliases-ecmascript/2.0.0:
     resolution: {integrity: sha512-5Zfuy9q/DFr4tfO7ZPeVXb1aPoeQSdeFMLpYuFebehDAhbuevLs5yxSZmIFN1tP5F9Wl4IpJrYojg85/zgyZHQ==}
     engines: {node: '>=4'}
+    dev: false
+
+  /unique-names-generator/4.7.1:
+    resolution: {integrity: sha512-lMx9dX+KRmG8sq6gulYYpKWZc9RlGsgBR6aoO8Qsm3qvkSJ+3rAymr+TnV8EDMrIrwuFJ4kruzMWM/OpYzPoow==}
+    engines: {node: '>=8'}
     dev: false
 
   /unique-string/2.0.0:

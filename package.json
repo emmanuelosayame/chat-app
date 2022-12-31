@@ -47,6 +47,7 @@
     "react-webcam": "^7.0.1",
     "spinners-react": "^1.0.7",
     "timeago-react": "^3.0.5",
+    "unique-names-generator": "^4.7.1",
     "yup": "^0.32.11",
     "zustand": "^4.1.4"
   },
